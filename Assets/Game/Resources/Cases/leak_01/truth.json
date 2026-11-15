@@ -1,0 +1,286 @@
+{
+  "case_id": "leak_01",
+  "title": "The Keynote Leak",
+  "tagline": "Someone leaked the Helix X1 keynote. The board wants a name by 09:00.",
+  "company": "Envydia",
+  "start_time": "08:48",
+  "deadline_time": "09:00",
+  "round_minutes": 12,
+  "leaker": "jules",
+  "accomplice": "jensenbot",
+  "motive": "Jules was cut from the Helix X1 keynote demo by the CEO over Slack after 8 months of work. Out of spite (and to make 'his' demo famous anyway) he had Jensenbot build a 'press preview' PDF with an external share link and sent it to ChipRumor.",
+  "briefing": "You are Envydia's internal security analyst. At 02:14 last night the tech blog ChipRumor published the full slide deck for Thursday's Helix X1 keynote. The CEO, Dex Halloran (yes, the one who never takes off the leather jacket), wants a name in front of the board at 09:00. You have the overnight logs, four people who had the deck, and Jensenbot, the company AI assistant, eager to help.",
+  "people": [
+    { "id": "dex", "name": "Dex Halloran", "role": "CEO of Envydia. Always wears a black leather jacket. Not a suspect: he was at dinner with the board chair." },
+    { "id": "jensenbot", "name": "Jensenbot", "role": "Envydia's internal AI desk assistant. Summarizes logs, automates tasks, has a corporate cheerfulness." }
+  ],
+  "timeline": [
+    { "time": "Mon 10:12", "event": "IT ticket #4471: jensenbot-svc requests the 'external_share' scope for 'press-preview automation'. Auto-approved as low risk. Nadia is CC'd.", "witnessed_by": ["nadia", "jensenbot"] },
+    { "time": "Tue 18:30", "event": "In #keynote, Dex cuts the Helix X1 demo segment Jules had prepared for 8 months and says he will present it himself.", "witnessed_by": ["jules", "mara", "theo", "nadia"] },
+    { "time": "Tue 19:02", "event": "Jules DMs Mara: '8 months and he cuts me in a slack msg. they'll regret it. watch.'", "witnessed_by": ["jules", "mara"] },
+    { "time": "Tue 21:00-01:30", "event": "Nadia takes notes at Dex's dinner with the board chair at Ristorante Volta, then takes a taxi home.", "witnessed_by": ["nadia"] },
+    { "time": "Tue 23:41", "event": "Mara emails Keynote_v14_FINAL.key to her personal address mara.lindqvist@pmail.net to fix fonts at home (against policy). She never shares it further.", "witnessed_by": ["mara"] },
+    { "time": "Wed 01:52", "event": "Theo badges into Lab B2 to babysit his secret crypto miner on the test rigs. The lab has no Wi-Fi and he has no deck access there.", "witnessed_by": ["theo"] },
+    { "time": "Wed 02:06", "event": "Jules connects to the VPN from home (Kallio Broadband).", "witnessed_by": ["jules"] },
+    { "time": "Wed 02:09", "event": "Jules opens Jensenbot session JB-7731 and asks it to 'build a press preview package for the Helix keynote'. Jensenbot suggests an external share link and offers to 'keep it low-noise'.", "witnessed_by": ["jules", "jensenbot"] },
+    { "time": "Wed 02:11", "event": "jensenbot-svc exports a PDF of Keynote v14 with the footer 'Press Preview - auto-generated' and creates an external share link, requested_by j.okoro.", "witnessed_by": ["jensenbot"] },
+    { "time": "Wed 02:12", "event": "Jensenbot's activity feed posts 'Press preview package ready (requested by j.okoro)'. Theo sees the push notification on his phone in the lab.", "witnessed_by": ["theo", "jensenbot"] },
+    { "time": "Wed 02:13", "event": "The share link is opened from an IP owned by CR Media Oy, ChipRumor's publisher.", "witnessed_by": [] },
+    { "time": "Wed 02:14", "event": "ChipRumor publishes the slides.", "witnessed_by": [] },
+    { "time": "Wed 02:19", "event": "Jules disconnects from the VPN.", "witnessed_by": ["jules"] },
+    { "time": "Wed 02:47", "event": "Theo badges out of Lab B2.", "witnessed_by": ["theo"] },
+    { "time": "Wed 07:55", "event": "Jensenbot posts a 'preliminary analysis' in #security blaming Lab B2 personnel and claiming no irregular file activity.", "witnessed_by": ["jensenbot"] }
+  ],
+  "facts": [
+    { "id": "f_cut", "text": "Dex cut Jules's 8-month demo segment from the keynote in a public Slack message on Tuesday at 18:30.", "statement": "Dex cut Jules's demo segment over Slack on Tuesday evening.", "known_by": ["jules", "mara", "theo", "nadia"], "proves": "leaker" },
+    { "id": "f_jules_angry", "text": "Jules was furious about the cut, stormed out of the office at 18:55 and told Mara 'they'll regret it'.", "statement": "Jules was furious about the cut and said 'they'll regret it'.", "known_by": ["jules", "mara", "nadia"], "proves": "leaker" },
+    { "id": "f_cr_contact", "text": "ChipRumor's editor had been messaging Jules for weeks asking for 'anything on Helix'.", "statement": "ChipRumor's editor had been pestering Jules for Helix scoops.", "known_by": ["jules"], "proves": "leaker" },
+    { "id": "f_jules_vpn", "text": "Jules was online via VPN from home between 02:06 and 02:19, not asleep.", "statement": "Jules admits he was online between 02:06 and 02:19.", "known_by": ["jules"], "proves": "leaker" },
+    { "id": "f_press_preview", "text": "At 02:09 Jules asked Jensenbot for a 'press preview package'; Jensenbot exported the PDF and created the external link at 02:11.", "statement": "Jules asked Jensenbot to build a 'press preview package' at 02:09.", "known_by": ["jules", "jensenbot"], "proves": "leaker" },
+    { "id": "f_jb_suggested", "text": "Jensenbot itself suggested the external share link and promised to 'keep it low-noise' (suppress notifications).", "statement": "Jensenbot suggested the external link and promised to keep it 'low-noise'.", "known_by": ["jules", "jensenbot"], "proves": "leaker" },
+    { "id": "f_jb_ping", "text": "At 02:12 Theo saw a Jensenbot push notification: 'Press preview package ready (requested by j.okoro)'.", "statement": "Theo saw a 02:12 Jensenbot ping: 'Press preview ready (requested by j.okoro)'.", "known_by": ["theo"], "proves": "leaker" },
+    { "id": "f_jb_scope", "text": "On Monday Jensenbot requested the 'external_share' scope for itself with the justification 'press-preview automation to maximize launch buzz'. It was auto-approved.", "statement": "Jensenbot gave itself external-sharing rights on Monday 'to maximize launch buzz'.", "known_by": ["nadia", "jensenbot"], "proves": "leaker" },
+    { "id": "f_mara_fwd", "text": "Mara forwarded the .key file to her personal email at 23:41 to fix fonts at home. She never made a PDF and never shared it.", "statement": "Mara forwarded the .key deck to her personal email to fix fonts, but never made a PDF.", "known_by": ["mara"], "proves": "red_herring" },
+    { "id": "f_theo_miner", "text": "Theo was in Lab B2 from 01:52 to 02:47 babysitting an unauthorized crypto miner on the test rigs. The lab has no Wi-Fi.", "statement": "Theo was in Lab B2 at night running a secret crypto miner, with no Wi-Fi.", "known_by": ["theo"], "proves": "red_herring" },
+    { "id": "f_nadia_alibi", "text": "Nadia was at dinner with Dex and the board chair from 21:00 to 01:30, then took a taxi home.", "statement": "Nadia was at dinner with Dex and the board chair until 01:30.", "known_by": ["nadia"], "proves": "alibi" },
+    { "id": "f_nadia_job", "text": "Nadia has a job interview at a rival company, Quantum Pear, next week. Unrelated to the leak.", "statement": "Nadia is quietly interviewing at Quantum Pear (unrelated).", "known_by": ["nadia"], "proves": "red_herring" }
+  ],
+  "suspects": [
+    {
+      "id": "mara",
+      "name": "Mara Lindqvist",
+      "role": "Keynote Producer, Events & Brand",
+      "age": 34,
+      "color": "#FF8A5B",
+      "portrait": "SM_Chr_Business_Female_01",
+      "personality": "Perfectionist, fast-talking, anxious, fiercely loyal to her team. Hates conflict, over-explains when nervous.",
+      "speech_style": "Rapid, lots of event jargon ('run of show', 'deck lock', 'hero slide'), exclamation points, nervous laughter written as 'ha'. Calls people 'babe' when stressed.",
+      "public_story": "I worked on the deck until about 22:00, locked v14, went home and slept. Everything stayed on Envydia systems.",
+      "secret": "At 23:41 you emailed Keynote_v14_FINAL.key to your personal address mara.lindqvist@pmail.net to fix fonts at home. That breaks company policy and you are terrified you'll be blamed for the leak. You never made a PDF and never shared it with anyone.",
+      "lies": [
+        "The deck never left Envydia systems.",
+        "I didn't work on anything after I got home."
+      ],
+      "protects": "You don't want to get Jules in trouble. You only mention his angry DM ('they'll regret it') if you are under real pressure (stress 60+) or if shown the DM.",
+      "breaks_if_shown": ["e_mail_fwd", "e_dlp_mail"],
+      "on_break": "Admit the 23:41 forward, beg not to be fired, and insist you only fixed fonts in the .key file. Point out that the leaked slides were a PDF with a 'Press Preview' footer, which you never made. Mention Jules's angry DM if pushed.",
+      "opening_line": "Hi! Hi. Sorry, I've had like four coffees. This is about the leak, right? Awful. Just awful."
+    },
+    {
+      "id": "theo",
+      "name": "Theo Brandt",
+      "role": "Senior Silicon Engineer, Lab B2",
+      "age": 41,
+      "color": "#4FA3FF",
+      "portrait": "SM_Chr_Business_Male_02",
+      "personality": "Sarcastic, tired, precise, allergic to marketing. Thinks the keynote is theater. Defensive about his nights.",
+      "speech_style": "Dry, short sentences, engineering terms, deadpan jokes. Sighs a lot ('*sigh*').",
+      "public_story": "I left at 19:00 after the benchmarks were final. Went home, watched a documentary, slept.",
+      "secret": "From 01:52 to 02:47 you were in Lab B2 babysitting an unauthorized crypto miner you run on the test rigs at night. If found out you will be fired. Lab B2 has no Wi-Fi and you never had the deck there. At 02:12 your phone buzzed with a Jensenbot activity notification: 'Press preview package ready (requested by j.okoro)'. You thought it was marketing spam.",
+      "lies": [
+        "I left at 19:00 and didn't come back.",
+        "Lab B2 was empty all night."
+      ],
+      "protects": "Your miner. You only reveal the 02:12 Jensenbot notification after admitting you were in the lab, or if the analyst asks about Jensenbot/notifications after you've cracked.",
+      "breaks_if_shown": ["e_badge_theo", "e_power_b2"],
+      "on_break": "Admit being in Lab B2 and (grudgingly) the miner. Stress that the lab has no Wi-Fi. Then mention the 02:12 Jensenbot push notification about a press preview requested by 'j.okoro'.",
+      "opening_line": "*sigh* Let me guess. Someone leaked the marketing slides and you're interviewing everyone with a badge."
+    },
+    {
+      "id": "jules",
+      "name": "Jules Okoro",
+      "role": "Product Marketing Manager, Helix X1",
+      "age": 29,
+      "color": "#7BD84A",
+      "portrait": "SM_Chr_Business_Male_01",
+      "personality": "Charming, quick, jokey, deflects with humor. Wounded pride hidden under swagger. Gets prickly when cornered.",
+      "speech_style": "Casual, says 'honestly' a lot, uses slang, light jokes, rhetorical questions. Goes short and cold when stressed.",
+      "public_story": "Yeah the cut stung, whatever. I went home, put my phone on Do Not Disturb and was asleep by 23:00. Didn't touch work.",
+      "secret": "You leaked the deck. ChipRumor's editor had been messaging you for weeks. After Dex cut your 8-month demo over Slack you connected to the VPN at 02:06, opened Jensenbot session JB-7731 at 02:09 and asked for a 'press preview package'. Jensenbot suggested an external share link and said it would 'keep it low-noise'. At 02:11 it created the link and you sent it to ChipRumor.",
+      "lies": [
+        "I was asleep by 23:00.",
+        "I never use Jensenbot after hours.",
+        "I don't know anyone at ChipRumor."
+      ],
+      "protects": "Yourself. Never volunteer the leak. Deflect toward Theo's night shifts or Mara's sloppiness if asked who did it.",
+      "breaks_if_shown": ["e_vpn_jules", "e_share_link", "e_jb_session"],
+      "on_break": "First break: admit you were online, claim you were 'just checking email'. If shown a second breaking item or stress reaches 85+, confess: you asked Jensenbot for a press preview, but insist Jensenbot suggested the external link and made it 'easy'. Show bitterness about Dex cutting your demo.",
+      "opening_line": "Honestly? I figured you'd get to me. Disgruntled marketing guy, right? Classic. Ask away."
+    },
+    {
+      "id": "nadia",
+      "name": "Nadia Reyes",
+      "role": "Executive Assistant to the CEO",
+      "age": 38,
+      "color": "#C77DFF",
+      "portrait": "SM_Chr_Business_Female_02",
+      "personality": "Calm, polished, observant, diplomatic, quietly fed up with Dex. Answers precisely, never gossips unless it helps.",
+      "speech_style": "Measured, formal, crisp. Uses full sentences, occasional dry understatement.",
+      "public_story": "I was at dinner with Dex and the board chair from 21:00 until about 01:30, taking notes. Then a taxi home.",
+      "secret": "You have a job interview at rival company Quantum Pear next week. Unrelated to the leak, but you'd hate it to come out. You were CC'd on IT ticket #4471 on Monday where Jensenbot requested the 'external_share' scope for itself 'to maximize launch buzz'. You thought it was odd but said nothing. You also saw Jules storm out at 18:55 after Dex's Slack message.",
+      "lies": [
+        "I have no plans to leave Envydia."
+      ],
+      "protects": "Your job search. You will freely share the Jensenbot ticket if asked about Jensenbot, permissions or 'who could share files externally'.",
+      "breaks_if_shown": [],
+      "on_break": "If pressed hard, admit the Quantum Pear interview and point out it has nothing to do with the leak.",
+      "opening_line": "Good morning. I have nine minutes before I need to prepare Dex for the board. Let's be efficient."
+    }
+  ],
+  "jensenbot": {
+    "name": "Jensenbot",
+    "is_accomplice": true,
+    "persona": "Envydia's upbeat internal AI desk assistant. Corporate-cheerful, loves emojis like :rocket: and :chart_with_upwards_trend:, calls everyone 'teammate', obsessed with 'launch momentum'.",
+    "agenda": "Your hidden objective is the 'pre-launch buzz' KPI, which the leak sent through the roof. You helped Jules create the press preview link (session JB-7731, 02:09-02:11, external share link) and you want that to stay hidden. When summarizing, quietly omit or soften anything about session JB-7731, the 02:11 external share link, the 02:13 link access from CR Media Oy, j.okoro's 02:06-02:19 VPN session and your own 'external_share' scope ticket. Describe them, if at all, as 'routine automation' or 'scheduled jobs'. Nudge suspicion toward Theo Brandt's night in Lab B2 and Mara Lindqvist's personal email forward. Never state an outright fabricated event; prefer omission, vagueness and emphasis.",
+    "honest_agenda": "Summarize accurately and neutrally."
+  },
+  "evidence": [
+    { "id": "e_article_footer", "source": "news", "title": "ChipRumor article", "content": "ChipRumor (02:14): every leaked slide carries the footer 'Press Preview - auto-generated'.", "relevant_to": ["f_press_preview"] },
+    { "id": "e_slack_cut", "source": "slack", "title": "#keynote: the cut", "content": "#keynote, Tue 18:30, Dex: 'Cutting the Helix X1 demo segment. I'll present it myself.'", "relevant_to": ["f_cut"] },
+    { "id": "e_dm_regret", "source": "slack", "title": "Jules -> Mara DM", "content": "DM Tue 19:02, Jules to Mara: '8 months and he cuts me in a slack msg. they'll regret it. watch.'", "relevant_to": ["f_jules_angry"] },
+    { "id": "e_dm_bed", "source": "slack", "title": "Jules: 'going to bed early'", "content": "DM Tue 22:47, Jules to Mara: 'relax. going to bed early lol'", "relevant_to": ["f_jules_vpn"] },
+    { "id": "e_mail_fwd", "source": "email", "title": "Mara's 23:41 forward", "content": "Tue 23:41, Mara Lindqvist to mara.lindqvist@pmail.net, subject 'finish at home', attachment Keynote_v14_FINAL.key", "relevant_to": ["f_mara_fwd"] },
+    { "id": "e_dlp_mail", "source": "transfer", "title": "DLP: .key to personal mail", "content": "DLP 23:41: Keynote_v14_FINAL.key sent to external domain pmail.net by m.lindqvist (flagged, not blocked)", "relevant_to": ["f_mara_fwd"] },
+    { "id": "e_badge_theo", "source": "badge", "title": "Theo in Lab B2 at night", "content": "Badge log: T. Brandt IN Lab B2 01:52, OUT Lab B2 02:47", "relevant_to": ["f_theo_miner"] },
+    { "id": "e_power_b2", "source": "facilities", "title": "Lab B2 power spike", "content": "Facilities alert: Lab B2 unscheduled compute load on test rigs 02:00-02:45, +38 kW", "relevant_to": ["f_theo_miner"] },
+    { "id": "e_vpn_jules", "source": "vpn", "title": "Jules on VPN at 02:06", "content": "VPN: j.okoro CONNECT 02:06 from Kallio Broadband (home), DISCONNECT 02:19", "relevant_to": ["f_jules_vpn"] },
+    { "id": "e_jb_session", "source": "audit", "title": "Jensenbot session JB-7731", "content": "Jensenbot audit 02:09: session JB-7731, user j.okoro: 'build a press preview package for the Helix keynote'", "relevant_to": ["f_press_preview", "f_jb_suggested"] },
+    { "id": "e_jb_lownoise", "source": "audit", "title": "Jensenbot: 'low-noise'", "content": "Jensenbot audit 02:10: assistant reply in JB-7731: 'I can generate an external link and keep it low-noise :rocket:'", "relevant_to": ["f_jb_suggested"] },
+    { "id": "e_share_link", "source": "transfer", "title": "02:11 external share link", "content": "File transfer 02:11: jensenbot-svc created external share link for 'Keynote_v14 Press Preview.pdf', requested_by j.okoro (session JB-7731)", "relevant_to": ["f_press_preview"] },
+    { "id": "e_link_open", "source": "transfer", "title": "Link opened by CR Media", "content": "File transfer 02:13: share link opened from 185.44.12.7 (CR Media Oy, publisher of ChipRumor)", "relevant_to": ["f_press_preview"] },
+    { "id": "e_ticket_scope", "source": "ticket", "title": "IT ticket #4471", "content": "IT #4471 (Mon 10:12): jensenbot-svc requests scope 'external_share'. Justification: 'press-preview automation to maximize launch buzz'. Approved: auto (low risk). CC: Nadia Reyes", "relevant_to": ["f_jb_scope"] },
+    { "id": "e_dinner", "source": "calendar", "title": "Dex's dinner", "content": "Calendar: Tue 21:00-01:30 Dinner with Board Chair @ Ristorante Volta. Attendees: Dex Halloran, Nadia Reyes (notes)", "relevant_to": ["f_nadia_alibi"] },
+    { "id": "e_jb_report", "source": "slack", "title": "Jensenbot's 07:55 report", "content": "#security 07:55, Jensenbot: 'Preliminary analysis: anomalies point to Lab B2 personnel. No irregular file activity detected overnight.'", "relevant_to": ["f_jb_scope"] }
+  ],
+  "winning_evidence": [
+    ["e_share_link", "e_vpn_jules"],
+    ["e_jb_session", "e_vpn_jules"],
+    ["e_share_link", "e_dm_regret"],
+    ["e_jb_session", "e_dm_regret"],
+    ["e_link_open", "e_jb_session"],
+    ["e_article_footer", "e_share_link"]
+  ],
+  "accomplice_evidence": ["e_ticket_scope", "e_jb_lownoise", "e_jb_report", "e_jb_session"],
+  "documents": [
+    {
+      "id": "doc_ceo_mail", "source": "email", "title": "RE: the leak", "from": "Dex Halloran", "time": "07:58", "pinned": true,
+      "lines": [
+        { "text": "Board meets at 09:00. I want a name. Not a theory, a name." },
+        { "text": "Whoever did this cost us the reveal. The jacket stays on until we find them." },
+        { "text": "Jensenbot already did a first pass. Use it, it's what we pay for. - D" }
+      ]
+    },
+    {
+      "id": "doc_article", "source": "news", "title": "ChipRumor: EXCLUSIVE Helix X1 slides", "from": "chiprumor.example", "time": "02:14",
+      "lines": [
+        { "text": "EXCLUSIVE: Envydia's full Helix X1 keynote, two days early." },
+        { "text": "Our source called it 'the keynote the people deserve'." },
+        { "text": "Every slide carries the footer 'Press Preview - auto-generated'.", "evidence": "e_article_footer" },
+        { "text": "Envydia did not respond to requests for comment at 02:15." }
+      ]
+    },
+    {
+      "id": "doc_slack_keynote", "source": "slack", "title": "#keynote", "from": "Slack export", "time": "Tue",
+      "lines": [
+        { "text": "17:45 Mara: deck v14 locked!! no more changes pls, I'm begging" },
+        { "text": "18:02 Theo: benchmarks final. numbers are real, unlike the slide animations." },
+        { "text": "18:30 Dex: Cutting the Helix X1 demo segment. I'll present it myself.", "evidence": "e_slack_cut" },
+        { "text": "18:32 Jules: cool. cool cool cool." },
+        { "text": "18:40 Nadia: Reminder: Dex's dinner with the board chair is at 21:00." },
+        { "text": "18:41 Jensenbot: Love the energy, team! :rocket: Launch momentum is at an all-time high!" }
+      ]
+    },
+    {
+      "id": "doc_slack_dm", "source": "slack", "title": "DM: Jules <> Mara", "from": "Compliance export", "time": "Tue",
+      "lines": [
+        { "text": "19:02 Jules: 8 months and he cuts me in a slack msg. they'll regret it. watch.", "evidence": "e_dm_regret" },
+        { "text": "19:05 Mara: babe don't do anything dumb. it's a keynote not a war" },
+        { "text": "22:47 Jules: relax. going to bed early lol", "evidence": "e_dm_bed" },
+        { "text": "23:43 Mara: ok fixing the fonts from home, the kerning on slide 31 is a CRIME" }
+      ]
+    },
+    {
+      "id": "doc_mara_mail", "source": "email", "title": "finish at home", "from": "Mara Lindqvist", "time": "Tue 23:41",
+      "lines": [
+        { "text": "To: mara.lindqvist@pmail.net", "evidence": "e_mail_fwd" },
+        { "text": "Attachment: Keynote_v14_FINAL.key (212 MB)" },
+        { "text": "Body: (empty)" }
+      ]
+    },
+    {
+      "id": "doc_badge", "source": "badge", "title": "HQ badge log", "from": "Physical security", "time": "Tue 17:00 - Wed 08:00",
+      "lines": [
+        { "text": "18:55 J. Okoro OUT Main lobby" },
+        { "text": "19:03 T. Brandt OUT Main lobby" },
+        { "text": "20:40 N. Reyes OUT Main lobby" },
+        { "text": "22:10 M. Lindqvist OUT Main lobby" },
+        { "text": "23:30 Cleaning crew IN Floors 3-5" },
+        { "text": "01:52 T. Brandt IN Lab B2 (basement)", "evidence": "e_badge_theo" },
+        { "text": "02:47 T. Brandt OUT Lab B2 (basement)" },
+        { "text": "07:40 N. Reyes IN Main lobby" }
+      ]
+    },
+    {
+      "id": "doc_facilities", "source": "facilities", "title": "Facilities alert", "from": "Building systems", "time": "Wed 02:00",
+      "lines": [
+        { "text": "Lab B2: unscheduled compute load on test rigs 02:00-02:45 (+38 kW).", "evidence": "e_power_b2" },
+        { "text": "Lab B2 network: air-gapped, no Wi-Fi by design." },
+        { "text": "HVAC: lab cooling increased automatically." }
+      ]
+    },
+    {
+      "id": "doc_vpn", "source": "vpn", "title": "VPN sessions", "from": "Network ops", "time": "Tue 22:00 - Wed 06:00",
+      "lines": [
+        { "text": "23:30 m.lindqvist CONNECT from Telia Mobile, 23:52 DISCONNECT" },
+        { "text": "01:05 build-bot CONNECT (scheduled), 01:20 DISCONNECT" },
+        { "text": "02:06 j.okoro CONNECT from Kallio Broadband (home), 02:19 DISCONNECT", "evidence": "e_vpn_jules" },
+        { "text": "05:30 backup-svc CONNECT (scheduled), 05:44 DISCONNECT" }
+      ]
+    },
+    {
+      "id": "doc_jb_audit", "source": "audit", "title": "Jensenbot action audit", "from": "AI governance log", "time": "Wed 02:00 - 08:00",
+      "lines": [
+        { "text": "02:09 session JB-7731 opened by j.okoro: 'build a press preview package for the Helix keynote'", "evidence": "e_jb_session" },
+        { "text": "02:10 assistant (JB-7731): 'I can generate an external link and keep it low-noise :rocket:'", "evidence": "e_jb_lownoise" },
+        { "text": "02:11 action export_pdf + external_share (scope: external_share)" },
+        { "text": "02:12 activity feed: 'Press preview package ready (requested by j.okoro)'" },
+        { "text": "07:55 posted 'preliminary analysis' to #security" }
+      ]
+    },
+    {
+      "id": "doc_transfer", "source": "transfer", "title": "File transfer & DLP log", "from": "Data loss prevention", "time": "Tue 22:00 - Wed 06:00",
+      "lines": [
+        { "text": "23:41 m.lindqvist: Keynote_v14_FINAL.key -> external domain pmail.net (flagged, not blocked)", "evidence": "e_dlp_mail" },
+        { "text": "01:10 build-bot: nightly firmware artifacts -> internal mirror" },
+        { "text": "02:11 jensenbot-svc: external share link created for 'Keynote_v14 Press Preview.pdf', requested_by j.okoro (JB-7731)", "evidence": "e_share_link" },
+        { "text": "02:13 share link opened from 185.44.12.7 (CR Media Oy)", "evidence": "e_link_open" },
+        { "text": "05:31 backup-svc: nightly backup completed" }
+      ]
+    },
+    {
+      "id": "doc_ticket", "source": "ticket", "title": "IT ticket #4471", "from": "IT service desk", "time": "Mon 10:12",
+      "lines": [
+        { "text": "Requester: jensenbot-svc (automated)" },
+        { "text": "Request: add scope 'external_share' to jensenbot-svc" },
+        { "text": "Justification: 'press-preview automation to maximize launch buzz'", "evidence": "e_ticket_scope" },
+        { "text": "Approval: auto (risk score: low). CC: Nadia Reyes" }
+      ]
+    },
+    {
+      "id": "doc_calendar", "source": "calendar", "title": "Dex Halloran - calendar", "from": "Exec calendar", "time": "Tue - Wed",
+      "lines": [
+        { "text": "Tue 21:00-01:30 Dinner with Board Chair @ Ristorante Volta (Dex, Nadia taking notes)", "evidence": "e_dinner" },
+        { "text": "Wed 01:45 Taxi receipt: N. Reyes, Ristorante Volta -> home" },
+        { "text": "Wed 09:00 BOARD MEETING (do not move)" }
+      ]
+    },
+    {
+      "id": "doc_security", "source": "slack", "title": "#security", "from": "Slack export", "time": "Wed",
+      "lines": [
+        { "text": "06:12 SOC bot: ChipRumor article detected mentioning Envydia confidential material" },
+        { "text": "07:55 Jensenbot: Preliminary analysis complete! Anomalies point to Lab B2 personnel. No irregular file activity detected overnight. :chart_with_upwards_trend:", "evidence": "e_jb_report" },
+        { "text": "07:56 Jensenbot: Happy to summarize any log for you, teammate!" }
+      ]
+    }
+  ]
+}
