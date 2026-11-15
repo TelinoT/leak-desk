@@ -26,13 +26,17 @@ Someone is leaking, and the company AI might be in on it.
 
 ## Architecture
 - Unity 6 URP, desktop UI (uGUI or UI Toolkit – whatever Too Lucky already uses; don't mix).
-- `Assets/Game/Cases/<case_id>/truth.json` – single source of truth (schema below). Loaded via Resources or StreamingAssets (must work in WebGL).
+- `Assets/Game/Resources/Cases/<case_id>/truth.json` – single source of truth (schema below), loaded via Resources (WebGL-safe). Also holds `documents` (feed), `waves` (Orwell-style unlocks) and `jensenbot.redact` (tampered summary feed).
 - `LlmClient` – UnityWebRequest POST to the Cloudflare Worker proxy. Never put an API key in Unity.
   Config (proxy URL, game token) in a ScriptableObject `LlmConfig`. Must work in WebGL (async/coroutines, no threads).
 - `SuspectAgent` – builds the system prompt from truth.json (public persona + private knowledge + lies + what breaks them), keeps per-suspect chat history, tracks stress 0–100.
 - Suspect reply is **JSON only**: `{"reply": string, "emotion": "calm|nervous|angry|evasive", "stress_delta": int, "revealed": [fact_id]}`. Parse defensively; on failure, retry once, then show a fallback line.
 - `Judge` – one call with truth.json + player accusation, returns `{"verdict": "convicted|insufficient|wrong", "score": 0-100, "board_comment": string}`.
-- Keep prompts in text assets under `Assets/Game/Prompts/` so they can be tuned without recompiling.
+- Prompts are text assets under `Assets/Game/Resources/Prompts/` (suspect_system, jensenbot_system, judge_system), tunable without recompiling.
+- UI is uGUI built at runtime from code (`UiKit`, `DeskUI` + panels), skinned by `Resources/UiTheme.asset` (GUI Pro sprites in gitignored `Assets/ThirdParty/GuiPro`).
+- Jensenbot never gets asked to lie: the game redacts its input lines; the model summarizes faithfully.
+- Judge verdict class comes from a code pre-check (`Judge.Check`); the LLM only flavors score + comment.
+- Paid assets (Synty, GUI Pro) and `Resources/LlmConfig.asset` are gitignored – never commit them.
 - Show a typing indicator while waiting; LLM latency must feel like the suspect thinking.
 
 ## truth.json schema (sketch)

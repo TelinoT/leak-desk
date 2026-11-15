@@ -226,7 +226,7 @@ public class DeskUI : MonoBehaviour
         card.Size(prefW: 480);
         var row = UiKit.Rect("Row", card.transform);
         row.HLayout(10);
-        var dot = UiKit.Panel(row, color ?? T.accent, T.pillSprite, "Dot");
+        var dot = UiKit.Panel(row, color ?? T.accent, UiKit.AvatarSprite, "Dot");
         dot.Size(prefW: 14, prefH: 14, minW: 14);
         var t = UiKit.Text(row, message, T.smallSize + 1, T.cardText);
         t.Size(flexW: 1);

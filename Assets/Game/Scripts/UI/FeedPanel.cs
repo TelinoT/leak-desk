@@ -61,9 +61,7 @@ public class FeedPanel
 
         var header = UiKit.Rect("Header", viewer.transform);
         header.HLayout(14);
-        docTagBg = UiKit.Panel(header, Color.white, T.pillSprite, "Tag");
-        docTagBg.HLayout(0, 8, TextAnchor.MiddleCenter);
-        docTagBg.Size(prefW: 130, prefH: 34);
+        docTagBg = UiKit.Chip(header, Color.white, 130, 34, "Tag");
         docTag = UiKit.Text(docTagBg.transform, "", T.smallSize, T.cardText, TextAlignmentOptions.Center, FontStyles.Bold);
         var titles = UiKit.Rect("Titles", header);
         titles.VLayout(2);
@@ -113,7 +111,7 @@ public class FeedPanel
         btn.onClick.AddListener(() => Select(doc));
         card.gameObject.AddComponent<ButtonPop>();
 
-        var tag = UiKit.Panel(card.transform, SourceStyle.Color(doc.Source), T.pillSprite, "Tag");
+        var tag = UiKit.Panel(card.transform, SourceStyle.Color(doc.Source), T.pillSprite, "Tag").Pill(10);
         tag.Size(prefW: 10, minW: 10, prefH: 54);
 
         var col = UiKit.Rect("Col", card.transform);
@@ -124,7 +122,7 @@ public class FeedPanel
         meta.textWrappingMode = TextWrappingModes.NoWrap;
         meta.overflowMode = TextOverflowModes.Ellipsis;
 
-        var unread = UiKit.Panel(card.transform, T.accent, T.pillSprite, "Unread");
+        var unread = UiKit.Panel(card.transform, T.accent, UiKit.AvatarSprite, "Unread");
         unread.Size(prefW: 12, prefH: 12, minW: 12);
         docCards[doc.Id] = card;
         return card;

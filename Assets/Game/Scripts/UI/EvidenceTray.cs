@@ -60,9 +60,7 @@ public class EvidenceTray
         var card = UiKit.Card(parent, T.card, 12, 4, "Evidence: " + item.Id);
         var top = UiKit.Rect("Top", card.transform);
         top.HLayout(8);
-        var tag = UiKit.Panel(top, SourceStyle.Color(item.Source), T.pillSprite, "Tag");
-        tag.HLayout(0, 4, TextAnchor.MiddleCenter);
-        tag.Size(prefW: 112, prefH: 26);
+        var tag = UiKit.Chip(top, SourceStyle.Color(item.Source), 112, 26, "Tag");
         UiKit.Text(tag.transform, SourceStyle.Label(item.Source), 13, T.cardText, TextAlignmentOptions.Center, FontStyles.Bold);
         var title = UiKit.Text(top, $"<b>{item.Title}</b>", T.smallSize, T.cardText);
         title.Size(flexW: 1);

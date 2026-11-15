@@ -72,9 +72,7 @@ public class InterrogationPanel
         headerRole = UiKit.Text(info, "", T.bodySize - 2, T.muted);
         var chips = UiKit.Rect("Chips", info);
         chips.HLayout(10);
-        headerEmotionBg = UiKit.Panel(chips, T.accent, T.pillSprite, "Emotion");
-        headerEmotionBg.HLayout(0, 6, TextAnchor.MiddleCenter);
-        headerEmotionBg.Size(prefW: 130, prefH: 34);
+        headerEmotionBg = UiKit.Chip(chips, T.accent, 130, 34, "Emotion");
         headerEmotion = UiKit.Text(headerEmotionBg.transform, "CALM", T.smallSize, T.cardText, TextAlignmentOptions.Center, FontStyles.Bold);
         headerStress = UiKit.Text(chips, "Stress 0", T.smallSize, T.text, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
         headerStress.Size(prefW: 120);
@@ -127,9 +125,7 @@ public class InterrogationPanel
         role.overflowMode = TextOverflowModes.Ellipsis;
         var row = UiKit.Rect("Row", col);
         row.HLayout(8);
-        var emoBg = UiKit.Panel(row, SourceStyle.EmotionColor("calm"), T.pillSprite, "Emotion");
-        emoBg.HLayout(0, 3, TextAnchor.MiddleCenter);
-        emoBg.Size(prefW: 92, prefH: 24);
+        var emoBg = UiKit.Chip(row, SourceStyle.EmotionColor("calm"), 92, 24, "Emotion");
         var emo = UiKit.Text(emoBg.transform, "CALM", 13, T.cardText, TextAlignmentOptions.Center, FontStyles.Bold);
         var fill = UiKit.Bar(row, T.warning, 10);
 
@@ -183,7 +179,7 @@ public class InterrogationPanel
             case ChatEntry.Kind.Evidence:
                 var b = chat.AddBubble($"EVIDENCE PRESENTED  ·  {SourceStyle.Label(e.EvidenceSource)}", e.Text, ChatView.Side.Right,
                     new Color(1f, 0.95f, 0.78f));
-                var stripe = UiKit.Panel(b.transform, SourceStyle.Color(e.EvidenceSource), T.pillSprite, "Stripe");
+                var stripe = UiKit.Panel(b.transform, SourceStyle.Color(e.EvidenceSource), T.pillSprite, "Stripe").Pill(6);
                 stripe.Size(prefH: 6);
                 stripe.transform.SetAsFirstSibling();
                 break;

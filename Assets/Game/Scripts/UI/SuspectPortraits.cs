@@ -19,7 +19,7 @@ public class SuspectPortraits : MonoBehaviour
 
     [SerializeField] List<Entry> characters = new();
     [SerializeField] Vector3 stageOffset = new(0, -500, 0);
-    [SerializeField] int textureSize = 512;
+    [SerializeField] int textureSize = 768;
 
     const int PortraitLayer = 31; // keep the office out of the portrait camera and the portrait out of the main camera
     readonly Dictionary<string, GameObject> spawned = new();
@@ -38,28 +38,24 @@ public class SuspectPortraits : MonoBehaviour
         if (characters.Count == 0) { enabled = false; yield break; }
         yield return null; // let LeakDeskGame build the UI first
 
-        rt = new RenderTexture(textureSize, textureSize, 16) { name = "SuspectPortraitRT" };
+        rt = new RenderTexture(textureSize, textureSize, 24) { name = "SuspectPortraitRT", antiAliasing = 4 };
         var camGo = new GameObject("PortraitCamera");
         camGo.transform.SetParent(transform, false);
         camGo.transform.position = stageOffset + CamOffset;
         camGo.transform.LookAt(stageOffset + LookOffset);
         cam = camGo.AddComponent<Camera>();
         cam.targetTexture = rt;
-        cam.fieldOfView = 26f;
+        cam.fieldOfView = 24f;
         cam.clearFlags = CameraClearFlags.SolidColor;
         cam.backgroundColor = new Color(0, 0, 0, 0);
         cam.cullingMask = 1 << PortraitLayer;
         cam.nearClipPlane = 0.05f;
         cam.farClipPlane = 10f;
 
-        var lightGo = new GameObject("PortraitLight");
-        lightGo.transform.SetParent(transform, false);
-        lightGo.transform.position = stageOffset + new Vector3(0.8f, 2.4f, 1.6f);
-        var light = lightGo.AddComponent<Light>();
-        light.type = LightType.Point;
-        light.range = 6f;
-        light.intensity = 3f;
-        light.cullingMask = 1 << PortraitLayer;
+        // Soft three-point lighting so the low-poly faces read well: warm key, cool fill, bright rim.
+        AddLight("Key", new Vector3(-0.9f, 2.3f, 1.4f), new Color(1f, 0.93f, 0.85f), 2.6f);
+        AddLight("Fill", new Vector3(1.1f, 1.5f, 1.3f), new Color(0.75f, 0.85f, 1f), 1.2f);
+        AddLight("Rim", new Vector3(0.3f, 2.2f, -1.0f), new Color(1f, 1f, 1f), 2.2f);
 
         var game = LeakDeskGame.Instance;
         var panel = FindAnyObjectByType<DeskUI>()?.Interrogation;
@@ -76,9 +72,22 @@ public class SuspectPortraits : MonoBehaviour
         if (game == null) enabled = false;
     }
 
-    // Portrait framing: head and shoulders.
-    static readonly Vector3 CamOffset = new(0, 1.62f, 1.25f);
-    static readonly Vector3 LookOffset = new(0, 1.52f, 0);
+    // Portrait framing: head, shoulders and a bit of chest, from slightly above and to the side.
+    static readonly Vector3 CamOffset = new(0.35f, 1.62f, 1.75f);
+    static readonly Vector3 LookOffset = new(0, 1.42f, 0);
+
+    void AddLight(string name, Vector3 offset, Color color, float intensity)
+    {
+        var go = new GameObject("Portrait" + name + "Light");
+        go.transform.SetParent(transform, false);
+        go.transform.position = stageOffset + offset;
+        var l = go.AddComponent<Light>();
+        l.type = LightType.Point;
+        l.range = 5f;
+        l.color = color;
+        l.intensity = intensity;
+        l.cullingMask = 1 << PortraitLayer;
+    }
 
     public void Show(SuspectData data)
     {

@@ -35,7 +35,7 @@ public static class UiKit
         var scaler = go.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand; // never crop the 16:9 layout on other aspect ratios
         go.AddComponent<GraphicRaycaster>();
         return canvas;
     }
@@ -271,12 +271,33 @@ public static class UiKit
         return img;
     }
 
+    /// <summary>
+    /// Makes a 9-sliced round sprite a true capsule at this height: scales the slice borders to half the height,
+    /// so small bars and chips don't get squashed into ovals.
+    /// </summary>
+    public static Image Pill(this Image img, float height)
+    {
+        if (img.sprite == null || img.sprite.border == Vector4.zero) return img;
+        float border = Mathf.Max(img.sprite.border.y, img.sprite.border.w) * 100f / img.sprite.pixelsPerUnit;
+        img.pixelsPerUnitMultiplier = Mathf.Max(0.01f, border / (height * 0.5f));
+        return img;
+    }
+
+    /// <summary>A capsule-shaped chip (emotion tags, source tags).</summary>
+    public static Image Chip(Transform parent, Color color, float width, float height, string name = "Chip")
+    {
+        var img = Panel(parent, color, Theme.pillSprite, name).Pill(height);
+        img.HLayout(0, 4, TextAnchor.MiddleCenter);
+        img.Size(prefW: width, prefH: height, minW: width);
+        return img;
+    }
+
     /// <summary>Horizontal progress bar; returns the fill image (use SetBar).</summary>
     public static Image Bar(Transform parent, Color fill, float height = 12)
     {
-        var bg = Panel(parent, new Color(0, 0, 0, 0.35f), Theme.pillSprite, "Bar");
+        var bg = Panel(parent, new Color(0, 0, 0, 0.35f), Theme.pillSprite, "Bar").Pill(height);
         bg.Size(prefH: height, minH: height, flexW: 1);
-        var f = Panel(bg.transform, fill, Theme.barFillSprite ?? Theme.pillSprite, "Fill");
+        var f = Panel(bg.transform, fill, Theme.barFillSprite ?? Theme.pillSprite, "Fill").Pill(height);
         var rt = (RectTransform)f.transform;
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = new Vector2(0, 1);
