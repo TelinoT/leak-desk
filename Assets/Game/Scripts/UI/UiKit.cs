@@ -298,6 +298,9 @@ public static class UiKit
         return rt;
     }
 
+    /// <summary>Round avatar sprite (falls back to the pill).</summary>
+    public static Sprite AvatarSprite => Theme.avatarSprite != null ? Theme.avatarSprite : Theme.pillSprite;
+
     public static string Hex(Color c) => ColorUtility.ToHtmlStringRGB(c);
 
     public static void Clear(Transform t)

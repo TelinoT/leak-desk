@@ -59,7 +59,7 @@ public class InterrogationPanel
         var header = UiKit.Rect("Header", room.transform);
         header.HLayout(18);
         header.Size(prefH: 150);
-        avatar = UiKit.Panel(header, Color.white, T.pillSprite, "Avatar");
+        avatar = UiKit.Panel(header, Color.white, UiKit.AvatarSprite, "Avatar");
         avatar.Size(prefW: 150, prefH: 150, minW: 150);
         portraitSlot = (RectTransform)avatar.transform;
         avatarInitials = UiKit.Text(avatar.transform, "", 56, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
@@ -113,7 +113,7 @@ public class InterrogationPanel
         card.gameObject.AddComponent<Button>().onClick.AddListener(() => Select(agent));
         card.gameObject.AddComponent<ButtonPop>();
 
-        var av = UiKit.Panel(card.transform, agent.Data.Color, T.pillSprite, "Avatar");
+        var av = UiKit.Panel(card.transform, agent.Data.Color, UiKit.AvatarSprite, "Avatar");
         av.Size(prefW: 64, prefH: 64, minW: 64);
         var ini = UiKit.Text(av.transform, Initials(agent.Data.Name), 26, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
         ((RectTransform)ini.transform).Stretch();

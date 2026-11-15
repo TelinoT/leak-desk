@@ -27,7 +27,7 @@ public class JensenbotPanel
 
         var header = UiKit.Rect("Header", panel.transform);
         header.HLayout(16);
-        var av = UiKit.Panel(header, BotColor, T.pillSprite, "Avatar");
+        var av = UiKit.Panel(header, BotColor, UiKit.AvatarSprite, "Avatar");
         av.Size(prefW: 90, prefH: 90, minW: 90);
         var face = UiKit.Text(av.transform, "^_^", 32, T.accentText, TextAlignmentOptions.Center, FontStyles.Bold);
         ((RectTransform)face.transform).Stretch();

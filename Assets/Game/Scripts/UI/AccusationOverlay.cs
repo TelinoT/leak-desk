@@ -46,7 +46,7 @@ public class AccusationOverlay
             sc.Size(prefH: 92, flexW: 1);
             sc.gameObject.AddComponent<Button>().onClick.AddListener(() => PickSuspect(s.Id));
             sc.gameObject.AddComponent<ButtonPop>();
-            var av = UiKit.Panel(sc.transform, s.Color, T.pillSprite, "Avatar");
+            var av = UiKit.Panel(sc.transform, s.Color, UiKit.AvatarSprite, "Avatar");
             av.Size(prefW: 64, prefH: 64, minW: 64);
             var ini = UiKit.Text(av.transform, InterrogationPanel.Initials(s.Name), 24, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
             ((RectTransform)ini.transform).Stretch();

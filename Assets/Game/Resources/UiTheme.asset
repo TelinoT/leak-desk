@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   font: {fileID: 0}
   headingFont: {fileID: 0}
-  background: {r: 0.09, g: 0.1, b: 0.16, a: 0.55}
-  panel: {r: 0.14, g: 0.16, b: 0.25, a: 0.96}
-  panelAlt: {r: 0.2, g: 0.22, b: 0.34, a: 1}
+  background: {r: 0.08, g: 0.06, b: 0.18, a: 0.3}
+  panel: {r: 0.13, g: 0.15, b: 0.27, a: 0.97}
+  panelAlt: {r: 0.22, g: 0.25, b: 0.42, a: 1}
   card: {r: 0.97, g: 0.96, b: 0.92, a: 1}
   cardText: {r: 0.16, g: 0.17, b: 0.24, a: 1}
   text: {r: 0.96, g: 0.97, b: 1, a: 1}
@@ -29,13 +29,14 @@ MonoBehaviour:
   bubbleSuspect: {r: 1, g: 1, b: 1, a: 1}
   bubblePlayer: {r: 0.46, g: 0.85, b: 0.25, a: 1}
   bubbleSystem: {r: 1, g: 0.86, b: 0.45, a: 1}
-  panelSprite: {fileID: 0}
-  cardSprite: {fileID: 0}
-  buttonSprite: {fileID: 0}
-  inputSprite: {fileID: 0}
-  bubbleSprite: {fileID: 0}
-  pillSprite: {fileID: 0}
-  barFillSprite: {fileID: 0}
+  panelSprite: {fileID: 21300000, guid: c1d73f0f211da45b1bc7d4b1dc27f822, type: 3}
+  cardSprite: {fileID: 21300000, guid: 11785b2ef30da436fb4ab8165d509f77, type: 3}
+  buttonSprite: {fileID: 21300000, guid: 0b06cbc129b1046d6aa3cca54a0d58b1, type: 3}
+  inputSprite: {fileID: 21300000, guid: b1de60f30248d4836b399a3830060fd2, type: 3}
+  bubbleSprite: {fileID: 21300000, guid: b1de60f30248d4836b399a3830060fd2, type: 3}
+  pillSprite: {fileID: 21300000, guid: 218c10e476101420c8c9a40993f90415, type: 3}
+  avatarSprite: {fileID: 21300000, guid: 9580146eafe614364827b2bc1176c2c9, type: 3}
+  barFillSprite: {fileID: 21300000, guid: 218c10e476101420c8c9a40993f90415, type: 3}
   pixelsPerUnitMultiplier: 1
   bodySize: 22
   smallSize: 17

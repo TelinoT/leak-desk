@@ -36,6 +36,7 @@ public class UiTheme : ScriptableObject
     public Sprite inputSprite;
     public Sprite bubbleSprite;
     public Sprite pillSprite;
+    public Sprite avatarSprite;
     public Sprite barFillSprite;
 
     [Header("Sizes")]
