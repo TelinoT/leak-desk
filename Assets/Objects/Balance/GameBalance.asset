@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a3ed34d9983a4b36a399d289bff284f, type: 3}
+  m_Name: GameBalance
+  m_EditorClassIdentifier: 
+  startStars: 4
+  fireAtStars: 1
+  maxStars: 5
+  baseBudget: 100
+  bugdetPerStar: 50
+  moneyBonusShare: 0.1
+  shiftStartHour: 18
+  shiftEndHour: 2
+  bingoPrizeMin: 50
+  bingoPrizeMax: 400
+  resolvedClaimLinger: 5
+  checkSeconds: 4
+  maxHoldSeconds: 20
+  holdStarCostPerSecond: 0.02
+  honestApprovedStars: 0.05
+  cheaterCaughtStars: 0.15
+  evidenceBonusStars: 0.05
+  falseCheckStars: -0.5
+  cheaterPaidStars: -0.3
+  secondsBetweenCalls: 1.5
+  minCallsBeforeBingo: 15
+  shiftStartCallsMin: 8
+  shiftStartCallsMax: 15
+  guestSpawnInterval: 2
+  tellIntervalMin: 20
+  tellIntervalMax: 40
+  tellDuration: 3
+  redHandedGrace: 1.5
+  liveCatchMoney: 150
+  liveCatchStars: 0.2
+  redHandedBonusStars: 0.1

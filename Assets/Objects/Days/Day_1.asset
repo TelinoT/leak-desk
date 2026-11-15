@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c63d1dcc874ee44fbb7073829de63d93, type: 3}
+  m_Name: Day_1
+  m_EditorClassIdentifier: 
+  dayType: 0
+  headline: Welcome to the team
+  managerEmail: "Hi! Welcome to the Lucky Number Casino. \n\nTonight it\u2019s just
+    the bingo hall, nice and quiet. Keep an eye on the cards; some of our regulars
+    get creative. Coffee is in the break room.\n\nReminder: no phones during the
+    games.\n\nDolores, Manager"
+  shiftSeconds: 120
+  toolsToUnlock:
+  - {fileID: 11400000, guid: 744dc4e0915464bdd85a3c29a82959e8, type: 2}
+  - {fileID: 11400000, guid: 0db866865c3bb4f79b38b9619d8d5aa4, type: 2}
+  - {fileID: 11400000, guid: ac1228b58889640a7bb8d9c2056e04ef, type: 2}
+  bingoTables: 1
+  guestsPerTable: 4
+  liveTells: 00000000
+  cheaterChance: 0.2
+  claimCountdownSeconds: 35
+  secondsBetweenClaims: 10
