@@ -1,0 +1,79 @@
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>Right-hand column listing collected evidence. While interrogating, each card has a "Show" button.</summary>
+public class EvidenceTray
+{
+    readonly DeskUI ui;
+    readonly RectTransform content;
+    readonly TextMeshProUGUI header;
+    readonly GameObject emptyHint;
+
+    UiTheme T => UiKit.Theme;
+
+    public EvidenceTray(DeskUI ui, Transform parent)
+    {
+        this.ui = ui;
+        var panel = UiKit.Panel(parent, T.panel, T.panelSprite, "EvidenceTray");
+        panel.Size(prefW: 400, flexH: 1);
+        panel.VLayout(10, 16);
+        header = UiKit.Heading(panel.transform, "Evidence (0)", 26);
+        UiKit.Text(panel.transform, "Flag log lines. Statements from suspects land here too.", T.smallSize, T.muted);
+
+        var scroll = UiKit.ScrollList(panel.transform, out content, 10, 2);
+        scroll.Size(flexH: 1);
+
+        var hint = UiKit.Card(content, new Color(1, 1, 1, 0.08f), 18, 4, "EmptyHint");
+        UiKit.Text(hint.transform, "Nothing yet.\n\nOpen <b>Logs</b> and flag lines that look suspicious.", T.bodySize - 2, T.muted,
+            TextAlignmentOptions.Center);
+        emptyHint = hint.gameObject;
+
+        ui.Game.Evidence.Added += _ => Refresh(pulseLast: true);
+    }
+
+    public void Refresh(bool pulseLast = false)
+    {
+        var items = ui.Game.Evidence.Items;
+        header.text = $"Evidence ({items.Count})";
+        for (int i = content.childCount - 1; i >= 0; i--)
+        {
+            var child = content.GetChild(i).gameObject;
+            if (child != emptyHint) Object.Destroy(child);
+        }
+        emptyHint.SetActive(items.Count == 0);
+
+        bool canPresent = ui.CurrentTab == DeskUI.Tab.Interrogate && ui.Game.Phase == GamePhase.Investigating;
+        // Newest first, so fresh finds are visible without scrolling.
+        for (int i = items.Count - 1; i >= 0; i--)
+        {
+            var item = items[i];
+            var card = EvidenceCard(content, item, canPresent ? () => ui.Interrogation.Present(item) : null);
+            if (pulseLast && i == items.Count - 1) ui.StartCoroutine(DeskUI.PopModal(card.transform));
+        }
+    }
+
+    /// <summary>Shared evidence card visual (tray, picker, accusation).</summary>
+    public static Image EvidenceCard(Transform parent, EvidenceItem item, System.Action onShow, string buttonLabel = "Show")
+    {
+        var T = UiKit.Theme;
+        var card = UiKit.Card(parent, T.card, 12, 4, "Evidence: " + item.Id);
+        var top = UiKit.Rect("Top", card.transform);
+        top.HLayout(8);
+        var tag = UiKit.Panel(top, SourceStyle.Color(item.Source), T.pillSprite, "Tag");
+        tag.HLayout(0, 4, TextAnchor.MiddleCenter);
+        tag.Size(prefW: 112, prefH: 26);
+        UiKit.Text(tag.transform, SourceStyle.Label(item.Source), 13, T.cardText, TextAlignmentOptions.Center, FontStyles.Bold);
+        var title = UiKit.Text(top, $"<b>{item.Title}</b>", T.smallSize, T.cardText);
+        title.Size(flexW: 1);
+        title.textWrappingMode = TextWrappingModes.NoWrap;
+        title.overflowMode = TextOverflowModes.Ellipsis;
+        if (onShow != null)
+        {
+            var b = UiKit.Button(top, buttonLabel, onShow, T.warning, T.cardText, 30, 15);
+            b.Size(prefW: 74, prefH: 30, minW: 74);
+        }
+        UiKit.Text(card.transform, item.Content, T.smallSize - 1, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.85f));
+        return card;
+    }
+}

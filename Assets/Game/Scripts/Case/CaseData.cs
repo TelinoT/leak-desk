@@ -27,6 +27,7 @@ public class CaseFile
     [JsonProperty("winning_evidence")] public List<List<string>> WinningEvidence = new();
     [JsonProperty("accomplice_evidence")] public List<string> AccompliceEvidence = new();
     [JsonProperty("documents")] public List<CaseDocument> Documents = new();
+    [JsonProperty("waves")] public List<CaseWave> Waves = new();
 
     public SuspectData Suspect(string id) => Suspects.FirstOrDefault(s => s.Id == id);
     public EvidenceData EvidenceById(string id) => Evidence.FirstOrDefault(e => e.Id == id);
@@ -34,6 +35,21 @@ public class CaseFile
     public bool HasAccomplice => !string.IsNullOrEmpty(Accomplice) && Accomplice != "null";
 
     public float RoundSeconds => Mathf.Max(60f, RoundMinutes * 60f);
+}
+
+/// <summary>
+/// A batch of documents/suspects that becomes available during the round (Orwell-style pacing): at a fixed time,
+/// or earlier when the player flags/learns one of the trigger ids (evidence id, fact id, or "any_question").
+/// </summary>
+public class CaseWave
+{
+    [JsonProperty("id")] public string Id;
+    [JsonProperty("title")] public string Title;
+    [JsonProperty("message")] public string Message;
+    [JsonProperty("after_seconds")] public float AfterSeconds;
+    [JsonProperty("triggers")] public List<string> Triggers = new();
+    [JsonProperty("documents")] public List<string> Documents = new();
+    [JsonProperty("suspects")] public List<string> Suspects = new();
 }
 
 public class CasePerson
@@ -89,6 +105,8 @@ public class JensenbotData
     [JsonProperty("persona")] public string Persona;
     [JsonProperty("agenda")] public string Agenda;
     [JsonProperty("honest_agenda")] public string HonestAgenda;
+    [JsonProperty("redact")] public List<string> Redact = new();
+    [JsonProperty("redact_replacement")] public string RedactReplacement = "scheduled automation job (routine)";
 }
 
 public class EvidenceData
@@ -110,12 +128,24 @@ public class CaseDocument
     [JsonProperty("pinned")] public bool Pinned;
     [JsonProperty("lines")] public List<DocumentLine> Lines = new();
 
-    /// <summary>Plain-text rendering, used when asking Jensenbot to summarize.</summary>
-    public string ToPlainText()
+    /// <summary>
+    /// Plain-text rendering, used when asking Jensenbot to summarize. With redact terms (accomplice mode), any line
+    /// containing one is swapped for a bland replacement that keeps its timestamp - Jensenbot's tampered data feed.
+    /// </summary>
+    public string ToPlainText(IReadOnlyList<string> redact = null, string replacement = null)
     {
         var sb = new System.Text.StringBuilder();
         sb.AppendLine($"[{Source.ToUpperInvariant()}] {Title} (from: {From}, time: {Time})");
-        foreach (var l in Lines) sb.AppendLine("- " + l.Text);
+        foreach (var l in Lines)
+        {
+            string text = l.Text;
+            if (redact != null && redact.Any(term => text.IndexOf(term, System.StringComparison.OrdinalIgnoreCase) >= 0))
+            {
+                var m = System.Text.RegularExpressions.Regex.Match(text, @"^\d{2}:\d{2}");
+                text = (m.Success ? m.Value + " " : "") + (replacement ?? "scheduled automation job (routine)");
+            }
+            sb.AppendLine("- " + text);
+        }
         return sb.ToString();
     }
 }

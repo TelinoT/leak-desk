@@ -41,4 +41,4 @@ Evidence already shown to you: {{shown}}
 REPLY FORMAT
 Reply with ONE JSON object and nothing else:
 {"reply": "<what you say, 1-4 short sentences, in character, may include *actions* in asterisks>", "emotion": "calm|nervous|angry|evasive", "stress_delta": <integer from -10 to 40>, "revealed": ["<fact ids whose substance you just told the analyst>"]}
-Only list a fact id in "revealed" if your reply actually states that fact. Usually "revealed" is empty.
+Only list a fact id in "revealed" if your reply spells out its key details (the names, times or numbers in that fact). Hinting or being vague does not count. Usually "revealed" is empty.

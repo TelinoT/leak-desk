@@ -15,13 +15,16 @@ public class JensenbotAgent
     public bool Busy { get; private set; }
     public int SummariesGiven { get; private set; }
     public string Name => caseFile.Jensenbot?.Name ?? "Jensenbot";
+    public bool IsAccomplice => caseFile.Jensenbot != null && caseFile.Jensenbot.IsAccomplice && caseFile.Accomplice == "jensenbot";
 
     public JensenbotAgent(CaseFile caseFile) => this.caseFile = caseFile;
 
     public void Summarize(CaseDocument doc, Action<string> done)
     {
         SummariesGiven++;
-        Send($"Summarize this log for me:\n\n{doc.ToPlainText()}", done);
+        var jb = caseFile.Jensenbot;
+        string text = IsAccomplice ? doc.ToPlainText(jb.Redact, jb.RedactReplacement) : doc.ToPlainText();
+        Send($"Summarize this log for me:\n\n{text}", done);
     }
 
     public void Ask(string question, Action<string> done) => Send(question, done);
@@ -50,7 +53,7 @@ public class JensenbotAgent
     string BuildSystemPrompt()
     {
         var jb = caseFile.Jensenbot ?? new JensenbotData();
-        bool accomplice = jb.IsAccomplice && caseFile.Accomplice == "jensenbot";
+        bool accomplice = IsAccomplice;
         return CaseLoader.Fill(CaseLoader.Prompt("jensenbot_system"),
             ("name", Name), ("company", caseFile.Company), ("persona", jb.Persona),
             ("agenda", accomplice ? jb.Agenda : (jb.HonestAgenda ?? "Summarize accurately and neutrally.")));

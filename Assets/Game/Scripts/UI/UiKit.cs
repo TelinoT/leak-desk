@@ -108,6 +108,10 @@ public static class UiKit
         float minW = -1, float minH = -1)
     {
         var le = c.gameObject.GetComponent<LayoutElement>() ?? c.gameObject.AddComponent<LayoutElement>();
+        // A fixed preferred size means "don't grow": layout groups otherwise report themselves as flexible
+        // and steal leftover space from the columns that should stretch.
+        if (prefW >= 0 && flexW < 0) flexW = 0;
+        if (prefH >= 0 && flexH < 0) flexH = 0;
         le.preferredWidth = prefW;
         le.preferredHeight = prefH;
         le.flexibleWidth = flexW;
