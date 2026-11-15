@@ -1,7 +1,9 @@
 // Cloudflare Worker: keeps the Anthropic API key out of the Unity build.
 // Secrets: ANTHROPIC_API_KEY, GAME_TOKEN (wrangler secret put ...)
 
-const MODEL = "claude-haiku-5-5"; // fast + cheap for live dialogue; swap if you want
+const DEFAULT_MODEL = "claude-haiku-5-5"; // fast + cheap for live dialogue
+// The game may pick a model per call (e.g. a smarter one for the verdict), but only from this list.
+const ALLOWED_MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5"];
 const MAX_TOKENS_CAP = 600;
 
 const CORS = {
@@ -20,6 +22,7 @@ export default {
     try { body = await request.json(); } catch { return json({ error: "bad json" }, 400); }
 
     const { system = "", messages = [], max_tokens = 400 } = body;
+    const model = ALLOWED_MODELS.includes(body.model) ? body.model : DEFAULT_MODEL;
     if (!Array.isArray(messages) || messages.length === 0 || messages.length > 60)
       return json({ error: "bad messages" }, 400);
 
@@ -31,13 +34,13 @@ export default {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: MODEL,
+        model,
         system,
         messages,
         max_tokens: Math.min(max_tokens, MAX_TOKENS_CAP),
-        // Haiku 5.5 thinks by default; for snappy in-character dialogue we turn it off
-        // so the whole token budget goes to the visible reply.
-        thinking: { type: "disabled" },
+        // Both models think by default; for snappy replies we turn it off so the whole token
+        // budget goes to the visible text. Sonnet 5.5 rejects "disabled" and uses "between_tools".
+        thinking: { type: model.includes("sonnet") ? "between_tools" : "disabled" },
       }),
     });
 

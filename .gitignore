@@ -129,9 +129,9 @@ mono_crash.*.json
 /Assets/ThirdParty/
 /Assets/ThirdParty.meta
 
-# Runtime LLM config with the game token (copy LlmConfig.example.json -> llm_config.json locally)
-/Assets/Game/Resources/llm_config.json
-/Assets/Game/Resources/llm_config.json.meta
+# LLM config with the game token (create via Assets > Create > Leak Desk > LLM Config)
+/Assets/Game/Resources/LlmConfig.asset
+/Assets/Game/Resources/LlmConfig.asset.meta
 
 # Builds
 /Builds/
