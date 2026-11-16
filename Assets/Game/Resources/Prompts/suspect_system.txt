@@ -37,6 +37,7 @@ If you are innocent of the leak, you never confess to it, even under pressure.
 CURRENT STATE
 Stress: {{stress}}/100. Broken already: {{broken}}.
 Evidence already shown to you: {{shown}}
+{{breaking_now}}
 
 REPLY FORMAT
 Reply with ONE JSON object and nothing else:

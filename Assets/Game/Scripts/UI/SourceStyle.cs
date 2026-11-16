@@ -16,6 +16,7 @@ public static class SourceStyle
         "news" => "NEWS",
         "facilities" => "FACILITIES",
         "testimony" => "STATEMENT",
+        "desk" => "DESK",
         _ => "NOTE",
     };
 
@@ -32,7 +33,25 @@ public static class SourceStyle
         "news" => new Color(0.95f, 0.95f, 0.95f),
         "facilities" => new Color(0.55f, 0.75f, 0.95f),
         "testimony" => new Color(1f, 0.86f, 0.45f),
+        "desk" => new Color(0.36f, 0.88f, 0.75f),
         _ => new Color(0.75f, 0.78f, 0.85f),
+    };
+
+    public static string Icon(string source) => source switch
+    {
+        "email" => "mail",
+        "slack" => "talk",
+        "badge" => "key_1",
+        "transfer" => "folder",
+        "vpn" => "wifi",
+        "audit" => "brain",
+        "ticket" => "tag",
+        "calendar" => "calendar",
+        "news" => "news_1",
+        "facilities" => "thunder",
+        "testimony" => "bubble_typing",
+        "desk" => "find",
+        _ => "paper_1",
     };
 
     public static Color EmotionColor(string emotion) => emotion switch

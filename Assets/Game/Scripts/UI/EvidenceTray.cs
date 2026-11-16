@@ -60,7 +60,9 @@ public class EvidenceTray
         var card = UiKit.Card(parent, T.card, 12, 4, "Evidence: " + item.Id);
         var top = UiKit.Rect("Top", card.transform);
         top.HLayout(8);
-        var tag = UiKit.Chip(top, SourceStyle.Color(item.Source), 112, 26, "Tag");
+        var tag = UiKit.Chip(top, SourceStyle.Color(item.Source), 124, 28, "Tag");
+        tag.GetComponent<HorizontalLayoutGroup>().spacing = 4;
+        UiKit.Icon(tag.transform, SourceStyle.Icon(item.Source), 18, T.cardText);
         UiKit.Text(tag.transform, SourceStyle.Label(item.Source), 13, T.cardText, TextAlignmentOptions.Center, FontStyles.Bold);
         var title = UiKit.Text(top, $"<b>{item.Title}</b>", T.smallSize, T.cardText);
         title.Size(flexW: 1);
@@ -72,6 +74,7 @@ public class EvidenceTray
             b.Size(prefW: 74, prefH: 30, minW: 74);
         }
         UiKit.Text(card.transform, item.Content, T.smallSize - 1, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.85f));
+        card.gameObject.AddComponent<EvidenceDrag>().Item = item;
         return card;
     }
 }

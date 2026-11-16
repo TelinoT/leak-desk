@@ -43,6 +43,7 @@ public class SuspectAgent
     readonly List<LlmMessage> history = new();
     readonly HashSet<string> shown = new();
     readonly HashSet<string> revealed = new();
+    string breakingNow; // content of evidence that breaks the story, presented this turn
 
     public List<ChatEntry> Log { get; } = new();
     public int Stress { get; private set; }
@@ -87,6 +88,7 @@ public class SuspectAgent
         bool first = shown.Add(evidence.Id);
 
         string content = $"[The analyst places a piece of evidence on the table. {evidence.PromptText}] Explain this.";
+        breakingNow = breaking && first ? evidence.Content : null;
         Send(content, done, adjust: reply =>
         {
             // The truth file decides what breaks a suspect; don't leave that to the model alone.
@@ -114,6 +116,7 @@ public class SuspectAgent
                 : reply.raw));
 
             adjust?.Invoke(reply);
+            breakingNow = null;
             Apply(reply);
             done?.Invoke(reply);
         });
@@ -229,6 +232,8 @@ public class SuspectAgent
             ("knowledge", knowledge.ToString()), ("people", people.ToString()),
             ("breaks", breaks), ("on_break", Data.OnBreak ?? ""),
             ("stress", Stress.ToString()), ("broken", Broken ? "yes - you no longer deny what the evidence shows" : "no"),
+            ("breaking_now", breakingNow == null ? "" :
+                $"THIS TURN: the analyst just showed you \"{breakingNow}\". It breaks your story. Do NOT deny it any more - react as described in HOW YOU BREAK, starting now, with a big stress_delta (25-40)."),
             ("shown", shownText));
     }
 

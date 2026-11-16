@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -39,9 +40,25 @@ public class UiTheme : ScriptableObject
     public Sprite avatarSprite;
     public Sprite barFillSprite;
 
+    [Header("Icons (looked up by sprite name without the 'Pictoicon_' prefix)")]
+    public List<Sprite> icons = new();
+
     [Header("Sizes")]
     public float pixelsPerUnitMultiplier = 1f;
     public float bodySize = 22f;
     public float smallSize = 17f;
     public float headingSize = 30f;
+
+    Dictionary<string, Sprite> iconLookup;
+
+    public Sprite Icon(string name)
+    {
+        if (iconLookup == null)
+        {
+            iconLookup = new Dictionary<string, Sprite>();
+            foreach (var s in icons)
+                if (s != null) iconLookup[s.name.Replace("Pictoicon_", "")] = s;
+        }
+        return name != null && iconLookup.TryGetValue(name, out var sprite) ? sprite : null;
+    }
 }

@@ -272,7 +272,8 @@
         "e_dlp_mail"
       ],
       "on_break": "Admit the 23:41 forward, beg not to be fired, and insist you only fixed fonts in the .key file. Point out that the leaked slides were a PDF with a 'Press Preview' footer, which you never made. Mention Jules's angry DM if pushed.",
-      "opening_line": "Hi! Hi. Sorry, I've had like four coffees. This is about the leak, right? Awful. Just awful."
+      "opening_line": "Hi! Hi. Sorry, I've had like four coffees. This is about the leak, right? Awful. Just awful.",
+      "voice_pitch": 1.4
     },
     {
       "id": "theo",
@@ -295,7 +296,8 @@
         "e_power_b2"
       ],
       "on_break": "Admit being in Lab B2 and (grudgingly) the miner. Stress that the lab has no Wi-Fi. Then mention the 02:12 Jensenbot push notification about a press preview requested by 'j.okoro'.",
-      "opening_line": "*sigh* Let me guess. Someone leaked the marketing slides and you're interviewing everyone with a badge."
+      "opening_line": "*sigh* Let me guess. Someone leaked the marketing slides and you're interviewing everyone with a badge.",
+      "voice_pitch": 0.72
     },
     {
       "id": "jules",
@@ -320,7 +322,8 @@
         "e_jb_session"
       ],
       "on_break": "First break: admit you were online, claim you were 'just checking email'. If shown a second breaking item or stress reaches 85+, confess: you asked Jensenbot for a press preview, but insist Jensenbot suggested the external link and made it 'easy'. Show bitterness about Dex cutting your demo.",
-      "opening_line": "Honestly? I figured you'd get to me. Disgruntled marketing guy, right? Classic. Ask away."
+      "opening_line": "Honestly? I figured you'd get to me. Disgruntled marketing guy, right? Classic. Ask away.",
+      "voice_pitch": 1.0
     },
     {
       "id": "nadia",
@@ -339,7 +342,8 @@
       "protects": "Your job search. You will freely share the Jensenbot ticket if asked about Jensenbot, permissions or 'who could share files externally'.",
       "breaks_if_shown": [],
       "on_break": "If pressed hard, admit the Quantum Pear interview and point out it has nothing to do with the leak.",
-      "opening_line": "Good morning. I have nine minutes before I need to prepare Dex for the board. Let's be efficient."
+      "opening_line": "Good morning. I have nine minutes before I need to prepare Dex for the board. Let's be efficient.",
+      "voice_pitch": 1.2
     }
   ],
   "jensenbot": {
@@ -506,6 +510,80 @@
       "relevant_to": [
         "f_jb_scope"
       ]
+    },
+    {
+      "id": "e_mara_sticky",
+      "source": "desk",
+      "title": "Mara's sticky note",
+      "content": "Sticky note on Mara's monitor: 'SLIDE 31 KERNING!!! fix at home -> send to pmail'",
+      "relevant_to": [
+        "f_mara_fwd"
+      ]
+    },
+    {
+      "id": "e_theo_payout",
+      "source": "desk",
+      "title": "Mining payout printout",
+      "content": "Printout in Theo's drawer: 'NightShift pool payout +0.42 coins, Wed 02:45, rig B2-07'",
+      "relevant_to": [
+        "f_theo_miner"
+      ]
+    },
+    {
+      "id": "e_card_chiprumor",
+      "source": "desk",
+      "title": "ChipRumor business card",
+      "content": "Business card in Jules's trash: 'Kai Varga, Editor, ChipRumor', handwritten on the back: 'anything on Helix? call anytime'",
+      "relevant_to": [
+        "f_cr_contact"
+      ]
+    },
+    {
+      "id": "e_jules_sticky",
+      "source": "desk",
+      "title": "Jules's sticky note",
+      "content": "Sticky note on Jules's monitor: 'JB does press previews?? ask how'",
+      "relevant_to": [
+        "f_press_preview",
+        "f_jb_suggested"
+      ]
+    },
+    {
+      "id": "e_jules_demo",
+      "source": "desk",
+      "title": "Cut demo printout",
+      "content": "Printout of the Helix X1 demo segment in Jules's drawer, 'MY DEMO' scrawled across it in marker",
+      "relevant_to": [
+        "f_cut",
+        "f_jules_angry"
+      ]
+    },
+    {
+      "id": "e_nadia_interview",
+      "source": "desk",
+      "title": "Quantum Pear reminder",
+      "content": "Calendar reminder on Nadia's monitor: 'Quantum Pear - 2nd round, Thu 17:00'",
+      "relevant_to": [
+        "f_nadia_job"
+      ]
+    },
+    {
+      "id": "e_nadia_ticket_note",
+      "source": "desk",
+      "title": "Annotated IT ticket",
+      "content": "Printed IT ticket #4471 in Nadia's drawer, with her note: 'why does the bot need external sharing??'",
+      "relevant_to": [
+        "f_jb_scope"
+      ]
+    },
+    {
+      "id": "e_volta_receipt",
+      "source": "desk",
+      "title": "Restaurant receipt",
+      "content": "Receipt in Nadia's trash: Ristorante Volta, Tue 01:22, 3 covers, paid by Envydia exec card",
+      "relevant_to": [
+        "f_nadia_alibi"
+      ]
     }
   ],
   "winning_evidence": [
@@ -532,13 +610,27 @@
     [
       "e_article_footer",
       "e_share_link"
+    ],
+    [
+      "e_share_link",
+      "e_card_chiprumor"
+    ],
+    [
+      "e_jb_session",
+      "e_card_chiprumor"
+    ],
+    [
+      "e_vpn_jules",
+      "e_card_chiprumor"
     ]
   ],
   "accomplice_evidence": [
     "e_ticket_scope",
     "e_jb_lownoise",
     "e_jb_report",
-    "e_jb_session"
+    "e_jb_session",
+    "e_jules_sticky",
+    "e_nadia_ticket_note"
   ],
   "documents": [
     {
@@ -869,7 +961,9 @@
         "e_slack_cut",
         "e_article_footer",
         "e_jb_report",
-        "any_question"
+        "any_question",
+        "e_mara_sticky",
+        "e_jules_demo"
       ],
       "documents": [
         "doc_badge",
@@ -890,7 +984,10 @@
         "e_dm_bed",
         "f_theo_miner",
         "f_jules_angry",
-        "f_cut"
+        "f_cut",
+        "e_theo_payout",
+        "e_card_chiprumor",
+        "e_jules_sticky"
       ],
       "documents": [
         "doc_vpn",
@@ -922,5 +1019,108 @@
         "nadia"
       ]
     }
-  ]
+  ],
+  "desks": [
+    {
+      "suspect": "mara",
+      "spots": [
+        {
+          "id": "monitor",
+          "name": "Monitor",
+          "icon": "monitor",
+          "found": "A neon sticky note is stuck to the bezel.",
+          "evidence": "e_mara_sticky"
+        },
+        {
+          "id": "drawer",
+          "name": "Drawer",
+          "icon": "pouch",
+          "found": "Four empty espresso pods and a run-of-show with 'v14 LOCKED' circled three times. Nothing useful."
+        },
+        {
+          "id": "trash",
+          "name": "Trash bin",
+          "icon": "delete_1",
+          "found": "A printout of slide 31 covered in red pen. Just kerning notes."
+        }
+      ]
+    },
+    {
+      "suspect": "theo",
+      "spots": [
+        {
+          "id": "monitor",
+          "name": "Monitor",
+          "icon": "monitor",
+          "found": "A benchmark spreadsheet and a lot of energy-drink rings. Nothing useful."
+        },
+        {
+          "id": "drawer",
+          "name": "Drawer",
+          "icon": "pouch",
+          "found": "Under a pile of cables: a thermal printout.",
+          "evidence": "e_theo_payout"
+        },
+        {
+          "id": "trash",
+          "name": "Trash bin",
+          "icon": "delete_1",
+          "found": "Three empty energy drinks and a burnt-out GPU fan. Hmm."
+        }
+      ]
+    },
+    {
+      "suspect": "jules",
+      "spots": [
+        {
+          "id": "monitor",
+          "name": "Monitor",
+          "icon": "monitor",
+          "found": "A sticky note, half peeled off.",
+          "evidence": "e_jules_sticky"
+        },
+        {
+          "id": "drawer",
+          "name": "Drawer",
+          "icon": "pouch",
+          "found": "A stack of printouts, the top one defaced.",
+          "evidence": "e_jules_demo"
+        },
+        {
+          "id": "trash",
+          "name": "Trash bin",
+          "icon": "delete_1",
+          "found": "Crumpled under a coffee cup: a business card.",
+          "evidence": "e_card_chiprumor"
+        }
+      ]
+    },
+    {
+      "suspect": "nadia",
+      "spots": [
+        {
+          "id": "monitor",
+          "name": "Monitor",
+          "icon": "monitor",
+          "found": "A calendar reminder is still open on screen.",
+          "evidence": "e_nadia_interview"
+        },
+        {
+          "id": "drawer",
+          "name": "Drawer",
+          "icon": "pouch",
+          "found": "A neatly filed printout with a note in the margin.",
+          "evidence": "e_nadia_ticket_note"
+        },
+        {
+          "id": "trash",
+          "name": "Trash bin",
+          "icon": "delete_1",
+          "found": "A folded restaurant receipt.",
+          "evidence": "e_volta_receipt"
+        }
+      ]
+    }
+  ],
+  "desk_search_seconds": 30
 }

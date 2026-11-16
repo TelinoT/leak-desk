@@ -56,6 +56,18 @@ public class EvidenceInventory
         });
     }
 
+    /// <summary>Adds a case evidence item directly (desk searches).</summary>
+    public EvidenceItem AddCaseEvidence(string evidenceId)
+    {
+        var ev = caseFile.EvidenceById(evidenceId);
+        if (ev == null) return null;
+        return Add(new EvidenceItem
+        {
+            Id = ev.Id, Source = ev.Source, Title = ev.Title, Content = ev.Content,
+            RelevantFacts = new List<string>(ev.RelevantTo),
+        });
+    }
+
     public EvidenceItem AddTestimony(SuspectData suspect, CaseFact fact)
     {
         if (fact == null) return null;

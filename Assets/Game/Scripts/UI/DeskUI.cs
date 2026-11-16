@@ -10,13 +10,14 @@ using UnityEngine.UI;
 /// </summary>
 public class DeskUI : MonoBehaviour
 {
-    public enum Tab { Logs, Interrogate, Jensenbot }
+    public enum Tab { Logs, Desks, Interrogate, Jensenbot }
 
     public LeakDeskGame Game { get; private set; }
     public Canvas Canvas { get; private set; }
     public FeedPanel Feed { get; private set; }
     public InterrogationPanel Interrogation { get; private set; }
     public JensenbotPanel JensenbotView { get; private set; }
+    public DeskSearchPanel Desks { get; private set; }
     public EvidenceTray Tray { get; private set; }
     public AccusationOverlay Accusation { get; private set; }
     public Tab CurrentTab { get; private set; } = Tab.Logs;
@@ -27,6 +28,8 @@ public class DeskUI : MonoBehaviour
     Image timeBar;
     Button accuseButton;
     readonly Dictionary<Tab, Button> navButtons = new();
+    readonly Dictionary<Tab, TextMeshProUGUI> navLabels = new();
+    readonly Dictionary<Tab, Image> navIcons = new();
     VerdictOverlay verdict;
     BriefingOverlay briefing;
 
@@ -66,6 +69,7 @@ public class DeskUI : MonoBehaviour
         Feed = new FeedPanel(this, center);
         Interrogation = new InterrogationPanel(this, center);
         JensenbotView = new JensenbotPanel(this, center);
+        Desks = new DeskSearchPanel(this, center);
 
         Tray = new EvidenceTray(this, body);
 
@@ -111,11 +115,12 @@ public class DeskUI : MonoBehaviour
 
         var clock = UiKit.Rect("Clock", bar.transform);
         clock.VLayout(4);
-        clock.Size(prefW: 280);
+        clock.Size(prefW: 300);
         var clockRow = UiKit.Rect("ClockRow", clock);
         clockRow.HLayout(12);
         clockText = UiKit.Text(clockRow, "08:48", 40, T.text, TextAlignmentOptions.Left, FontStyles.Bold);
-        clockText.Size(prefW: 120);
+        clockText.textWrappingMode = TextWrappingModes.NoWrap;
+        clockText.Size(prefW: 140);
         countdownText = UiKit.Text(clockRow, "12:00 left", T.smallSize, T.muted, TextAlignmentOptions.Left);
         countdownText.Size(flexW: 1);
         timeBar = UiKit.Bar(clock, T.accent, 10);
@@ -130,36 +135,43 @@ public class DeskUI : MonoBehaviour
         nav.VLayout(12, 14);
         nav.Size(prefW: 200, flexH: 1);
 
-        AddNav(nav.transform, Tab.Logs, "Logs\n<size=60%>flag lines</size>");
-        AddNav(nav.transform, Tab.Interrogate, "Interrogate\n<size=60%>4 suspects</size>");
-        AddNav(nav.transform, Tab.Jensenbot, "Jensenbot\n<size=60%>AI assistant</size>");
+        AddNav(nav.transform, Tab.Logs, "folder", "Logs");
+        AddNav(nav.transform, Tab.Desks, "find", "Desks");
+        AddNav(nav.transform, Tab.Interrogate, "mic", "Interrogate");
+        AddNav(nav.transform, Tab.Jensenbot, "brain", "Jensenbot");
         UiKit.Spacer(nav.transform, 0, 1);
         var help = UiKit.Text(nav.transform, "Board meeting at 09:00.\nName the leaker, attach proof.", T.smallSize - 2, T.muted,
             TextAlignmentOptions.Center);
         help.Size(prefH: 80);
     }
 
-    void AddNav(Transform parent, Tab tab, string label)
+    void AddNav(Transform parent, Tab tab, string icon, string label)
     {
-        var b = UiKit.Button(parent, label, () => ShowTab(tab), T.panelAlt, T.text, 96, 21);
+        var b = UiKit.Button(parent, "", () => { Sfx.Play("click"); ShowTab(tab); }, T.panelAlt, T.text, 112, 21);
         navButtons[tab] = b;
-        var t = b.GetComponentInChildren<TMP_Text>();
+        Destroy(b.GetComponentInChildren<TMP_Text>().gameObject);
+        b.image.VLayout(4, 12, TextAnchor.MiddleCenter);
+        var iconRow = UiKit.Rect("IconRow", b.transform);
+        iconRow.HLayout(0, 0, TextAnchor.MiddleCenter);
+        navIcons[tab] = UiKit.Icon(iconRow, icon, 40, T.text);
+        var t = UiKit.Text(b.transform, label, 20, T.text, TextAlignmentOptions.Center, FontStyles.Bold);
         t.textWrappingMode = TextWrappingModes.NoWrap;
-        t.overflowMode = TextOverflowModes.Overflow;
-        t.lineSpacing = -10;
+        navLabels[tab] = t;
     }
 
     public void ShowTab(Tab tab)
     {
         CurrentTab = tab;
         Feed.SetVisible(tab == Tab.Logs);
+        Desks.SetVisible(tab == Tab.Desks);
         Interrogation.SetVisible(tab == Tab.Interrogate);
         JensenbotView.SetVisible(tab == Tab.Jensenbot);
         foreach (var kv in navButtons)
         {
             bool on = kv.Key == tab;
             kv.Value.image.color = on ? T.accent : T.panelAlt;
-            kv.Value.GetComponentInChildren<TMP_Text>().color = on ? T.accentText : T.text;
+            navLabels[kv.Key].color = on ? T.accentText : T.text;
+            navIcons[kv.Key].color = on ? T.accentText : T.text;
         }
         Tray.Refresh();
     }
@@ -191,7 +203,7 @@ public class DeskUI : MonoBehaviour
         if (Game == null || Game.Case == null) return;
         Feed.Tick();
         int unread = Feed.UnreadCount;
-        navButtons[Tab.Logs].SetLabel(unread > 0 ? $"Logs  <color=#{Hex(T.warning)}>({unread})</color>\n<size=60%>flag lines</size>" : "Logs\n<size=60%>flag lines</size>");
+        navLabels[Tab.Logs].text = unread > 0 ? $"Logs <color=#{Hex(CurrentTab == Tab.Logs ? T.accentText : T.warning)}>({unread})</color>" : "Logs";
         clockText.text = Game.ClockText;
         countdownText.text = Game.CountdownText;
         float left = Game.RoundSeconds <= 0 ? 0 : Game.TimeLeft / Game.RoundSeconds;

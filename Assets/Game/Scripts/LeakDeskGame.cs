@@ -155,6 +155,27 @@ public class LeakDeskGame : MonoBehaviour
         if (item != null && ui != null) ui.Toast($"New statement from {agent.Data.FirstName} added to evidence", SourceStyle.Color("testimony"));
     }
 
+    // ---------- desk searches ----------
+
+    readonly HashSet<string> searchedSpots = new();
+
+    public bool IsSpotSearched(string suspectId, string spotId) => searchedSpots.Contains(suspectId + ":" + spotId);
+
+    /// <summary>Searches a desk spot: costs clock time, may add evidence. Returns the evidence (or null).</summary>
+    public EvidenceItem SearchSpot(string suspectId, DeskSpot spot)
+    {
+        if (Phase != GamePhase.Investigating || !searchedSpots.Add(suspectId + ":" + spot.Id)) return null;
+        SpendTime(Case.DeskSearchSeconds);
+        return string.IsNullOrEmpty(spot.EvidenceId) ? null : Evidence.AddCaseEvidence(spot.EvidenceId);
+    }
+
+    /// <summary>Moves the round clock forward (actions that take time in-fiction).</summary>
+    public void SpendTime(float seconds)
+    {
+        if (Overtime) return;
+        Elapsed = Mathf.Min(RoundSeconds - 1f, Elapsed + seconds);
+    }
+
     // ---------- progressive unlocks ----------
 
     public bool IsWaveUnlocked(CaseWave w) => unlockedWaves.Contains(w.Id);

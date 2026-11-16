@@ -112,6 +112,8 @@ public static class UiKit
         // and steal leftover space from the columns that should stretch.
         if (prefW >= 0 && flexW < 0) flexW = 0;
         if (prefH >= 0 && flexH < 0) flexH = 0;
+        // Fixed-width columns also refuse to be squeezed by greedy neighbours (long unwrapped text).
+        if (prefW >= 0 && flexW == 0 && minW < 0) minW = prefW;
         le.preferredWidth = prefW;
         le.preferredHeight = prefH;
         le.flexibleWidth = flexW;
@@ -319,13 +321,32 @@ public static class UiKit
         return rt;
     }
 
+    /// <summary>A tinted icon from the theme's icon set (empty Image if the pack isn't present).</summary>
+    public static Image Icon(Transform parent, string icon, float size, Color color)
+    {
+        var img = Panel(parent, color, null, "Icon: " + icon);
+        img.sprite = Theme.Icon(icon);
+        img.preserveAspect = true;
+        img.raycastTarget = false;
+        img.enabled = img.sprite != null;
+        img.Size(prefW: size, prefH: size, minW: size, minH: size);
+        return img;
+    }
+
     /// <summary>Round avatar sprite (falls back to the pill).</summary>
     public static Sprite AvatarSprite => Theme.avatarSprite != null ? Theme.avatarSprite : Theme.pillSprite;
 
     public static string Hex(Color c) => ColorUtility.ToHtmlStringRGB(c);
 
+    /// <summary>Removes all children now (detached first, so childCount/GetChild are correct immediately).</summary>
     public static void Clear(Transform t)
     {
-        for (int i = t.childCount - 1; i >= 0; i--) UnityEngine.Object.Destroy(t.GetChild(i).gameObject);
+        for (int i = t.childCount - 1; i >= 0; i--)
+        {
+            var child = t.GetChild(i);
+            child.gameObject.SetActive(false);
+            child.SetParent(null, false);
+            UnityEngine.Object.Destroy(child.gameObject);
+        }
     }
 }

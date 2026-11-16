@@ -28,6 +28,8 @@ public class CaseFile
     [JsonProperty("accomplice_evidence")] public List<string> AccompliceEvidence = new();
     [JsonProperty("documents")] public List<CaseDocument> Documents = new();
     [JsonProperty("waves")] public List<CaseWave> Waves = new();
+    [JsonProperty("desks")] public List<CaseDesk> Desks = new();
+    [JsonProperty("desk_search_seconds")] public float DeskSearchSeconds = 30f;
 
     public SuspectData Suspect(string id) => Suspects.FirstOrDefault(s => s.Id == id);
     public EvidenceData EvidenceById(string id) => Evidence.FirstOrDefault(e => e.Id == id);
@@ -50,6 +52,22 @@ public class CaseWave
     [JsonProperty("triggers")] public List<string> Triggers = new();
     [JsonProperty("documents")] public List<string> Documents = new();
     [JsonProperty("suspects")] public List<string> Suspects = new();
+}
+
+/// <summary>A suspect's desk: a few spots the player can search (each costs clock time).</summary>
+public class CaseDesk
+{
+    [JsonProperty("suspect")] public string Suspect;
+    [JsonProperty("spots")] public List<DeskSpot> Spots = new();
+}
+
+public class DeskSpot
+{
+    [JsonProperty("id")] public string Id;
+    [JsonProperty("name")] public string Name;
+    [JsonProperty("icon")] public string Icon;
+    [JsonProperty("found")] public string Found;
+    [JsonProperty("evidence")] public string EvidenceId;
 }
 
 public class CasePerson
@@ -92,6 +110,7 @@ public class SuspectData
     [JsonProperty("breaks_if_shown")] public List<string> BreaksIfShown = new();
     [JsonProperty("on_break")] public string OnBreak;
     [JsonProperty("opening_line")] public string OpeningLine;
+    [JsonProperty("voice_pitch")] public float VoicePitch = 1f;
 
     public string FirstName => string.IsNullOrEmpty(Name) ? Id : Name.Split(' ')[0];
 
