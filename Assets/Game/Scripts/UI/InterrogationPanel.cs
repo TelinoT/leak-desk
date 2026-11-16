@@ -316,6 +316,7 @@ public class InterrogationPanel
                 {
                     var texts = bubble.GetComponentsInChildren<TextMeshProUGUI>();
                     UiFx.Typewrite(texts[^1], 60f, current.Data.VoicePitch);
+                    SuspectPortraits.Instance?.Talk(e.Text.Length / 60f);
                 }
                 break;
             case ChatEntry.Kind.Evidence:

@@ -7,8 +7,9 @@ using UnityEngine;
 /// </summary>
 public class SuspectRig
 {
-    readonly Transform root, spine2, spine3, neck, head, shoulderL, shoulderR, elbowL, elbowR;
-    readonly Quaternion baseSpine2, baseSpine3, baseNeck, baseHead;
+    readonly Transform root, spine2, spine3, neck, head, shoulderL, shoulderR, elbowL, elbowR, jaw, brows;
+    readonly Quaternion baseSpine2, baseSpine3, baseNeck, baseHead, baseJaw;
+    readonly Vector3 baseBrows;
     readonly float seed;
 
     public SuspectRig(GameObject character, float armDown = 74f, float elbowBend = 14f)
@@ -22,6 +23,8 @@ public class SuspectRig
         shoulderR = Find("Shoulder_R");
         elbowL = Find("Elbow_L");
         elbowR = Find("Elbow_R");
+        jaw = Find("Jaw");
+        brows = Find("Eyebrows");
         seed = Random.value * 10f;
 
         // Arms down: rotate each upper arm around the character's forward axis, away from the side it sticks out to.
@@ -32,6 +35,8 @@ public class SuspectRig
         baseSpine3 = spine3 ? spine3.localRotation : Quaternion.identity;
         baseNeck = neck ? neck.localRotation : Quaternion.identity;
         baseHead = head ? head.localRotation : Quaternion.identity;
+        baseJaw = jaw ? jaw.localRotation : Quaternion.identity;
+        baseBrows = brows ? brows.localPosition : Vector3.zero;
     }
 
     Transform Find(string name)
@@ -66,9 +71,10 @@ public class SuspectRig
     /// <param name="react">0..1 how far into the current reaction (eases in)</param>
     /// <param name="stress">0..100</param>
     /// <param name="recoil">0..1 short flinch after evidence is slammed</param>
-    public void Tick(float t, string emotion, float react, int stress, float recoil)
+    public void Tick(float t, string emotion, float react, int stress, float recoil, float talking = 0f)
     {
         t += seed;
+        Reset(jaw, baseJaw);
         Reset(spine2, baseSpine2);
         Reset(spine3, baseSpine3);
         Reset(neck, baseNeck);
@@ -102,6 +108,20 @@ public class SuspectRig
             default:
                 if (head) Rotate(head, new Vector3(0, 0, Mathf.Sin(t * 0.8f) * 3f));
                 break;
+        }
+
+        // Talking: the jaw flaps in a syllable-ish rhythm while the reply types out.
+        if (talking > 0 && jaw != null)
+        {
+            float open = Mathf.Max(0, Mathf.Sin(t * 17f) * 0.6f + Mathf.Sin(t * 9.3f) * 0.5f);
+            Rotate(jaw, new Vector3(open * 14f * Mathf.Clamp01(talking * 4f), 0, 0));
+        }
+
+        // Eyebrows: raised when nervous/evasive, lowered when angry or broken.
+        if (brows != null)
+        {
+            float up = emotion switch { "nervous" => 0.012f, "evasive" => 0.008f, "angry" => -0.01f, "broken" => -0.006f, _ => 0f };
+            brows.position = brows.parent.TransformPoint(baseBrows) + root.up * up * k;
         }
 
         // Flinch backwards when evidence hits the table.

@@ -149,6 +149,11 @@ public class SuspectPortraits : MonoBehaviour
         stress = stressLevel;
     }
 
+    float talkUntil;
+
+    /// <summary>Animate the selected suspect talking for this many seconds.</summary>
+    public void Talk(float seconds) => talkUntil = Time.time + seconds;
+
     /// <summary>Short flinch, used when evidence is slammed on the table.</summary>
     public void Recoil() => recoil = 1f;
 
@@ -157,7 +162,7 @@ public class SuspectPortraits : MonoBehaviour
         if (!IsReady || current == null || !rigs.TryGetValue(current, out var rig)) return;
         reactionTime += Time.deltaTime;
         recoil = Mathf.MoveTowards(recoil, 0, Time.deltaTime * 2.5f);
-        rig.Tick(Time.time, reaction, Mathf.Clamp01(reactionTime * 2.5f), stress, recoil);
+        rig.Tick(Time.time, reaction, Mathf.Clamp01(reactionTime * 2.5f), stress, recoil, Mathf.Max(0, talkUntil - Time.time));
     }
 
     void OnDestroy()
