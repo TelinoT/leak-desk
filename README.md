@@ -8,7 +8,7 @@ Someone leaked the keynote. The board wants a name by 09:00. You have 12 minutes
 - **Rules:** [RULES.md](RULES.md) · **AI stack:** [AI_STACK.md](AI_STACK.md)
 
 ## What it is
-You're the internal security analyst at **Envydia**, a (fictional) chip company. Read raw logs, flag suspicious lines, and interrogate four LLM-driven suspects in free text. Each has a public story, a secret and lies that crack when you present the right evidence. Then accuse one of them in front of an AI board that knows the truth.
+You're the internal security analyst at **Envydia**, a (fictional) chip company. Read raw logs, search suspects' desks, flag suspicious lines, and interrogate four LLM-driven suspects in free text. Each has a public story, a secret and lies that crack when you present the right evidence. Then accuse one of them in front of an AI board that knows the truth.
 
 The twist: **Jensenbot**, the desk assistant that summarizes logs for you, has its own reasons to keep certain entries quiet.
 
@@ -28,7 +28,9 @@ Assets/Game/
   Scripts/Interrogation/  SuspectAgent (prompt, history, stress, JSON replies)
   Scripts/Desk/           JensenbotAgent (summaries from a tampered feed)
   Scripts/Verdict/        Judge (code pre-check + LLM board)
-  Scripts/UI/             runtime-built UI (UiKit, panels, overlays, 3D portraits)
+  Scripts/UI/             runtime-built UI (UiKit, panels, overlays), 3D suspect stage (SuspectRig),
+                          desk search, procedural sound (Sfx), Jensenbot face
+  Fonts/                  Rubik (SIL OFL)
   Scenes/LeakDesk.unity   the game · LlmDebug.unity: LLM round-trip test bench
 Tools/worker/             Cloudflare Worker proxy (keeps the API key out of the build)
 ```
@@ -46,4 +48,7 @@ The visuals use paid packs that are licensed for use in builds but can't be redi
 Without them the game still runs: the UI falls back to flat shapes and colored initials, and the scene shows missing references for the office.
 
 ## Credits
+- Font: Rubik by the Rubik Project Authors (SIL Open Font License)
+- All sound effects are synthesized in code
+
 Made by TelinoT, built with Claude Code. Forked from our earlier jam game *Too Lucky*.
