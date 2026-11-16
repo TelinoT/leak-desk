@@ -159,6 +159,8 @@ public class LeakDeskGame : MonoBehaviour
 
     readonly HashSet<string> searchedSpots = new();
 
+    public int SpotsSearched => searchedSpots.Count;
+
     public bool IsSpotSearched(string suspectId, string spotId) => searchedSpots.Contains(suspectId + ":" + spotId);
 
     /// <summary>Searches a desk spot: costs clock time, may add evidence. Returns the evidence (or null).</summary>

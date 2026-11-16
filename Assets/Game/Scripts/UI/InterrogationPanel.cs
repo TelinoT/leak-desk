@@ -300,7 +300,8 @@ public class InterrogationPanel
                 break;
             case ChatEntry.Kind.Suspect:
                 var label = $"{current.Data.FirstName}  <color=#{UiKit.Hex(Color.Lerp(SourceStyle.EmotionColor(e.Emotion), Color.black, 0.25f))}>· {SourceStyle.EmotionLabel(e.Emotion)}</color>";
-                var bubble = chat.AddBubble(label, e.Text, ChatView.Side.Left, T.bubbleSuspect);
+                var head = SuspectPortraits.Instance != null ? SuspectPortraits.Instance.Headshot(current.Data.Id) : null;
+                var bubble = chat.AddBubble(label, e.Text, ChatView.Side.Left, T.bubbleSuspect, null, head);
                 if (animate)
                 {
                     var texts = bubble.GetComponentsInChildren<TextMeshProUGUI>();

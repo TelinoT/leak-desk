@@ -97,6 +97,27 @@ public class VerdictOverlay
             UiKit.Text(truth.transform, line, T.smallSize, T.muted);
         }
 
+        // What you missed: the closest winning combination, with what the player had vs. never found.
+        if (p != null && !p.Proven)
+        {
+            var best = c.WinningEvidence.OrderByDescending(combo => combo.Count(id => game.Evidence.Has(id))).FirstOrDefault();
+            if (best != null)
+            {
+                var miss = UiKit.Card(body, new Color(1, 1, 1, 0.07f), 22, 8, "Missed");
+                UiKit.Text(miss.transform, "THE PROOF THAT WOULD HAVE CLOSED IT", T.smallSize, T.warning, style: FontStyles.Bold);
+                foreach (var id in best)
+                {
+                    var ev = c.EvidenceById(id);
+                    bool had = game.Evidence.Has(id);
+                    var row = UiKit.Rect("Row", miss.transform);
+                    row.HLayout(12);
+                    UiKit.Icon(row, had ? "mark_check" : "mark_x", 26, had ? T.accent : T.danger);
+                    UiKit.Text(row, $"<b>{ev?.Title}</b>  <color=#{UiKit.Hex(T.muted)}>({SourceStyle.Label(ev?.Source)}{(had ? ", you had it" : ", never found")})</color>",
+                        T.bodySize - 2, T.text).Size(flexW: 1);
+                }
+            }
+        }
+
         // Stats
         int questions = game.Suspects.Sum(s => s.QuestionsAsked);
         int minutes = Mathf.FloorToInt(game.Elapsed / 60f), seconds = Mathf.FloorToInt(game.Elapsed % 60f);

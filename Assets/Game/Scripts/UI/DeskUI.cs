@@ -23,6 +23,12 @@ public class DeskUI : MonoBehaviour
     public Tab CurrentTab { get; private set; } = Tab.Logs;
 
     RectTransform overlayRoot;
+    RectTransform centerRoot;
+    Button muteButton;
+    Image muteIcon;
+    TextMeshProUGUI progEvidence, progCracked, progDesks, progBot;
+    public Button AccuseButton => accuseButton;
+    public TextMeshProUGUI ClockLabel => clockText;
     RectTransform toastRoot;
     TextMeshProUGUI clockText, countdownText;
     Image timeBar;
@@ -44,6 +50,7 @@ public class DeskUI : MonoBehaviour
         ui.BuildLayout();
         game.PhaseChanged += ui.OnPhaseChanged;
         game.WaveUnlocked += ui.OnWave;
+        canvas.gameObject.AddComponent<DeskDirector>();
         return ui;
     }
 
@@ -65,6 +72,7 @@ public class DeskUI : MonoBehaviour
         BuildNav(body);
 
         var center = UiKit.Rect("Center", body);
+        centerRoot = center;
         center.Size(flexW: 1, flexH: 1);
         Feed = new FeedPanel(this, center);
         Interrogation = new InterrogationPanel(this, center);
@@ -126,7 +134,15 @@ public class DeskUI : MonoBehaviour
         countdownText.Size(flexW: 1);
         timeBar = UiKit.Bar(clock, T.accent, 10);
 
-        accuseButton = UiKit.Button(bar.transform, "ACCUSE", () => Game.OpenAccusation(false), T.danger, Color.white, 64, 26);
+        muteButton = UiKit.Button(bar.transform, "", ToggleMute, T.panelAlt, T.text, 64);
+        muteButton.Size(prefW: 64, prefH: 64);
+        Destroy(muteButton.GetComponentInChildren<TMP_Text>().gameObject);
+        muteIcon = UiKit.Icon(muteButton.transform, "sound_on", 30, T.text);
+        var mr = (RectTransform)muteIcon.transform;
+        mr.anchorMin = mr.anchorMax = new Vector2(0.5f, 0.55f);
+        mr.sizeDelta = new Vector2(30, 30);
+
+        accuseButton = UiKit.Button(bar.transform, "ACCUSE", () => { Sfx.Play("click"); Game.OpenAccusation(false); }, T.danger, Color.white, 64, 26);
         accuseButton.Size(prefW: 220, prefH: 64);
     }
 
@@ -141,9 +157,42 @@ public class DeskUI : MonoBehaviour
         AddNav(nav.transform, Tab.Interrogate, "mic", "Interrogate");
         AddNav(nav.transform, Tab.Jensenbot, "brain", "Jensenbot");
         UiKit.Spacer(nav.transform, 0, 1);
-        var help = UiKit.Text(nav.transform, "Board meeting at 09:00.\nName the leaker, attach proof.", T.smallSize - 2, T.muted,
-            TextAlignmentOptions.Center);
-        help.Size(prefH: 80);
+        var card = UiKit.Card(nav.transform, new Color(0, 0, 0, 0.25f), 12, 8, "CaseFile");
+        UiKit.Text(card.transform, "CASE FILE", 14, T.accent, style: FontStyles.Bold).characterSpacing = 6;
+        progEvidence = ProgressRow(card.transform, "folder");
+        progCracked = ProgressRow(card.transform, "mic");
+        progDesks = ProgressRow(card.transform, "find");
+        progBot = ProgressRow(card.transform, "brain");
+    }
+
+    TextMeshProUGUI ProgressRow(Transform parent, string icon)
+    {
+        var row = UiKit.Rect("Row", parent);
+        row.HLayout(8);
+        UiKit.Icon(row, icon, 18, T.muted);
+        var t = UiKit.Text(row, "", 15, T.text);
+        t.textWrappingMode = TextWrappingModes.NoWrap;
+        t.Size(flexW: 1);
+        return t;
+    }
+
+    public void UpdateProgress()
+    {
+        int cracked = 0, met = 0;
+        foreach (var s in Game.Suspects) { if (s.Broken) cracked++; if (s.Met) met++; }
+        int spots = 0;
+        foreach (var d in Game.Case.Desks) spots += d.Spots.Count;
+        progEvidence.text = $"<b>{Game.Evidence.Count}</b> evidence";
+        progCracked.text = $"<b>{cracked}</b>/{Game.Suspects.Count} cracked";
+        progDesks.text = $"<b>{Game.SpotsSearched}</b>/{spots} spots";
+        progBot.text = Game.Jensenbot.Exposed ? $"<color=#{UiKit.Hex(T.danger)}><b>AI EXPOSED</b></color>" : "AI: trusted";
+    }
+
+    void ToggleMute()
+    {
+        Sfx.Muted = !Sfx.Muted;
+        muteIcon.sprite = T.Icon(Sfx.Muted ? "sound_off" : "sound_on");
+        if (!Sfx.Muted) Sfx.Play("click");
     }
 
     void AddNav(Transform parent, Tab tab, string icon, string label)
@@ -175,11 +224,19 @@ public class DeskUI : MonoBehaviour
             navIcons[kv.Key].color = on ? T.accentText : T.text;
         }
         Tray.Refresh();
+        // Fade + slide the newly shown app in.
+        foreach (Transform child in centerRoot)
+        {
+            if (!child.gameObject.activeSelf) continue;
+            var cg = child.GetComponent<CanvasGroup>() ?? child.gameObject.AddComponent<CanvasGroup>();
+            UiFx.FadeIn(cg, 0.2f, -16f);
+        }
+        if (navButtons.TryGetValue(tab, out var nb)) UiFx.Punch(nb.transform, 0.06f, 0.25f);
     }
 
     void OnWave(CaseWave wave)
     {
-        Toast($"<b>NEW: {wave.Title}</b>\n{wave.Message}", T.secondary);
+        Toast($"<b>NEW: {wave.Title}</b>\n{wave.Message}", T.secondary, "folder");
         StartCoroutine(PulseNav(Tab.Logs));
         if (wave.Suspects.Count > 0) StartCoroutine(PulseNav(Tab.Interrogate));
     }
@@ -233,27 +290,51 @@ public class DeskUI : MonoBehaviour
 
     // ---------- toasts ----------
 
-    public void Toast(string message, Color? color = null)
+    /// <summary>Phone-style notification that slides in at the top right.</summary>
+    public void Toast(string message, Color? color = null, string icon = "bell_1")
     {
-        var card = UiKit.Card(toastRoot, T.card, 14, 0, "Toast");
-        card.Size(prefW: 480);
-        var row = UiKit.Rect("Row", card.transform);
-        row.HLayout(10);
-        var dot = UiKit.Panel(row, color ?? T.accent, UiKit.AvatarSprite, "Dot");
-        dot.Size(prefW: 14, prefH: 14, minW: 14);
-        var t = UiKit.Text(row, message, T.smallSize + 1, T.cardText);
+        var c = color ?? T.accent;
+        var holder = UiKit.Rect("Toast", toastRoot);
+        holder.Size(prefW: 500);
+        holder.VLayout(0);
+        var card = UiKit.Panel(holder, new Color(0.11f, 0.08f, 0.24f, 0.97f), T.cardSprite, "Card");
+        card.HLayout(14, 14);
+        var ib = UiKit.Panel(card.transform, c, UiKit.AvatarSprite, "IconBg");
+        ib.Size(prefW: 46, prefH: 46, minW: 46);
+        var ih = UiKit.Rect("H", ib.transform).Stretch(11, 11, 11, 11);
+        ((RectTransform)UiKit.Icon(ih, icon, 24, new Color(0.1f, 0.08f, 0.2f)).transform).Stretch();
+        var t = UiKit.Text(card.transform, message, T.smallSize, T.text);
         t.Size(flexW: 1);
-        StartCoroutine(ToastLife(card.gameObject));
+        var stripe = UiKit.Panel(card.transform, c, T.pillSprite, "Stripe").Pill(6);
+        stripe.Size(prefW: 6, prefH: 40);
+        StartCoroutine(ToastLife(holder.gameObject, (RectTransform)card.transform));
     }
 
-    IEnumerator ToastLife(GameObject go)
+    IEnumerator ToastLife(GameObject go, RectTransform card)
     {
         var cg = go.AddComponent<CanvasGroup>();
         cg.blocksRaycasts = false;
-        for (float t = 0; t < 0.2f; t += Time.unscaledDeltaTime) { cg.alpha = t / 0.2f; yield return null; }
+        yield return null; // let the layout place it
+        if (go == null) yield break;
+        Vector2 basePos = card.anchoredPosition;
+        for (float t = 0; t < 0.28f && go != null; t += Time.unscaledDeltaTime)
+        {
+            float k = 1 - Mathf.Pow(1 - t / 0.28f, 3);
+            cg.alpha = k;
+            card.anchoredPosition = basePos + new Vector2(80f * (1 - k), 0);
+            yield return null;
+        }
+        if (go == null) yield break;
         cg.alpha = 1;
-        yield return new WaitForSecondsRealtime(3.2f);
-        for (float t = 0; t < 0.4f; t += Time.unscaledDeltaTime) { if (go == null) yield break; cg.alpha = 1 - t / 0.4f; yield return null; }
+        card.anchoredPosition = basePos;
+        yield return new WaitForSecondsRealtime(3.6f);
+        for (float t = 0; t < 0.35f; t += Time.unscaledDeltaTime)
+        {
+            if (go == null) yield break;
+            cg.alpha = 1 - t / 0.35f;
+            card.anchoredPosition = basePos + new Vector2(60f * t / 0.35f, 0);
+            yield return null;
+        }
         if (go != null) Destroy(go);
     }
 

@@ -30,10 +30,20 @@ public class ChatView : MonoBehaviour
     }
 
     /// <summary>Adds a bubble. Returns the bubble so callers can decorate it (e.g. evidence cards).</summary>
-    public Image AddBubble(string speaker, string text, Side side, Color bubbleColor, Color? textColor = null)
+    public Image AddBubble(string speaker, string text, Side side, Color bubbleColor, Color? textColor = null, Texture avatar = null)
     {
         var row = UiKit.Rect("Row", content);
-        row.HLayout(0, 0, side == Side.Right ? TextAnchor.UpperRight : TextAnchor.UpperLeft);
+        row.HLayout(avatar != null ? 10 : 0, 0, side == Side.Right ? TextAnchor.UpperRight : TextAnchor.UpperLeft);
+
+        if (avatar != null && side == Side.Left)
+        {
+            var av = UiKit.Panel(row, new Color(1, 1, 1, 0.9f), UiKit.AvatarSprite, "Avatar");
+            av.Size(prefW: 54, prefH: 54, minW: 54);
+            av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+            var raw = UiKit.Rect("Head", av.transform).Stretch().gameObject.AddComponent<RawImage>();
+            raw.texture = avatar;
+            raw.raycastTarget = false;
+        }
 
         if (side == Side.Right) UiKit.Spacer(row, 1);
         if (side == Side.Center) UiKit.Spacer(row, 0.5f);

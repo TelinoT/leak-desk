@@ -16,6 +16,13 @@ public class Sfx : MonoBehaviour
 
     public static float Volume = 0.8f;
 
+    /// <summary>Global mute (the top-bar speaker button).</summary>
+    public static bool Muted
+    {
+        get => AudioListener.volume < 0.01f;
+        set => AudioListener.volume = value ? 0f : 1f;
+    }
+
     public static Sfx Instance
     {
         get

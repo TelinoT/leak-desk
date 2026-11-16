@@ -7,7 +7,12 @@ public class ButtonPop : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     float target = 1f;
     float current = 1f;
 
-    public void OnPointerEnter(PointerEventData e) => target = 1.04f;
+    public void OnPointerEnter(PointerEventData e)
+    {
+        target = 1.04f;
+        var b = GetComponent<UnityEngine.UI.Selectable>();
+        if (b == null || b.interactable) Sfx.Play("hover", Random.Range(0.95f, 1.1f));
+    }
     public void OnPointerExit(PointerEventData e) => target = 1f;
     public void OnPointerDown(PointerEventData e) => target = 0.94f;
     public void OnPointerUp(PointerEventData e) => target = 1.04f;
