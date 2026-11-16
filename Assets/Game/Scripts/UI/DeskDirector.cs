@@ -80,9 +80,14 @@ public class DeskDirector : MonoBehaviour
             Hint("late", "The strongest case connects <b>how</b> it was leaked with <b>who</b> was awake to do it.");
     }
 
+    float lastHint = -999f;
+
     void Hint(string id, string text)
     {
-        if (!hintsShown.Add(id)) return;
+        // At most one hint every 25 seconds, so tips never pile up.
+        if (hintsShown.Contains(id) || Time.unscaledTime - lastHint < 25f) return;
+        hintsShown.Add(id);
+        lastHint = Time.unscaledTime;
         ui.Toast(text, T.secondary, "bulb");
     }
 }

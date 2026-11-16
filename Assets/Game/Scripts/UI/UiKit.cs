@@ -371,6 +371,14 @@ public static class UiKit
 
     public static string Hex(Color c) => ColorUtility.ToHtmlStringRGB(c);
 
+    /// <summary>Removes one child now (detached first so the layout updates immediately).</summary>
+    public static void Remove(Transform child)
+    {
+        child.gameObject.SetActive(false);
+        child.SetParent(null, false);
+        UnityEngine.Object.Destroy(child.gameObject);
+    }
+
     /// <summary>Removes all children now (detached first, so childCount/GetChild are correct immediately).</summary>
     public static void Clear(Transform t)
     {

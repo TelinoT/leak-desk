@@ -308,6 +308,8 @@ public class DeskUI : MonoBehaviour
     public void Toast(string message, Color? color = null, string icon = "bell_1")
     {
         var c = color ?? T.accent;
+        // Never stack more than 3: the oldest one leaves early.
+        while (toastRoot.childCount >= 3) UiKit.Remove(toastRoot.GetChild(0));
         var holder = UiKit.Rect("Toast", toastRoot);
         holder.Size(prefW: 500);
         holder.VLayout(0);
