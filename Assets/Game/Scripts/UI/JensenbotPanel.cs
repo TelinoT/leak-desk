@@ -101,6 +101,13 @@ public class JensenbotPanel
             var doc = docs[i];
             var b = UiKit.Button(quickRow, doc.Title, () => RequestSummary(doc), T.panelAlt, T.text, 44, 17);
             b.Size(flexW: 1, prefH: 44);
+            var label = b.GetComponentInChildren<TMP_Text>();
+            ((RectTransform)label.transform).Stretch(44, 4, 12, 4);
+            var ic = UiKit.Icon(b.transform, SourceStyle.Icon(doc.Source), 22, SourceStyle.Color(doc.Source));
+            var ir = (RectTransform)ic.transform;
+            ir.anchorMin = ir.anchorMax = new Vector2(0, 0.55f);
+            ir.anchoredPosition = new Vector2(26, 0);
+            ir.sizeDelta = new Vector2(22, 22);
         }
     }
 

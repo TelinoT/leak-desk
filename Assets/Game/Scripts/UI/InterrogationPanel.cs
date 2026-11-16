@@ -38,6 +38,7 @@ public class InterrogationPanel
 
     SuspectAgent current;
     EvidencePicker picker;
+    readonly List<Button> quickChips = new();
 
     UiTheme T => UiKit.Theme;
     LeakDeskGame Game => ui.Game;
@@ -164,6 +165,22 @@ public class InterrogationPanel
         chatBg.Size(flexH: 1, flexW: 1);
         chat = ChatView.Create(chatBg.transform);
         ((RectTransform)chat.transform).Stretch();
+
+        // Quick questions: one click to ask, so nobody stares at an empty text box.
+        var quick = UiKit.Rect("Quick", col);
+        quick.HLayout(8);
+        foreach (var (label, q) in new[]
+                 {
+                     ("Alibi at 02:14?", "Where were you at 02:14 last night?"),
+                     ("Who had the deck?", "Who else had access to the keynote deck?"),
+                     ("Jensenbot?", "What do you know about Jensenbot and what it does with files?"),
+                 })
+        {
+            string question = q;
+            var chip = UiKit.Button(quick, label, () => { input.text = question; Ask(); }, new Color(1, 1, 1, 0.10f), T.text, 40, 16);
+            chip.Size(flexW: 1, prefH: 40);
+            quickChips.Add(chip);
+        }
 
         var inputRow = UiKit.Rect("InputRow", col);
         inputRow.HLayout(10);
@@ -489,6 +506,7 @@ public class InterrogationPanel
     {
         bool can = current != null && !current.Busy && CanAct;
         askButton.interactable = can;
+        foreach (var c in quickChips) c.interactable = can;
         presentButton.interactable = can && Game.Evidence.Count > 0;
     }
 
