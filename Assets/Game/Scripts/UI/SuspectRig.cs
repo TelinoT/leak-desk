@@ -114,7 +114,9 @@ public class SuspectRig
         if (talking > 0 && jaw != null)
         {
             float open = Mathf.Max(0, Mathf.Sin(t * 17f) * 0.6f + Mathf.Sin(t * 9.3f) * 0.5f);
-            Rotate(jaw, new Vector3(open * 14f * Mathf.Clamp01(talking * 4f), 0, 0));
+            float fade = Mathf.Clamp01(talking * 4f);
+            Rotate(jaw, new Vector3(open * 22f * fade, 0, 0));
+            if (head) Rotate(head, new Vector3(Mathf.Sin(t * 7.5f) * 2.5f * fade, Mathf.Sin(t * 3.1f) * 3f * fade, 0));
         }
 
         // Eyebrows: raised when nervous/evasive, lowered when angry or broken.
