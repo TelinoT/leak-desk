@@ -31801,8 +31801,11 @@ MonoBehaviour:
     characterPrefab: {fileID: 1454114287192450, guid: 3c5b1db0b16674f40a46b5819998a15f, type: 3}
   - suspectId: nadia
     characterPrefab: {fileID: 1977554221320892, guid: 88f81e1631ea70f458d192631bf8886d, type: 3}
+  - suspectId: guide
+    characterPrefab: {fileID: 1861045244336520, guid: 06a87c8b15efd30448d53857e94c45e9, type: 3}
   stageOffset: {x: 0, y: -500, z: 0}
-  textureSize: 512
+  stageSize: {x: 640, y: 1024}
+  headshotSize: 256
 --- !u!4 &493255419
 Transform:
   m_ObjectHideFlags: 0

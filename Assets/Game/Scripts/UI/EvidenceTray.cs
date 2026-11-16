@@ -7,6 +7,18 @@ public class EvidenceTray
 {
     readonly DeskUI ui;
     readonly RectTransform content;
+
+    // Tutorial targets.
+    public RectTransform Root { get; private set; }
+    public RectTransform FirstCard
+    {
+        get
+        {
+            foreach (Transform c in content)
+                if (c.gameObject.activeSelf && c.GetComponent<EvidenceDrag>() != null) return (RectTransform)c;
+            return null;
+        }
+    }
     readonly TextMeshProUGUI header;
     readonly GameObject emptyHint;
 
@@ -16,6 +28,7 @@ public class EvidenceTray
     {
         this.ui = ui;
         var panel = UiKit.Panel(parent, T.panel, T.panelSprite, "EvidenceTray");
+        Root = (RectTransform)panel.transform;
         panel.Size(prefW: 400, flexH: 1);
         panel.VLayout(10, 16);
         header = UiKit.Heading(panel.transform, "Evidence (0)", 26);

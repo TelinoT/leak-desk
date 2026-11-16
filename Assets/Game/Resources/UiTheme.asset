@@ -36,6 +36,7 @@ MonoBehaviour:
   bubbleSprite: {fileID: 21300000, guid: b1de60f30248d4836b399a3830060fd2, type: 3}
   pillSprite: {fileID: 21300000, guid: 218c10e476101420c8c9a40993f90415, type: 3}
   avatarSprite: {fileID: 21300000, guid: 9580146eafe614364827b2bc1176c2c9, type: 3}
+  outlineSprite: {fileID: 21300000, guid: 23bc175ea03124be2954a94eb0f2acc8, type: 3}
   barFillSprite: {fileID: 21300000, guid: 218c10e476101420c8c9a40993f90415, type: 3}
   icons:
   - {fileID: 21300000, guid: 7f4e34cf4c89c4094a731b764074ae53, type: 3}

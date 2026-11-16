@@ -28,6 +28,8 @@ public class DeskUI : MonoBehaviour
     Image muteIcon;
     TextMeshProUGUI progEvidence, progCracked, progDesks, progBot;
     public Button AccuseButton => accuseButton;
+    public RectTransform NavRect(Tab tab) => navButtons.TryGetValue(tab, out var b) ? (RectTransform)b.transform : null;
+    public Tutorial Tutorial { get; private set; }
     public TextMeshProUGUI ClockLabel => clockText;
     RectTransform toastRoot;
     TextMeshProUGUI clockText, countdownText;
@@ -51,6 +53,7 @@ public class DeskUI : MonoBehaviour
         game.PhaseChanged += ui.OnPhaseChanged;
         game.WaveUnlocked += ui.OnWave;
         canvas.gameObject.AddComponent<DeskDirector>();
+        ui.Tutorial = canvas.gameObject.AddComponent<Tutorial>();
         return ui;
     }
 
@@ -307,6 +310,7 @@ public class DeskUI : MonoBehaviour
     /// <summary>Phone-style notification that slides in at the top right.</summary>
     public void Toast(string message, Color? color = null, string icon = "bell_1")
     {
+        if (Tutorial != null && Tutorial.Active) return; // Rosa is talking; no competing notifications
         var c = color ?? T.accent;
         // Never stack more than 3: the oldest one leaves early.
         while (toastRoot.childCount >= 3) UiKit.Remove(toastRoot.GetChild(0));

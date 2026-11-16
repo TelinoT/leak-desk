@@ -44,6 +44,10 @@ public class InterrogationPanel
     LeakDeskGame Game => ui.Game;
     public SuspectAgent Current => current;
 
+    // Tutorial targets.
+    public RectTransform StageRect => stage;
+    public RectTransform QuickRow => quickChips.Count > 0 ? (RectTransform)quickChips[0].transform.parent : null;
+
     public InterrogationPanel(DeskUI ui, Transform parent)
     {
         this.ui = ui;

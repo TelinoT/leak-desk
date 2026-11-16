@@ -27,6 +27,11 @@ public class FeedPanel
     readonly HashSet<string> read = new();
     readonly TextMeshProUGUI incoming;
     CaseDocument current;
+
+    // Tutorial targets.
+    public string CurrentDocId => current?.Id;
+    public RectTransform DocCard(string docId) => docCards.TryGetValue(docId, out var c) ? (RectTransform)c.transform : null;
+    public RectTransform LineRow(string docId, int index) => linesContent.Find($"Line {docId}:{index}") as RectTransform;
     string query = "";
     string justFlagged; // "docId:index" of the line to play the highlighter swipe on
 

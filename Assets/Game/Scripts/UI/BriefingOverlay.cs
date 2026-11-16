@@ -17,6 +17,17 @@ public class BriefingOverlay
     readonly TextMeshProUGUI mailBody;
     bool skipped;
     readonly Button startButton;
+    readonly Button tutorialToggle;
+
+    void ToggleTutorial()
+    {
+        Sfx.Play("click");
+        if (Tutorial.ShouldRun) Tutorial.MarkSeen(); else Tutorial.Reset();
+        RefreshToggle();
+    }
+
+    void RefreshToggle() =>
+        tutorialToggle.SetLabel(Tutorial.ShouldRun ? "[X] Guided tutorial" : "[ ] Guided tutorial");
 
     public BriefingOverlay(DeskUI ui, Transform overlayRoot)
     {
@@ -89,8 +100,13 @@ public class BriefingOverlay
         Tile(how, "mic", "Interrogate", "Talk to suspects. <b>Drag evidence onto them</b> to break their story.", SourceStyle.Color("badge"));
         Tile(how, "mallet", "Accuse", "Name the leaker, attach up to 3 pieces of proof, before 09:00.", T.danger);
 
-        startButton = UiKit.Button(card.transform, $"Start investigation  ·  {Mathf.RoundToInt(c.RoundMinutes)} minutes", Start, T.accent, T.accentText, 76, 30);
-        startButton.Size(prefH: 76);
+        var startRow = UiKit.Rect("StartRow", card.transform);
+        startRow.HLayout(14);
+        tutorialToggle = UiKit.Button(startRow, "", ToggleTutorial, T.panelAlt, T.text, 76, 20);
+        tutorialToggle.Size(prefW: 300, prefH: 76);
+        RefreshToggle();
+        startButton = UiKit.Button(startRow, $"Start investigation  ·  {Mathf.RoundToInt(c.RoundMinutes)} minutes", Start, T.accent, T.accentText, 76, 30);
+        startButton.Size(flexW: 1, prefH: 76);
         briefRoot.SetActive(false);
     }
 
@@ -109,7 +125,11 @@ public class BriefingOverlay
         UiKit.Text(col, text, T.smallSize, T.muted);
     }
 
-    public void Show() => ui.StartCoroutine(Sequence());
+    public void Show()
+    {
+        RefreshToggle();
+        ui.StartCoroutine(Sequence());
+    }
 
     IEnumerator Sequence()
     {
@@ -157,6 +177,7 @@ public class BriefingOverlay
         briefRoot.SetActive(false);
         Sfx.Play("click");
         ui.Game.StartInvestigation();
-        ui.Toast("Clock is running. Board meets at 09:00.", UiKit.Theme.accent);
+        if (Tutorial.ShouldRun) ui.Tutorial.Begin();
+        else ui.Toast("Clock is running. Board meets at 09:00.", UiKit.Theme.accent);
     }
 }

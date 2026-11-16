@@ -38,6 +38,7 @@ public class UiTheme : ScriptableObject
     public Sprite bubbleSprite;
     public Sprite pillSprite;
     public Sprite avatarSprite;
+    public Sprite outlineSprite;
     public Sprite barFillSprite;
 
     [Header("Icons (looked up by sprite name without the 'Pictoicon_' prefix)")]

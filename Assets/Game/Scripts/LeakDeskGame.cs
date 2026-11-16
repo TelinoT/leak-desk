@@ -78,9 +78,12 @@ public class LeakDeskGame : MonoBehaviour
         ui.ShowBriefing();
     }
 
+    /// <summary>Freezes the round clock and timed deliveries (used by the tutorial).</summary>
+    public bool Paused { get; set; }
+
     void Update()
     {
-        if (Phase is not (GamePhase.Investigating or GamePhase.Accusing)) return;
+        if (Phase is not (GamePhase.Investigating or GamePhase.Accusing) || Paused) return;
 
         if (!Overtime)
         {
