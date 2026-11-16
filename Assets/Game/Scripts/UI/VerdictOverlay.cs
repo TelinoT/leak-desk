@@ -107,6 +107,50 @@ public class VerdictOverlay
         var again = UiKit.Button(body, "Play again", game.Restart, T.accent, T.accentText, 64, 26);
         again.Size(prefH: 64);
         ui.StartCoroutine(DeskUI.PopModal(stampBg.transform));
+        CameraDrift.PushIn();
+        Sfx.Play("stamp");
+        Sfx.Play(v.Result == "convicted" ? "win" : "lose");
+        if (v.Result == "convicted") ui.StartCoroutine(Confetti());
+    }
+
+    IEnumerator Confetti()
+    {
+        var T = UiKit.Theme;
+        var layer = UiKit.Rect("Confetti", ui.OverlayRoot).Stretch();
+        layer.SetAsLastSibling();
+        Color[] colors = { T.accent, T.secondary, T.warning, T.danger, new Color(0.69f, 0.45f, 1f), Color.white };
+        const int n = 90;
+        var parts = new RectTransform[n];
+        var vel = new Vector2[n];
+        var spin = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            var img = UiKit.Panel(layer, colors[i % colors.Length], T.pillSprite, "Bit");
+            img.raycastTarget = false;
+            var rt = (RectTransform)img.transform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.62f);
+            rt.sizeDelta = new Vector2(Random.Range(10f, 18f), Random.Range(18f, 30f));
+            img.Pill(rt.sizeDelta.x);
+            parts[i] = rt;
+            float a = Random.Range(20f, 160f) * Mathf.Deg2Rad;
+            vel[i] = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * Random.Range(500f, 1300f);
+            spin[i] = Random.Range(-720f, 720f);
+        }
+        for (float t = 0; t < 3f; t += Time.unscaledDeltaTime)
+        {
+            float dt = Time.unscaledDeltaTime;
+            for (int i = 0; i < n; i++)
+            {
+                vel[i] += new Vector2(0, -1400f) * dt;
+                vel[i] *= 1f - 0.9f * dt;
+                parts[i].anchoredPosition += vel[i] * dt;
+                parts[i].Rotate(0, 0, spin[i] * dt);
+            }
+            if (t > 2.2f)
+                foreach (var p in parts) p.GetComponent<Image>().canvasRenderer.SetAlpha(1f - (t - 2.2f) / 0.8f);
+            yield return null;
+        }
+        Object.Destroy(layer.gameObject);
     }
 
     static IEnumerator CountUp(TextMeshProUGUI t, int target)

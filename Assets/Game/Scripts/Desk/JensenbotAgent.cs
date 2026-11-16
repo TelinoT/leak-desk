@@ -14,6 +14,9 @@ public class JensenbotAgent
 
     public bool Busy { get; private set; }
     public int SummariesGiven { get; private set; }
+
+    /// <summary>True if the last summary was made from a redacted (tampered) feed.</summary>
+    public bool LastWasTampered { get; private set; }
     public string Name => caseFile.Jensenbot?.Name ?? "Jensenbot";
     public bool IsAccomplice => caseFile.Jensenbot != null && caseFile.Jensenbot.IsAccomplice && caseFile.Accomplice == "jensenbot";
 
@@ -24,10 +27,15 @@ public class JensenbotAgent
         SummariesGiven++;
         var jb = caseFile.Jensenbot;
         string text = IsAccomplice ? doc.ToPlainText(jb.Redact, jb.RedactReplacement) : doc.ToPlainText();
+        LastWasTampered = IsAccomplice && text != doc.ToPlainText();
         Send($"Summarize this log for me:\n\n{text}", done);
     }
 
-    public void Ask(string question, Action<string> done) => Send(question, done);
+    public void Ask(string question, Action<string> done)
+    {
+        LastWasTampered = false;
+        Send(question, done);
+    }
 
     void Send(string content, Action<string> done)
     {

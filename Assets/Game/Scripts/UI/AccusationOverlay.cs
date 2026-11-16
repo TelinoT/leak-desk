@@ -15,6 +15,7 @@ public class AccusationOverlay
     readonly TextMeshProUGUI subtitle, evidenceCount;
     readonly RectTransform evidenceContent;
     readonly Dictionary<string, Image> suspectCards = new();
+    readonly Dictionary<string, RawImage> headshots = new();
     readonly TMP_InputField motive;
     readonly Button jensenToggle, submit, back;
     readonly HashSet<string> selectedEvidence = new();
@@ -47,9 +48,16 @@ public class AccusationOverlay
             sc.gameObject.AddComponent<Button>().onClick.AddListener(() => PickSuspect(s.Id));
             sc.gameObject.AddComponent<ButtonPop>();
             var av = UiKit.Panel(sc.transform, s.Color, UiKit.AvatarSprite, "Avatar");
-            av.Size(prefW: 64, prefH: 64, minW: 64);
+            av.Size(prefW: 72, prefH: 72, minW: 72);
+            av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
             var ini = UiKit.Text(av.transform, InterrogationPanel.Initials(s.Name), 24, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
             ((RectTransform)ini.transform).Stretch();
+            var head = UiKit.Rect("Headshot", av.transform).Stretch().gameObject.AddComponent<RawImage>();
+            head.raycastTarget = false;
+            var tex = SuspectPortraits.Instance != null ? SuspectPortraits.Instance.Headshot(s.Id) : null;
+            head.texture = tex;
+            head.enabled = tex != null;
+            headshots[s.Id] = head;
             var col = UiKit.Rect("Col", sc.transform);
             col.VLayout(2);
             col.Size(flexW: 1);
@@ -96,6 +104,13 @@ public class AccusationOverlay
     public void Open(bool isForced)
     {
         forced = isForced;
+        Sfx.Play(forced ? "crack" : "chime");
+        if (SuspectPortraits.Instance != null)
+            foreach (var kv in headshots)
+            {
+                kv.Value.texture = SuspectPortraits.Instance.Headshot(kv.Key);
+                kv.Value.enabled = kv.Value.texture != null;
+            }
         BuildEvidence();
         Refresh();
         root.SetActive(true);
@@ -127,7 +142,9 @@ public class AccusationOverlay
 
     void PickSuspect(string id)
     {
+        Sfx.Play("click");
         selectedSuspect = id;
+        if (suspectCards.TryGetValue(id, out var picked)) UiFx.Punch(picked.transform, 0.06f, 0.25f);
         Refresh();
     }
 

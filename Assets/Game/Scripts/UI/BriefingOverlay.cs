@@ -1,51 +1,152 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-/// <summary>Start screen: case briefing and how to play. Starting it starts the 12-minute clock.</summary>
+/// <summary>
+/// Opening sequence: a title card over the office (camera glides in), then the briefing styled as the CEO's email
+/// plus four "how to play" tiles. Starting the investigation starts the clock.
+/// </summary>
 public class BriefingOverlay
 {
     readonly DeskUI ui;
-    readonly GameObject root;
+    readonly GameObject titleRoot, briefRoot;
+    readonly CanvasGroup titleGroup;
+    readonly RectTransform titleText;
     readonly Transform modal;
+    readonly TextMeshProUGUI mailBody;
+    bool skipped;
 
     public BriefingOverlay(DeskUI ui, Transform overlayRoot)
     {
         this.ui = ui;
         var T = UiKit.Theme;
         var c = ui.Game.Case;
-        var card = DeskUI.Modal(overlayRoot, "Briefing", 1180, 880, out root);
+
+        // ---------- title card ----------
+        var title = UiKit.Panel(overlayRoot, new Color(0.06f, 0.03f, 0.16f, 0.82f), name: "TitleCard");
+        ((RectTransform)title.transform).Stretch();
+        titleRoot = title.gameObject;
+        titleGroup = titleRoot.AddComponent<CanvasGroup>();
+        title.gameObject.AddComponent<Button>().onClick.AddListener(() => skipped = true);
+        var col = UiKit.Rect("Col", title.transform);
+        col.anchorMin = col.anchorMax = new Vector2(0.5f, 0.55f);
+        col.sizeDelta = new Vector2(1400, 420);
+        col.VLayout(8, 0, TextAnchor.MiddleCenter);
+        var kicker = UiKit.Text(col, $"{c.Company.ToUpperInvariant()} // INTERNAL SECURITY", 26, T.accent, TextAlignmentOptions.Center, FontStyles.Bold);
+        kicker.characterSpacing = 12;
+        var big = UiKit.Heading(col, "LEAK DESK", 170, Color.white);
+        big.alignment = TextAlignmentOptions.Center;
+        big.textWrappingMode = TextWrappingModes.NoWrap;
+        big.fontMaterial.EnableKeyword("UNDERLAY_ON");
+        big.fontMaterial.SetColor("_UnderlayColor", new Color(0.3f, 0.1f, 0.5f, 0.9f));
+        big.fontMaterial.SetFloat("_UnderlayOffsetX", 0.6f);
+        big.fontMaterial.SetFloat("_UnderlayOffsetY", -0.6f);
+        titleText = (RectTransform)big.transform;
+        UiKit.Text(col, $"Case 01: <b>{c.Title}</b>", 34, T.text, TextAlignmentOptions.Center);
+        UiKit.Text(col, "click to continue", 18, T.muted, TextAlignmentOptions.Center);
+        titleRoot.SetActive(false);
+
+        // ---------- briefing ----------
+        var card = DeskUI.Modal(overlayRoot, "Briefing", 1500, 860, out briefRoot);
         modal = card.transform;
+        UiKit.Text(card.transform, $"<color=#{UiKit.Hex(T.accent)}><b>{c.Company.ToUpperInvariant()}</b></color> // SECURITY DESK  ·  WED {c.StartTime}",
+            T.smallSize + 1, T.muted);
+        UiKit.Heading(card.transform, c.Tagline, 40);
 
-        UiKit.Text(card.transform, $"<color=#{UiKit.Hex(T.accent)}><b>{c.Company.ToUpperInvariant()}</b></color> // SECURITY DESK  ·  WED 08:48",
-            T.smallSize + 2, T.muted);
-        UiKit.Heading(card.transform, $"LEAK DESK: {c.Title}", 52);
-        UiKit.Text(card.transform, c.Briefing, T.bodySize + 2, T.text);
+        var row = UiKit.Rect("Row", card.transform);
+        row.HLayout(24, 0, TextAnchor.UpperLeft);
+        row.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
+        row.Size(flexH: 1);
 
-        var how = UiKit.Card(card.transform, new Color(1, 1, 1, 0.07f), 22, 10, "HowTo");
-        UiKit.Text(how.transform, "HOW TO PLAY", T.smallSize, T.accent, style: FontStyles.Bold);
-        UiKit.Text(how.transform,
-            "<b>1. Logs</b> - read the overnight emails, Slack, badge, VPN and file logs. <b>Flag</b> suspicious lines to collect evidence.\n" +
-            "<b>2. Interrogate</b> - question the 4 suspects in free text. <b>Present evidence</b> to break their stories. Watch their stress.\n" +
-            "<b>3. Jensenbot</b> - the company AI can summarize logs for you. It's fast. It's confident. Is it right?\n" +
-            "<b>4. Accuse</b> - name the leaker, attach up to 3 pieces of evidence and a motive before the board meets at 09:00.",
-            T.bodySize, T.text);
+        // CEO email
+        var mail = UiKit.Card(row, T.card, 24, 10, "Mail");
+        mail.Size(prefW: 760, flexH: 1);
+        var mh = UiKit.Rect("Header", mail.transform);
+        mh.HLayout(12);
+        var mi = UiKit.Panel(mh, SourceStyle.Color("email"), UiKit.AvatarSprite, "Icon");
+        mi.Size(prefW: 52, prefH: 52, minW: 52);
+        ((RectTransform)UiKit.Icon(UiKit.Rect("H", mi.transform).Stretch(12, 12, 12, 12), "mail", 28, Color.white).transform).Stretch();
+        var mcol = UiKit.Rect("Col", mh);
+        mcol.VLayout(0);
+        mcol.Size(flexW: 1);
+        UiKit.Text(mcol, "<b>Dex Halloran</b>  <color=#888888>CEO</color>", T.bodySize, T.cardText);
+        UiKit.Text(mcol, "To: Security Desk  ·  Subject: <b>the leak</b>", T.smallSize, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.65f));
+        var line = UiKit.Panel(mail.transform, new Color(0, 0, 0, 0.08f), name: "Rule");
+        line.Size(prefH: 2);
+        mailBody = UiKit.Text(mail.transform, c.Briefing, T.bodySize + 1, T.cardText);
+        UiKit.Spacer(mail.transform, 0, 1);
+        UiKit.Text(mail.transform, "<i>P.S. Jensenbot already did a first pass. Use it. - D</i>", T.smallSize + 1, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.75f));
 
-        UiKit.Spacer(card.transform, 0, 1);
-        var start = UiKit.Button(card.transform, "Start investigation  (12 minutes)", Start, T.accent, T.accentText, 72, 28);
-        start.Size(prefH: 72);
-        root.SetActive(false);
+        // How to play
+        var how = UiKit.Rect("HowTo", row);
+        how.VLayout(14);
+        how.Size(flexW: 1, flexH: 1);
+        UiKit.Text(how, "HOW TO CRACK IT", T.smallSize, T.accent, style: FontStyles.Bold);
+        Tile(how, "folder", "Logs", "Read emails, Slack, badge, VPN and file logs. <b>Flag</b> lines. <b>Search</b> for names and times.", SourceStyle.Color("email"));
+        Tile(how, "find", "Desks", "Search monitors, drawers and trash bins. Each search costs 30 seconds.", SourceStyle.Color("desk"));
+        Tile(how, "mic", "Interrogate", "Talk to suspects. <b>Drag evidence onto them</b> to break their story.", SourceStyle.Color("badge"));
+        Tile(how, "mallet", "Accuse", "Name the leaker, attach up to 3 pieces of proof, before 09:00.", T.danger);
+
+        var start = UiKit.Button(card.transform, $"Start investigation  ·  {Mathf.RoundToInt(c.RoundMinutes)} minutes", Start, T.accent, T.accentText, 76, 30);
+        start.Size(prefH: 76);
+        briefRoot.SetActive(false);
     }
 
-    public void Show()
+    static void Tile(Transform parent, string icon, string title, string text, Color color)
     {
-        root.SetActive(true);
-        root.transform.SetAsLastSibling();
+        var T = UiKit.Theme;
+        var tile = UiKit.Panel(parent, T.panelAlt, T.cardSprite, "Tile: " + title);
+        tile.HLayout(16, 16);
+        var ib = UiKit.Panel(tile.transform, color, UiKit.AvatarSprite, "IconBg");
+        ib.Size(prefW: 64, prefH: 64, minW: 64);
+        ((RectTransform)UiKit.Icon(UiKit.Rect("H", ib.transform).Stretch(15, 15, 15, 15), icon, 34, T.cardText).transform).Stretch();
+        var col = UiKit.Rect("Col", tile.transform);
+        col.VLayout(2);
+        col.Size(flexW: 1);
+        UiKit.Text(col, $"<b>{title}</b>", T.bodySize, T.text);
+        UiKit.Text(col, text, T.smallSize, T.muted);
+    }
+
+    public void Show() => ui.StartCoroutine(Sequence());
+
+    IEnumerator Sequence()
+    {
+        CameraDrift.PlayIntro();
+        titleRoot.SetActive(true);
+        titleRoot.transform.SetAsLastSibling();
+        titleGroup.alpha = 0;
+        for (float t = 0; t < 0.6f; t += Time.unscaledDeltaTime)
+        {
+            float k = 1 - Mathf.Pow(1 - t / 0.6f, 3);
+            titleGroup.alpha = k;
+            titleText.localScale = Vector3.one * Mathf.Lerp(1.6f, 1f, k);
+            yield return null;
+        }
+        titleText.localScale = Vector3.one;
+        Sfx.Play("stamp");
+        UiFx.Punch(titleText, 0.08f, 0.35f);
+
+        for (float t = 0; t < 3.2f && !skipped; t += Time.unscaledDeltaTime) yield return null;
+
+        for (float t = 0; t < 0.4f; t += Time.unscaledDeltaTime)
+        {
+            titleGroup.alpha = 1 - t / 0.4f;
+            yield return null;
+        }
+        titleRoot.SetActive(false);
+
+        briefRoot.SetActive(true);
+        briefRoot.transform.SetAsLastSibling();
+        Sfx.Play("chime");
         ui.StartCoroutine(DeskUI.PopModal(modal));
+        UiFx.Typewrite(mailBody, 140f);
     }
 
     void Start()
     {
-        root.SetActive(false);
+        briefRoot.SetActive(false);
+        Sfx.Play("click");
         ui.Game.StartInvestigation();
         ui.Toast("Clock is running. Board meets at 09:00.", UiKit.Theme.accent);
     }

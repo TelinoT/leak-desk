@@ -86,6 +86,7 @@ public class DeskUI : MonoBehaviour
         verdict = new VerdictOverlay(this, overlayRoot);
         briefing = new BriefingOverlay(this, overlayRoot);
 
+        toastRoot.SetAsLastSibling(); // notifications stay readable above modals
         ShowTab(Tab.Logs);
     }
 

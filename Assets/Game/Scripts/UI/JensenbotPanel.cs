@@ -12,6 +12,7 @@ public class JensenbotPanel
     readonly TMP_InputField input;
     readonly Button askButton;
     readonly RectTransform quickRow;
+    readonly JensenbotFace face;
 
     UiTheme T => UiKit.Theme;
     JensenbotAgent Bot => ui.Game.Jensenbot;
@@ -27,10 +28,7 @@ public class JensenbotPanel
 
         var header = UiKit.Rect("Header", panel.transform);
         header.HLayout(16);
-        var av = UiKit.Panel(header, BotColor, UiKit.AvatarSprite, "Avatar");
-        av.Size(prefW: 90, prefH: 90, minW: 90);
-        var face = UiKit.Text(av.transform, "^_^", 32, T.accentText, TextAlignmentOptions.Center, FontStyles.Bold);
-        ((RectTransform)face.transform).Stretch();
+        face = JensenbotFace.Create(header, 112);
         var col = UiKit.Rect("Col", header);
         col.VLayout(4);
         col.Size(flexW: 1);
@@ -108,11 +106,24 @@ public class JensenbotPanel
     {
         askButton.interactable = false;
         chat.ShowTyping(Bot.Name);
+        face.SetMood(JensenbotFace.Mood.Thinking);
+        Sfx.Play("click", 1.4f);
         call(reply =>
         {
             chat.HideTyping();
-            chat.AddBubble(Bot.Name, Clean(reply), ChatView.Side.Left, new Color(0.88f, 1f, 0.82f));
+            var bubble = chat.AddBubble(Bot.Name, Clean(reply), ChatView.Side.Left, new Color(0.88f, 1f, 0.82f));
+            var texts = bubble.GetComponentsInChildren<TextMeshProUGUI>();
+            UiFx.Typewrite(texts[^1], 90f, 1.9f);
             askButton.interactable = true;
+            face.SetMood(JensenbotFace.Mood.Talking);
+            // A barely-there tell: the face glitches when its feed was doctored.
+            if (Bot.LastWasTampered) ui.StartCoroutine(GlitchLater());
         });
+    }
+
+    System.Collections.IEnumerator GlitchLater()
+    {
+        yield return new WaitForSecondsRealtime(1.2f);
+        face.SetMood(JensenbotFace.Mood.Glitch);
     }
 }
