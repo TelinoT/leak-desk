@@ -295,7 +295,7 @@ public class DeskUI : MonoBehaviour
     // ---------- overlays ----------
 
     public void ShowBriefing() => briefing.Show();
-    public void ShowDeliberation() { Accusation.Close(); verdict.ShowDeliberating(); }
+    public void ShowDeliberation(Accusation a) { Accusation.Close(); verdict.ShowDeliberating(a); }
     public void ShowVerdict(Accusation a, Verdict v) => verdict.ShowResult(a, v);
 
     public RectTransform OverlayRoot => overlayRoot;
@@ -355,7 +355,7 @@ public class DeskUI : MonoBehaviour
     /// <summary>Full-screen dimmer + centered modal card. Returns the card (vertical layout).</summary>
     public static Image Modal(Transform overlayRoot, string name, float width, float height, out GameObject root)
     {
-        var dim = UiKit.Panel(overlayRoot, new Color(0.03f, 0.04f, 0.08f, 0.78f), name: name);
+        var dim = UiKit.Panel(overlayRoot, new Color(0.03f, 0.02f, 0.08f, 0.88f), name: name);
         ((RectTransform)dim.transform).Stretch();
         root = dim.gameObject;
 
@@ -364,6 +364,12 @@ public class DeskUI : MonoBehaviour
         rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
         rt.sizeDelta = new Vector2(width, height);
         card.VLayout(16, 32);
+        // The frame sprite is semi-transparent in the middle; a second layer makes modals properly opaque.
+        var backing = UiKit.Panel(card.transform, UiKit.Theme.panel, UiKit.Theme.panelSprite, "Backing");
+        backing.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        ((RectTransform)backing.transform).Stretch();
+        backing.raycastTarget = false;
+        backing.transform.SetAsFirstSibling();
         return card;
     }
 

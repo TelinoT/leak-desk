@@ -132,7 +132,7 @@ public class LeakDeskGame : MonoBehaviour
     {
         if (Phase is GamePhase.Deliberating or GamePhase.Verdict) return;
         SetPhase(GamePhase.Deliberating);
-        ui.ShowDeliberation();
+        ui.ShowDeliberation(accusation);
         Judge.Run(Case, accusation, verdict =>
         {
             LastVerdict = verdict;

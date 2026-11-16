@@ -24,7 +24,7 @@ public class VerdictOverlay
         root.SetActive(false);
     }
 
-    public void ShowDeliberating()
+    public void ShowDeliberating(Accusation a)
     {
         UiKit.Clear(body);
         root.SetActive(true);
@@ -41,6 +41,41 @@ public class VerdictOverlay
         t.Size(prefH: 120);
         ui.StartCoroutine(Dots(t));
         ui.StartCoroutine(Gavel((RectTransform)gavel.transform.parent));
+
+        // Recap of what the player just put on the table.
+        var c = ui.Game.Case;
+        var s = c.Suspect(a.SuspectId);
+        var recap = UiKit.Card(body, new Color(1, 1, 1, 0.06f), 22, 10, "Recap");
+        UiKit.Text(recap.transform, "YOUR CASE", T.smallSize, T.accent, style: FontStyles.Bold);
+        var who = UiKit.Rect("Who", recap.transform);
+        who.HLayout(16);
+        var av = UiKit.Panel(who, s != null ? s.Color : T.panelAlt, UiKit.AvatarSprite, "Avatar");
+        av.Size(prefW: 84, prefH: 84, minW: 84);
+        av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+        var tex = s != null && SuspectPortraits.Instance != null ? SuspectPortraits.Instance.Headshot(s.Id) : null;
+        if (tex != null)
+        {
+            var raw = UiKit.Rect("Head", av.transform).Stretch().gameObject.AddComponent<RawImage>();
+            raw.texture = tex;
+        }
+        var col = UiKit.Rect("Col", who);
+        col.VLayout(4);
+        col.Size(flexW: 1);
+        UiKit.Heading(col, s != null ? $"You accuse {s.Name}" : "You accuse nobody", 30);
+        UiKit.Text(col, string.IsNullOrWhiteSpace(a.Motive) ? "<i>No motive given.</i>" : $"<i>\"{a.Motive.Trim()}\"</i>", T.bodySize - 2, T.muted);
+        if (a.NamesJensenbot) UiKit.Text(col, "...and you name <b>Jensenbot</b> as the accomplice.", T.bodySize - 2, T.danger);
+        var evRow = UiKit.Rect("Evidence", recap.transform);
+        evRow.HLayout(10);
+        if (a.Evidence.Count == 0) UiKit.Text(evRow, "No evidence attached.", T.smallSize, T.muted);
+        foreach (var e in a.Evidence)
+        {
+            var chip = UiKit.Chip(evRow, SourceStyle.Color(e.Source), 300, 36, "Ev");
+            chip.GetComponent<HorizontalLayoutGroup>().spacing = 6;
+            UiKit.Icon(chip.transform, SourceStyle.Icon(e.Source), 20, T.cardText);
+            var et = UiKit.Text(chip.transform, e.Title, 15, T.cardText, TextAlignmentOptions.Left, FontStyles.Bold);
+            et.textWrappingMode = TextWrappingModes.NoWrap;
+            et.overflowMode = TextOverflowModes.Ellipsis;
+        }
         ui.StartCoroutine(DeskUI.PopModal(modal));
     }
 
