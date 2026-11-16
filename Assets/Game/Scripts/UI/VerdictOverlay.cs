@@ -30,9 +30,17 @@ public class VerdictOverlay
         root.SetActive(true);
         root.transform.SetAsLastSibling();
         UiKit.Heading(body, "09:00 - Board room", 38);
+        var gavelRow = UiKit.Rect("GavelRow", body);
+        gavelRow.HLayout(0, 0, TextAnchor.MiddleCenter);
+        gavelRow.Size(prefH: 260);
+        var gavelBg = UiKit.Panel(gavelRow, new Color(1, 1, 1, 0.06f), UiKit.AvatarSprite, "GavelBg");
+        gavelBg.Size(prefW: 220, prefH: 220, minW: 220);
+        var gavel = UiKit.Icon(UiKit.Rect("H", gavelBg.transform).Stretch(45, 45, 45, 45), "mallet", 130, T.warning);
+        ((RectTransform)gavel.transform).Stretch();
         var t = UiKit.Text(body, "The board is deliberating", 30, T.text, TextAlignmentOptions.Center, FontStyles.Bold);
-        t.Size(prefH: 300);
+        t.Size(prefH: 120);
         ui.StartCoroutine(Dots(t));
+        ui.StartCoroutine(Gavel((RectTransform)gavel.transform.parent));
         ui.StartCoroutine(DeskUI.PopModal(modal));
     }
 
@@ -174,15 +182,44 @@ public class VerdictOverlay
         Object.Destroy(layer.gameObject);
     }
 
+    /// <summary>The gavel swings up slowly and knocks down, with a thud, until the verdict is in.</summary>
+    IEnumerator Gavel(RectTransform g)
+    {
+        while (g != null && ui.Game.Phase == GamePhase.Deliberating)
+        {
+            for (float t = 0; t < 0.55f && g != null; t += Time.unscaledDeltaTime)
+            {
+                g.localRotation = Quaternion.Euler(0, 0, Mathf.SmoothStep(0, 35f, t / 0.55f));
+                yield return null;
+            }
+            for (float t = 0; t < 0.09f && g != null; t += Time.unscaledDeltaTime)
+            {
+                g.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(35f, -8f, t / 0.09f));
+                yield return null;
+            }
+            if (g == null) yield break;
+            Sfx.Play("stamp", 1.3f, 0.6f);
+            UiFx.Punch(g.parent, 0.06f, 0.2f);
+            g.localRotation = Quaternion.identity;
+            yield return new WaitForSecondsRealtime(0.35f);
+        }
+    }
+
     static IEnumerator CountUp(TextMeshProUGUI t, int target)
     {
         float time = 0;
+        int last = -1;
         while (t != null && time < 1.2f)
         {
             time += Time.unscaledDeltaTime;
-            t.text = Mathf.RoundToInt(Mathf.Lerp(0, target, 1 - Mathf.Pow(1 - Mathf.Clamp01(time / 1.2f), 3))).ToString();
+            int v = Mathf.RoundToInt(Mathf.Lerp(0, target, 1 - Mathf.Pow(1 - Mathf.Clamp01(time / 1.2f), 3)));
+            if (v / 4 != last / 4) Sfx.Play("tick", 0.8f + v / 100f);
+            last = v;
+            t.text = v.ToString();
             yield return null;
         }
-        if (t != null) t.text = target.ToString();
+        if (t == null) yield break;
+        t.text = target.ToString();
+        UiFx.Punch(t.transform, 0.2f, 0.35f);
     }
 }
