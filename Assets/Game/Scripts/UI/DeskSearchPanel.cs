@@ -153,14 +153,14 @@ public class DeskSearchPanel
     {
         if (!Game.IsSuspectUnlocked(desk.Suspect))
         {
-            ui.Toast("That desk isn't accessible yet. Keep digging.", T.warning);
+            ui.Toast("Can't get into that desk yet.", T.warning);
             return;
         }
         current = desk;
         var s = Game.Case.Suspect(desk.Suspect);
         title.text = $"{s.Name}'s desk";
-        subtitle.text = $"{s.Role}. Pick where to look: each search costs {Mathf.RoundToInt(Game.Case.DeskSearchSeconds)} seconds.";
-        footerText.text = $"Found something on {s.FirstName}'s desk? <b>Drag it onto {s.FirstName}</b> in Interrogate and watch the story crack.";
+        subtitle.text = $"{s.Role}. Each search takes {Mathf.RoundToInt(Game.Case.DeskSearchSeconds)} seconds.";
+        footerText.text = $"Found something? Take it to {s.FirstName} and see what they say.";
         interrogateButton.SetLabel($"Interrogate {s.FirstName}");
         if (SuspectPortraits.Instance != null) titleHead.texture = SuspectPortraits.Instance.Headshot(desk.Suspect);
         titleHead.enabled = titleHead.texture != null;

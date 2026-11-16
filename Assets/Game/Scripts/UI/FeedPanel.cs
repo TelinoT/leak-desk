@@ -140,7 +140,7 @@ public class FeedPanel
         float next = Game.NextWaveIn;
         incoming.text = next < 0 ? "All logs received."
             : Game.Phase == GamePhase.Briefing ? ""
-            : $"Next delivery in ~{Mathf.CeilToInt(next / 60f)} min\n<size=80%><color=#{UiKit.Hex(T.muted)}>(sooner if you find good leads)</color></size>";
+            : $"Next delivery in ~{Mathf.CeilToInt(next / 60f)} min\n<size=80%><color=#{UiKit.Hex(T.muted)}>(sooner if you find something)</color></size>";
     }
 
     Image AddDocCard(CaseDocument doc)

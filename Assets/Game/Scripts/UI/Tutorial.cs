@@ -74,44 +74,44 @@ public class Tutorial : MonoBehaviour
     {
         new Step
         {
-            Text = "Morning, analyst. I'm <b>Rosa</b>, Head of Security. Quick walkthrough before the board clock starts. Don't worry, it's paused until we're done.",
-            Button = "Let's go",
+            Text = "Morning. Rosa, I run security here. Before Dex starts shouting, let me show you around. I've stopped the clock for now.",
+            Button = "Okay",
         },
         new Step
         {
-            Text = "These are the overnight logs. More arrive while you work. Open <b>#keynote</b>.",
+            Text = "Last night's logs come in here. Open <b>#keynote</b>, that's where the drama started.",
             OnEnter = () => ui.ShowTab(DeskUI.Tab.Logs),
             Target = () => ui.Feed.DocCard("doc_slack_keynote"),
             Done = () => ui.CurrentTab == DeskUI.Tab.Logs && ui.Feed.CurrentDocId == "doc_slack_keynote",
         },
         new Step
         {
-            Text = "18:30: Dex cuts the demo in public. That's a motive for someone. Hit <b>Flag</b> on that line.",
+            Text = "Dex killed Jules's demo in front of the whole channel. Somebody didn't take that well. <b>Flag</b> it.",
             Target = () => ui.Feed.LineRow("doc_slack_keynote", 2),
             Done = () => Game.Evidence.Has("e_slack_cut"),
         },
         new Step
         {
-            Text = "Flagged lines become <b>evidence</b> in your tray. Desk finds and confessions land here too.",
+            Text = "Whatever you flag ends up in this tray. Same with stuff from desks or anything people admit to.",
             Target = () => ui.Tray.Root,
-            Button = "Got it",
+            Button = "Okay",
         },
         new Step
         {
-            Text = "Now let's talk to someone. Open <b>Interrogate</b>.",
+            Text = "Right. Let's go talk to someone. <b>Interrogate</b>.",
             Target = () => ui.NavRect(DeskUI.Tab.Interrogate),
             Done = () => ui.CurrentTab == DeskUI.Tab.Interrogate,
         },
         new Step
         {
-            Text = "That's Jules from marketing, the one Dex cut. Tap a <b>quick question</b>, or type your own and press Enter.",
+            Text = "That's Jules. Ask him something. Click one of those, or just type.",
             OnEnter = () => ui.Interrogation.Open("jules"),
             Target = () => ui.Interrogation.QuickRow,
             Done = () => Jules != null && Jules.QuestionsAsked > 0 && !Jules.Busy,
         },
         new Step
         {
-            Text = "Talk is cheap. <b>Drag the evidence card</b> from your tray onto Jules. Watch his stress: hard proof is what makes people crack.",
+            Text = "Now <b>drag that Slack line</b> from your tray onto him. Keep an eye on his stress.",
             OnEnter = () => ui.Interrogation.Open("jules"),
             Target = () => ui.Tray.FirstCard,
             Target2 = () => ui.Interrogation.StageRect,
@@ -121,19 +121,19 @@ public class Tutorial : MonoBehaviour
         },
         new Step
         {
-            Text = "<b>Desks</b>: search monitors, drawers and trash bins for physical clues. Each search costs 30 seconds, so pick wisely.",
+            Text = "You can go through people's <b>desks</b> too. Each one takes half a minute, so don't search everything.",
             Target = () => ui.NavRect(DeskUI.Tab.Desks),
             Button = "Next",
         },
         new Step
         {
-            Text = "<b>Jensenbot</b> summarizes any log in seconds. Handy. Just... double-check it against the raw logs.",
+            Text = "That's <b>Jensenbot</b>. It'll summarize logs for you. I'd still read them myself.",
             Target = () => ui.NavRect(DeskUI.Tab.Jensenbot),
             Button = "Next",
         },
         new Step
         {
-            Text = "When you're sure, hit <b>ACCUSE</b>: one name, up to 3 pieces of proof, one motive. The board meets at 09:00. The clock starts now. Good luck!",
+            Text = "When you know who it was, hit <b>Accuse</b>. One name, up to three pieces of evidence, and why they did it. Board's at nine.",
             Target = () => (RectTransform)ui.AccuseButton.transform,
             Button = "Start the clock",
         },
@@ -245,7 +245,7 @@ public class Tutorial : MonoBehaviour
         PlayerPrefs.Save();
         root.gameObject.SetActive(false);
         Game.Paused = false;
-        ui.Toast("Clock is running. Board meets at 09:00.", T.accent, "hourglass");
+        ui.Toast("Clock's running. Board meets at 09:00.", T.accent, "hourglass");
         Sfx.Play("unlock");
     }
 

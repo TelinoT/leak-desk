@@ -68,7 +68,7 @@ public class InterrogationPanel
         var tipRow = UiKit.Rect("Row", tip.transform);
         tipRow.HLayout(10);
         UiKit.Icon(tipRow, "bulb", 30, T.warning);
-        UiKit.Text(tipRow, "Drag evidence from the tray onto the suspect to confront them.", T.smallSize - 1, T.muted).Size(flexW: 1);
+        UiKit.Text(tipRow, "Drag evidence onto a suspect to see how they react.", T.smallSize - 1, T.muted).Size(flexW: 1);
 
         // ---------- room: stage + conversation ----------
         var room = UiKit.Panel(rt, T.panel, T.panelSprite, "Room");
@@ -290,7 +290,7 @@ public class InterrogationPanel
     {
         if (!Game.IsSuspectUnlocked(agent.Data.Id))
         {
-            ui.Toast($"{agent.Data.FirstName} isn't available yet. New leads unlock more interviews.", T.warning);
+            ui.Toast($"{agent.Data.FirstName} isn't in yet.", T.warning);
             return;
         }
         current = agent;
@@ -409,7 +409,7 @@ public class InterrogationPanel
         Sfx.Play("crack");
         StartFlash(0.8f);
         UiFx.Shake(stageContent, 22f, 0.5f);
-        ui.Toast($"{current.Data.FirstName} cracked! Their story is falling apart.", T.danger);
+        ui.Toast($"{current.Data.FirstName} is cracking.", T.danger);
         var stamp = crackedText.transform.parent;
         crackedGroup.alpha = 1;
         for (float t = 0; t < 0.35f; t += Time.unscaledDeltaTime)

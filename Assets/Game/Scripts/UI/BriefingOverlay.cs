@@ -86,19 +86,19 @@ public class BriefingOverlay
         UiKit.Text(mcol, "To: Security Desk  ·  Subject: <b>the leak</b>", T.smallSize, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.65f));
         var line = UiKit.Panel(mail.transform, new Color(0, 0, 0, 0.08f), name: "Rule");
         line.Size(prefH: 2);
-        mailBody = UiKit.Text(mail.transform, c.Briefing, T.bodySize + 1, T.cardText);
+        mailBody = UiKit.Text(mail.transform, string.IsNullOrEmpty(c.CeoMail) ? c.Briefing : c.CeoMail, T.bodySize + 1, T.cardText);
         UiKit.Spacer(mail.transform, 0, 1);
-        UiKit.Text(mail.transform, "<i>P.S. Jensenbot already did a first pass. Use it. - D</i>", T.smallSize + 1, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.75f));
+        UiKit.Text(mail.transform, "<i>P.S. Jensenbot already had a look. Use it, it's what we pay for.</i>", T.smallSize + 1, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.75f));
 
         // How to play
         var how = UiKit.Rect("HowTo", row);
         how.VLayout(14);
         how.Size(flexW: 1, flexH: 1);
-        UiKit.Text(how, "HOW TO CRACK IT", T.smallSize, T.accent, style: FontStyles.Bold);
-        Tile(how, "folder", "Logs", "Read emails, Slack, badge, VPN and file logs. <b>Flag</b> lines. <b>Search</b> for names and times.", SourceStyle.Color("email"));
-        Tile(how, "find", "Desks", "Search monitors, drawers and trash bins. Each search costs 30 seconds.", SourceStyle.Color("desk"));
-        Tile(how, "mic", "Interrogate", "Talk to suspects. <b>Drag evidence onto them</b> to break their story.", SourceStyle.Color("badge"));
-        Tile(how, "mallet", "Accuse", "Name the leaker, attach up to 3 pieces of proof, before 09:00.", T.danger);
+        UiKit.Text(how, "WHAT YOU'VE GOT", T.smallSize, T.accent, style: FontStyles.Bold);
+        Tile(how, "folder", "Logs", "Emails, Slack, badge swipes, VPN and file logs from last night. Flag anything odd, or search for a name.", SourceStyle.Color("email"));
+        Tile(how, "find", "Desks", "Go through monitors, drawers and bins. Each search takes 30 seconds.", SourceStyle.Color("desk"));
+        Tile(how, "mic", "Interrogate", "Talk to the four people who had the deck. Drag evidence onto them and see what happens.", SourceStyle.Color("badge"));
+        Tile(how, "mallet", "Accuse", "Name one person before 09:00, with up to three pieces of evidence.", T.danger);
 
         var startRow = UiKit.Rect("StartRow", card.transform);
         startRow.HLayout(14);
@@ -178,6 +178,6 @@ public class BriefingOverlay
         Sfx.Play("click");
         ui.Game.StartInvestigation();
         if (Tutorial.ShouldRun) ui.Tutorial.Begin();
-        else ui.Toast("Clock is running. Board meets at 09:00.", UiKit.Theme.accent);
+        else ui.Toast("Clock's running. Board meets at 09:00.", UiKit.Theme.accent);
     }
 }

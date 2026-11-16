@@ -36,7 +36,7 @@ public class EvidencePicker
     {
         var modal = DeskUI.Modal(ui.OverlayRoot, "EvidencePicker", 860, 820, out root);
         title = UiKit.Heading(modal.transform, "Show evidence");
-        UiKit.Text(modal.transform, "Pick the item to put on the table. The suspect has to respond to it.", UiKit.Theme.smallSize, UiKit.Theme.muted);
+        UiKit.Text(modal.transform, "Pick what to put on the table.", UiKit.Theme.smallSize, UiKit.Theme.muted);
         var scroll = UiKit.ScrollList(modal.transform, out content, 10, 4);
         scroll.Size(flexH: 1);
         var close = UiKit.Button(modal.transform, "Cancel", Close, UiKit.Theme.panelAlt, UiKit.Theme.text);

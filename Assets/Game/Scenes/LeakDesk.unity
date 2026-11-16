@@ -31802,7 +31802,7 @@ MonoBehaviour:
   - suspectId: nadia
     characterPrefab: {fileID: 1977554221320892, guid: 88f81e1631ea70f458d192631bf8886d, type: 3}
   - suspectId: guide
-    characterPrefab: {fileID: 1861045244336520, guid: 06a87c8b15efd30448d53857e94c45e9, type: 3}
+    characterPrefab: {fileID: 1822189464268616, guid: f78a881d3ec75d945ac878527dc26674, type: 3}
   stageOffset: {x: 0, y: -500, z: 0}
   stageSize: {x: 640, y: 1024}
   headshotSize: 256

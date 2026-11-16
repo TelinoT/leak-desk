@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <style>
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1a1236; }
+      /* The game fills the whole window (or the itch.io frame) at any size. */
+      #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #1a1236; outline: none; }
+      #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                 gap: 14px; color: #fff; font-family: "Rubik", "Segoe UI", Helvetica, Arial, sans-serif; background: #1a1236; }
+      #loading .kicker { color: #8fee45; font-weight: 700; letter-spacing: 0.3em; font-size: 13px; }
+      #loading .title { font-size: clamp(36px, 8vw, 84px); font-weight: 800; letter-spacing: 0.02em; }
+      #loading .bar { width: min(420px, 70vw); height: 12px; border-radius: 6px; background: rgba(255,255,255,0.12); overflow: hidden; }
+      #loading .fill { height: 100%; width: 0; background: #8fee45; border-radius: 6px; transition: width 0.2s; }
+      #loading .hint { color: rgba(255,255,255,0.55); font-size: 13px; }
+      #fullscreen { position: fixed; right: 10px; bottom: 10px; width: 34px; height: 34px; border: 0; border-radius: 8px;
+                    background: rgba(0,0,0,0.35); cursor: pointer; display: none; padding: 7px; }
+      #fullscreen:hover { background: rgba(0,0,0,0.6); }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <div class="kicker">ENVYDIA // SECURITY DESK</div>
+      <div class="title">LEAK DESK</div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="hint">Loading the overnight logs...</div>
+    </div>
+    <button id="fullscreen" title="Fullscreen">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round">
+        <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+    <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+    <script>
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        arguments: [],
+        dataUrl: "Build/{{{ DATA_FILENAME }}}",
+        frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_THREADS
+        workerUrl: "Build/{{{ WORKER_FILENAME }}}",
+#endif
+#if USE_WASM
+        codeUrl: "Build/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
+#endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        // Sharp on retina, but capped so 4K screens don't melt laptops.
+        devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      }, (progress) => {
+        document.getElementById("fill").style.width = (100 * progress) + "%";
+      }).then((unityInstance) => {
+        document.getElementById("loading").remove();
+        const fs = document.getElementById("fullscreen");
+        fs.style.display = "block";
+        fs.onclick = () => unityInstance.SetFullscreen(1);
+        document.querySelector("#unity-canvas").focus();
+      }).catch((message) => {
+        alert(message);
+      });
+    </script>
+  </body>
+</html>

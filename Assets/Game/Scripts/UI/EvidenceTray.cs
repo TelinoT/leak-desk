@@ -32,7 +32,7 @@ public class EvidenceTray
         panel.Size(prefW: 400, flexH: 1);
         panel.VLayout(10, 16);
         header = UiKit.Heading(panel.transform, "Evidence (0)", 26);
-        UiKit.Text(panel.transform, "Flag log lines. Statements from suspects land here too.", T.smallSize, T.muted);
+        UiKit.Text(panel.transform, "Everything you've found so far.", T.smallSize, T.muted);
 
         var scroll = UiKit.ScrollList(panel.transform, out content, 10, 2);
         scroll.Size(flexH: 1);
@@ -43,7 +43,7 @@ public class EvidenceTray
         ir.HLayout(0, 0, TextAnchor.MiddleCenter);
         UiKit.Icon(ir, "folder", 56, new Color(1, 1, 1, 0.25f));
         UiKit.Text(hint.transform, "<b>No evidence yet</b>", T.bodySize, T.text, TextAlignmentOptions.Center);
-        UiKit.Text(hint.transform, "Flag lines in <b>Logs</b>, search <b>Desks</b>, or crack a suspect. Everything you find lands here.",
+        UiKit.Text(hint.transform, "Flag log lines, search desks or get someone talking. It all ends up here.",
             T.smallSize, T.muted, TextAlignmentOptions.Center);
         emptyHint = hint.gameObject;
 

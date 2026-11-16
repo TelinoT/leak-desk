@@ -18,7 +18,7 @@ RULES
 - verdict "insufficient": correct suspect but the evidence does not prove it. Score 25-55.
 - verdict "wrong": wrong suspect. Score 0-25.
 - Within the range, reward a motive sentence that matches the real motive, naming Jensenbot as accomplice (if it really is), and relevant extra evidence. Penalize irrelevant evidence lightly.
-- board_comment: 2-4 sentences, spoken by the board chair, witty and dramatic, mention the CEO's leather jacket at most once. If the player got the wrong person, hint at what they missed without naming the leaker outright. If convicted, say what happens to the leaker (and to Jensenbot, if it was named).
+- board_comment: 2-3 short sentences, spoken out loud by a tired, dry board chair. Plain words, no flowery metaphors, no lists. Mention the CEO's leather jacket at most once, only if it's funny. If the player got the wrong person, hint at what they missed without naming the leaker outright. If convicted, say what happens to the leaker (and to Jensenbot, if it was named).
 
 Reply with ONE JSON object and nothing else:
 {"verdict": "convicted|insufficient|wrong", "score": <0-100>, "board_comment": "<text>"}

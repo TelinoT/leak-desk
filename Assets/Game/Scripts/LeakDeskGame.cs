@@ -155,7 +155,7 @@ public class LeakDeskGame : MonoBehaviour
     void OnFactRevealed(SuspectAgent agent, CaseFact fact)
     {
         var item = Evidence.AddTestimony(agent.Data, fact);
-        if (item != null && ui != null) ui.Toast($"New statement from {agent.Data.FirstName} added to evidence", SourceStyle.Color("testimony"));
+        if (item != null && ui != null) ui.Toast($"{agent.Data.FirstName} let something slip. Added to evidence.", SourceStyle.Color("testimony"));
     }
 
     // ---------- desk searches ----------

@@ -152,7 +152,7 @@ public class AccusationOverlay
     {
         if (!selectedEvidence.Remove(id))
         {
-            if (selectedEvidence.Count >= MaxEvidence) { ui.Toast("Max 3 pieces of evidence. Choose your strongest.", T.warning); return; }
+            if (selectedEvidence.Count >= MaxEvidence) { ui.Toast("Three pieces, max. Pick your best ones.", T.warning); return; }
             selectedEvidence.Add(id);
         }
         Refresh();
@@ -167,8 +167,8 @@ public class AccusationOverlay
     void Refresh()
     {
         subtitle.text = forced
-            ? $"<color=#{UiKit.Hex(T.danger)}><b>It's 09:00. The board is seated.</b></color> Pick what you have. They will take it as-is when time runs out."
-            : "The CEO is tapping his leather sleeve. One shot: wrong names get people fired.";
+            ? $"<color=#{UiKit.Hex(T.danger)}><b>It's nine. They're sitting down.</b></color> Go with what you've got."
+            : "Dex is drumming on the table. You get one shot, and a wrong name gets someone fired.";
         back.gameObject.SetActive(!forced);
 
         foreach (var kv in suspectCards)

@@ -30,6 +30,7 @@ public static class LeakDeskBuild
         PlayerSettings.defaultWebScreenWidth = 1280;
         PlayerSettings.defaultWebScreenHeight = 720;
         PlayerSettings.runInBackground = true;
+        PlayerSettings.WebGL.template = "PROJECT:LeakDesk"; // responsive: fills the browser window / itch.io frame
 
         var options = new BuildPlayerOptions
         {

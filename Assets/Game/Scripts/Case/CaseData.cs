@@ -18,6 +18,7 @@ public class CaseFile
     [JsonProperty("accomplice")] public string Accomplice;
     [JsonProperty("motive")] public string Motive;
     [JsonProperty("briefing")] public string Briefing;
+    [JsonProperty("ceo_mail")] public string CeoMail;
     [JsonProperty("people")] public List<CasePerson> People = new();
     [JsonProperty("timeline")] public List<TimelineEntry> Timeline = new();
     [JsonProperty("facts")] public List<CaseFact> Facts = new();

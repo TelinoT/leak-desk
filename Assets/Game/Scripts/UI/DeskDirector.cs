@@ -43,7 +43,7 @@ public class DeskDirector : MonoBehaviour
         if (!warned1 && left <= 60f)
         {
             warned1 = true;
-            ui.Toast("<b>ONE MINUTE.</b> Make your accusation!", T.danger, "hourglass");
+            ui.Toast("<b>One minute.</b> Time to make a call.", T.danger, "hourglass");
             Sfx.Play("crack", 1.6f, 0.6f);
         }
         if (left <= 60f && !g.Overtime)
@@ -67,17 +67,17 @@ public class DeskDirector : MonoBehaviour
         bool presented = g.Suspects.Any(s => s.Log.Any(e => e.Type == ChatEntry.Kind.Evidence));
 
         if (t > 90 && g.Evidence.Count == 0)
-            Hint("flag", "Tip: <b>Flag</b> suspicious lines in Logs. They become evidence you can use.");
+            Hint("flag", "<b>Rosa:</b> Nothing flagged yet? If a log line looks off, flag it.");
         if (t > 200 && questions == 0)
-            Hint("talk", "Tip: open <b>Interrogate</b> and ask the suspects where they were at 02:14.");
+            Hint("talk", "<b>Rosa:</b> You haven't talked to anyone. Ask them where they were at two.");
         if (t > 270 && !presented && g.Evidence.Count > 0)
-            Hint("drag", "Tip: <b>drag evidence onto a suspect</b>. Lies crack under hard proof.");
+            Hint("drag", "<b>Rosa:</b> They'll keep lying until you show them something. Drag evidence onto them.");
         if (t > 330 && g.SpotsSearched == 0)
-            Hint("desk", "Tip: <b>Desks</b> hide physical clues. Trash bins are always worth a look.");
+            Hint("desk", "<b>Rosa:</b> Nobody's checked the desks. People throw away the strangest things.");
         if (t > 420 && !g.Jensenbot.Exposed && g.Jensenbot.SummariesGiven > 0)
-            Hint("bot", "Something about Jensenbot's summaries doesn't match the raw logs. Compare the times.");
+            Hint("bot", "<b>Rosa:</b> Jensenbot's summary and the raw log don't say the same thing. Check the times.");
         if (t > 480 && g.Evidence.Count < 2)
-            Hint("late", "The strongest case connects <b>how</b> it was leaked with <b>who</b> was awake to do it.");
+            Hint("late", "<b>Rosa:</b> Work out how the deck got out, then who was awake to do it.");
     }
 
     float lastHint = -999f;
