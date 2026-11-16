@@ -156,7 +156,8 @@ public static class UiKit
         var t = rt.gameObject.AddComponent<TextMeshProUGUI>();
         if (Theme.font != null) t.font = Theme.font;
         t.text = text;
-        t.fontSize = size > 0 ? size : Theme.bodySize;
+        // Floor of 15 so labels stay readable when the canvas is scaled down on small laptop screens.
+        t.fontSize = Mathf.Max(15f, size > 0 ? size : Theme.bodySize);
         t.color = color ?? Theme.text;
         t.alignment = align;
         t.fontStyle = style;

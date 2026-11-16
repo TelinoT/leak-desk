@@ -36,7 +36,7 @@ public class BriefingOverlay
         var c = ui.Game.Case;
 
         // ---------- title card ----------
-        var title = UiKit.Panel(overlayRoot, new Color(0.06f, 0.03f, 0.16f, 0.82f), name: "TitleCard");
+        var title = UiKit.Panel(overlayRoot, new Color(0.06f, 0.03f, 0.16f, 0.95f), name: "TitleCard");
         ((RectTransform)title.transform).Stretch();
         titleRoot = title.gameObject;
         titleGroup = titleRoot.AddComponent<CanvasGroup>();
