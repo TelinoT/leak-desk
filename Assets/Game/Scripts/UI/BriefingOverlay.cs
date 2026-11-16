@@ -16,6 +16,7 @@ public class BriefingOverlay
     readonly Transform modal;
     readonly TextMeshProUGUI mailBody;
     bool skipped;
+    readonly Button startButton;
 
     public BriefingOverlay(DeskUI ui, Transform overlayRoot)
     {
@@ -88,8 +89,8 @@ public class BriefingOverlay
         Tile(how, "mic", "Interrogate", "Talk to suspects. <b>Drag evidence onto them</b> to break their story.", SourceStyle.Color("badge"));
         Tile(how, "mallet", "Accuse", "Name the leaker, attach up to 3 pieces of proof, before 09:00.", T.danger);
 
-        var start = UiKit.Button(card.transform, $"Start investigation  ·  {Mathf.RoundToInt(c.RoundMinutes)} minutes", Start, T.accent, T.accentText, 76, 30);
-        start.Size(prefH: 76);
+        startButton = UiKit.Button(card.transform, $"Start investigation  ·  {Mathf.RoundToInt(c.RoundMinutes)} minutes", Start, T.accent, T.accentText, 76, 30);
+        startButton.Size(prefH: 76);
         briefRoot.SetActive(false);
     }
 
@@ -141,6 +142,14 @@ public class BriefingOverlay
         Sfx.Play("chime");
         ui.StartCoroutine(DeskUI.PopModal(modal));
         UiFx.Typewrite(mailBody, 140f);
+        // The start button breathes until it's pressed.
+        var label = startButton.GetComponentInChildren<TMP_Text>().transform;
+        while (briefRoot.activeSelf)
+        {
+            float k = 1f + Mathf.Sin(Time.unscaledTime * 3f) * 0.025f;
+            label.localScale = new Vector3(k, k, 1);
+            yield return null;
+        }
     }
 
     void Start()

@@ -125,6 +125,13 @@ public class FeedPanel
     /// <summary>Called every frame by DeskUI.</summary>
     public void Tick()
     {
+        // Unread dots breathe so new deliveries catch the eye.
+        float pulse = 1f + Mathf.Sin(Time.unscaledTime * 5f) * 0.25f;
+        foreach (var card in docCards.Values)
+        {
+            var dot = card.transform.Find("Unread");
+            if (dot != null && dot.gameObject.activeSelf) dot.localScale = new Vector3(pulse, pulse, 1);
+        }
         float next = Game.NextWaveIn;
         incoming.text = next < 0 ? "All logs received."
             : Game.Phase == GamePhase.Briefing ? ""

@@ -24,9 +24,14 @@ public class EvidenceTray
         var scroll = UiKit.ScrollList(panel.transform, out content, 10, 2);
         scroll.Size(flexH: 1);
 
-        var hint = UiKit.Card(content, new Color(1, 1, 1, 0.08f), 18, 4, "EmptyHint");
-        UiKit.Text(hint.transform, "Nothing yet.\n\nOpen <b>Logs</b> and flag lines that look suspicious.", T.bodySize - 2, T.muted,
-            TextAlignmentOptions.Center);
+        var hint = UiKit.Card(content, new Color(1, 1, 1, 0.06f), 24, 10, "EmptyHint");
+        hint.GetComponent<VerticalLayoutGroup>().childAlignment = TextAnchor.UpperCenter;
+        var ir = UiKit.Rect("IconRow", hint.transform);
+        ir.HLayout(0, 0, TextAnchor.MiddleCenter);
+        UiKit.Icon(ir, "folder", 56, new Color(1, 1, 1, 0.25f));
+        UiKit.Text(hint.transform, "<b>No evidence yet</b>", T.bodySize, T.text, TextAlignmentOptions.Center);
+        UiKit.Text(hint.transform, "Flag lines in <b>Logs</b>, search <b>Desks</b>, or crack a suspect. Everything you find lands here.",
+            T.smallSize, T.muted, TextAlignmentOptions.Center);
         emptyHint = hint.gameObject;
 
         ui.Game.Evidence.Added += _ =>
@@ -82,6 +87,7 @@ public class EvidenceTray
         }
         UiKit.Text(card.transform, item.Content, T.smallSize - 1, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.85f));
         card.gameObject.AddComponent<EvidenceDrag>().Item = item;
+        card.gameObject.AddComponent<ButtonPop>();
         return card;
     }
 }

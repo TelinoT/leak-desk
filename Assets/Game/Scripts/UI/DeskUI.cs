@@ -109,9 +109,15 @@ public class DeskUI : MonoBehaviour
         rt.offsetMax = new Vector2(-20, -16);
         bar.HLayout(24, 18);
 
-        var brand = UiKit.Rect("Brand", bar.transform);
+        var brandRow = UiKit.Rect("BrandRow", bar.transform);
+        brandRow.HLayout(14);
+        brandRow.Size(prefW: 540);
+        var badge = UiKit.Panel(brandRow, T.accent, T.buttonSprite, "Badge");
+        badge.Size(prefW: 60, prefH: 60, minW: 60);
+        ((RectTransform)UiKit.Icon(UiKit.Rect("H", badge.transform).Stretch(12, 10, 12, 14), "thunder", 34, T.accentText).transform).Stretch();
+        var brand = UiKit.Rect("Brand", brandRow);
         brand.VLayout(0);
-        brand.Size(prefW: 500);
+        brand.Size(flexW: 1);
         UiKit.Text(brand, $"<color=#{UiKit.Hex(T.accent)}><b>{Game.Case.Company.ToUpperInvariant()}</b></color> // SECURITY DESK", 30,
             style: FontStyles.Bold).textWrappingMode = TextWrappingModes.NoWrap;
         UiKit.Text(brand, "Internal investigations unit", T.smallSize, T.muted);
@@ -119,14 +125,22 @@ public class DeskUI : MonoBehaviour
         var title = UiKit.Rect("CaseTitle", bar.transform);
         title.VLayout(0);
         title.Size(flexW: 1);
-        UiKit.Text(title, $"CASE: {Game.Case.Title.ToUpperInvariant()}", 24, T.text, style: FontStyles.Bold);
-        UiKit.Text(title, Game.Case.Tagline, T.smallSize, T.muted);
+        foreach (var t in new[]
+                 {
+                     UiKit.Text(title, $"CASE: {Game.Case.Title.ToUpperInvariant()}", 24, T.text, style: FontStyles.Bold),
+                     UiKit.Text(title, Game.Case.Tagline, T.smallSize, T.muted),
+                 })
+        {
+            t.textWrappingMode = TextWrappingModes.NoWrap;
+            t.overflowMode = TextOverflowModes.Ellipsis;
+        }
 
         var clock = UiKit.Rect("Clock", bar.transform);
         clock.VLayout(4);
-        clock.Size(prefW: 300);
+        clock.Size(prefW: 330);
         var clockRow = UiKit.Rect("ClockRow", clock);
         clockRow.HLayout(12);
+        UiKit.Icon(clockRow, "hourglass", 30, T.muted);
         clockText = UiKit.Text(clockRow, "08:48", 40, T.text, TextAlignmentOptions.Left, FontStyles.Bold);
         clockText.textWrappingMode = TextWrappingModes.NoWrap;
         clockText.Size(prefW: 140);

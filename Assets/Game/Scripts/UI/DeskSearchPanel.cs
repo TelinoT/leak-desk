@@ -18,6 +18,8 @@ public class DeskSearchPanel
     readonly RectTransform spotsRow;
     readonly TextMeshProUGUI title, subtitle;
     readonly RawImage titleHead;
+    readonly TextMeshProUGUI footerText;
+    readonly Button interrogateButton;
     CaseDesk current;
 
     UiTheme T => UiKit.Theme;
@@ -61,7 +63,23 @@ public class DeskSearchPanel
         spotsRow = UiKit.Rect("Spots", view.transform);
         spotsRow.HLayout(18, 0, TextAnchor.UpperLeft, expandWidth: true);
         spotsRow.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
-        spotsRow.Size(flexH: 1);
+        spotsRow.Size(prefH: 560, flexH: 0);
+
+        var footer = UiKit.Card(view.transform, new Color(0, 0, 0, 0.22f), 18, 0, "Footer");
+        var frow = UiKit.Rect("Row", footer.transform);
+        frow.HLayout(16);
+        UiKit.Icon(frow, "bulb", 34, T.warning);
+        footerText = UiKit.Text(frow, "", T.bodySize - 2, T.muted);
+        footerText.Size(flexW: 1);
+        interrogateButton = UiKit.Button(frow, "Interrogate", () =>
+        {
+            if (current == null) return;
+            Sfx.Play("whoosh");
+            ui.ShowTab(DeskUI.Tab.Interrogate);
+            ui.Interrogation.Open(current.Suspect);
+        }, T.secondary, Color.white, 56, 20);
+        interrogateButton.Size(prefW: 260, prefH: 56);
+        UiKit.Spacer(view.transform, 0, 1);
 
         var portraits = SuspectPortraits.Instance;
         if (portraits != null)
@@ -142,6 +160,8 @@ public class DeskSearchPanel
         var s = Game.Case.Suspect(desk.Suspect);
         title.text = $"{s.Name}'s desk";
         subtitle.text = $"{s.Role}. Pick where to look: each search costs {Mathf.RoundToInt(Game.Case.DeskSearchSeconds)} seconds.";
+        footerText.text = $"Found something on {s.FirstName}'s desk? <b>Drag it onto {s.FirstName}</b> in Interrogate and watch the story crack.";
+        interrogateButton.SetLabel($"Interrogate {s.FirstName}");
         if (SuspectPortraits.Instance != null) titleHead.texture = SuspectPortraits.Instance.Headshot(desk.Suspect);
         titleHead.enabled = titleHead.texture != null;
         RebuildSpots();
@@ -207,7 +227,17 @@ public class DeskSearchPanel
 
     IEnumerator SearchRoutine(DeskSpot spot, Image tile)
     {
-        Sfx.Play("flag", 0.8f);
+        // Rummage: the icon shakes while you dig through it.
+        var iconT = tile.transform.Find("Center/IconBg");
+        Sfx.Play("flag", 0.7f);
+        float nextRustle = 0f;
+        for (float time = 0; time < 0.5f && iconT != null; time += Time.unscaledDeltaTime)
+        {
+            iconT.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(time * 60f) * 12f * (1 - time / 0.5f));
+            if (time >= nextRustle) { nextRustle += 0.15f; Sfx.Play("hover", Random.Range(0.6f, 0.9f)); }
+            yield return null;
+        }
+        if (iconT != null) iconT.localRotation = Quaternion.identity;
         // Flip the tile closed...
         var t = tile.transform;
         for (float time = 0; time < 0.15f; time += Time.unscaledDeltaTime)

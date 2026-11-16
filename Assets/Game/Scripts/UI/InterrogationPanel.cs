@@ -191,6 +191,13 @@ public class InterrogationPanel
         Select(Game.Suspects[0]);
     }
 
+    /// <summary>Selects a suspect by id (used by the Desks app's "Interrogate X" button).</summary>
+    public void Open(string suspectId)
+    {
+        var agent = Game.Agent(suspectId);
+        if (agent != null) Select(agent);
+    }
+
     public void SetVisible(bool v)
     {
         root.SetActive(v);
