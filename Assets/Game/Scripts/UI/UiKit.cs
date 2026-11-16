@@ -333,6 +333,39 @@ public static class UiKit
         return img;
     }
 
+    static Sprite gradient;
+
+    /// <summary>Vertical white-to-transparent gradient (top opaque), generated once. Tint via Image.color.</summary>
+    public static Sprite GradientSprite
+    {
+        get
+        {
+            if (gradient != null) return gradient;
+            var tex = new Texture2D(4, 128, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "UiGradient" };
+            for (int y = 0; y < 128; y++)
+            {
+                float a = Mathf.SmoothStep(0f, 1f, y / 127f);
+                for (int x = 0; x < 4; x++) tex.SetPixel(x, y, new Color(1, 1, 1, a));
+            }
+            tex.Apply();
+            gradient = Sprite.Create(tex, new Rect(0, 0, 4, 128), new Vector2(0.5f, 0.5f), 100f);
+            return gradient;
+        }
+    }
+
+    /// <summary>Stretched gradient overlay (no raycasts). flip = darken from the bottom instead of light from the top.</summary>
+    public static Image GradientOverlay(Transform parent, Color color, bool flip = false)
+    {
+        var img = Panel(parent, color, null, "Gradient");
+        img.sprite = GradientSprite;
+        img.type = Image.Type.Simple;
+        img.raycastTarget = false;
+        var rt = (RectTransform)img.transform;
+        rt.Stretch();
+        if (flip) rt.localScale = new Vector3(1, -1, 1);
+        return img;
+    }
+
     /// <summary>Round avatar sprite (falls back to the pill).</summary>
     public static Sprite AvatarSprite => Theme.avatarSprite != null ? Theme.avatarSprite : Theme.pillSprite;
 

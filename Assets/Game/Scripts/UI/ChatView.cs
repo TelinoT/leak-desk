@@ -74,17 +74,46 @@ public class ChatView : MonoBehaviour
         {
             var row = UiKit.Rect("Typing", content);
             row.HLayout(0, 0, TextAnchor.UpperLeft);
-            var bubble = UiKit.Card(row, new Color(1, 1, 1, 0.85f), 12, 0, "TypingBubble");
-            typingText = UiKit.Text(bubble.transform, "", UiKit.Theme.bodySize, UiKit.Theme.cardText, style: FontStyles.Italic);
+            var bubble = UiKit.Panel(row, new Color(1, 1, 1, 0.92f), UiKit.Theme.bubbleSprite, "TypingBubble");
+            bubble.HLayout(10, 16, TextAnchor.MiddleLeft);
+            typingText = UiKit.Text(bubble.transform, "", UiKit.Theme.smallSize, new Color(0.3f, 0.28f, 0.45f), style: FontStyles.Bold);
             typingText.textWrappingMode = TextWrappingModes.NoWrap;
-            bubble.Size(prefW: 320);
+            dots = new RectTransform[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var d = UiKit.Panel(bubble.transform, new Color(0.45f, 0.40f, 0.70f), UiKit.AvatarSprite, "Dot");
+                d.Size(prefW: 12, prefH: 12, minW: 12);
+                dots[i] = (RectTransform)d.transform;
+            }
             UiKit.Spacer(row, 1);
             typingRow = row.gameObject;
             StartCoroutine(AnimateTyping());
         }
+        typingText.text = typingName;
         typingRow.SetActive(true);
         KeepTypingLast();
         ScrollToBottom();
+    }
+
+    RectTransform[] dots;
+
+    IEnumerator AnimateTyping()
+    {
+        // Three dots bouncing in a wave (scale, so the layout group never fights the animation).
+        while (typingRow != null)
+        {
+            if (typingRow.activeSelf && dots != null)
+            {
+                for (int i = 0; i < dots.Length; i++)
+                {
+                    if (dots[i] == null) continue;
+                    float k = Mathf.Max(0, Mathf.Sin(Time.unscaledTime * 7f - i * 0.9f));
+                    float s = 0.7f + k * 0.55f;
+                    dots[i].localScale = new Vector3(s, s, 1);
+                }
+            }
+            yield return null;
+        }
     }
 
     public void HideTyping()
@@ -97,19 +126,6 @@ public class ChatView : MonoBehaviour
         if (typingRow != null) typingRow.transform.SetAsLastSibling();
     }
 
-    IEnumerator AnimateTyping()
-    {
-        int dots = 0;
-        while (typingRow != null)
-        {
-            if (typingRow.activeSelf)
-            {
-                dots = (dots + 1) % 4;
-                typingText.text = $"{typingName} is thinking{new string('.', dots)}";
-            }
-            yield return new WaitForSecondsRealtime(0.35f);
-        }
-    }
 
     public void ScrollToBottom()
     {

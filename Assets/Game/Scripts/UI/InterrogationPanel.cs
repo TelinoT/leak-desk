@@ -79,6 +79,9 @@ public class InterrogationPanel
         // Everything visual lives in a stretched child so it can be shaken without fighting the layout system.
         stageContent = UiKit.Rect("Content", stage).Stretch();
 
+        UiKit.GradientOverlay(stageContent, new Color(1f, 1f, 1f, 0.16f));
+        var floor = UiKit.GradientOverlay(stageContent, new Color(0.05f, 0.03f, 0.12f, 0.55f), flip: true);
+        ((RectTransform)floor.transform).anchorMax = new Vector2(1, 0.45f);
         spotlight = UiKit.Panel(stageContent, new Color(1, 1, 1, 0.18f), UiKit.AvatarSprite, "Spotlight");
         var sp = (RectTransform)spotlight.transform;
         sp.anchorMin = sp.anchorMax = new Vector2(0.5f, 0.42f);
@@ -204,7 +207,7 @@ public class InterrogationPanel
     {
         var card = UiKit.Panel(parent, T.panelAlt, T.cardSprite, "Suspect: " + agent.Data.Id);
         card.HLayout(12, 12);
-        card.gameObject.AddComponent<Button>().onClick.AddListener(() => { Sfx.Play("click"); Select(agent); });
+        card.gameObject.AddComponent<Button>().onClick.AddListener(() => { Sfx.Play("whoosh"); Select(agent); });
         card.gameObject.AddComponent<ButtonPop>();
 
         var av = UiKit.Panel(card.transform, agent.Data.Color, UiKit.AvatarSprite, "Avatar");
@@ -398,6 +401,27 @@ public class InterrogationPanel
         crackedGroup.alpha = 0;
     }
 
+    /// <summary>"+12" rising from the stress number, red when stress goes up, green when it drops.</summary>
+    IEnumerator FloatDelta(int delta)
+    {
+        var t = UiKit.Text(stageContent, (delta > 0 ? "+" : "") + delta, 40, delta > 0 ? T.danger : T.accent, TextAlignmentOptions.Center, FontStyles.Bold, "Delta");
+        if (T.headingFont != null) t.font = T.headingFont;
+        var rt = (RectTransform)t.transform;
+        rt.anchorMin = rt.anchorMax = new Vector2(0, 0);
+        rt.sizeDelta = new Vector2(160, 60);
+        Vector2 start = new(110, 150);
+        UiFx.Punch(stageStress.transform, 0.25f, 0.35f);
+        for (float time = 0; time < 1.1f && t != null; time += Time.unscaledDeltaTime)
+        {
+            float k = time / 1.1f;
+            rt.anchoredPosition = start + new Vector2(Mathf.Sin(k * 6f) * 6f, k * 120f);
+            t.alpha = 1f - k * k;
+            rt.localScale = Vector3.one * (1f + Mathf.Sin(Mathf.Min(1f, k * 4f) * Mathf.PI) * 0.3f);
+            yield return null;
+        }
+        if (t != null) Object.Destroy(t.gameObject);
+    }
+
     void StartFlash(float strength) => ui.StartCoroutine(Flash(strength));
 
     IEnumerator Flash(float strength)
@@ -412,8 +436,14 @@ public class InterrogationPanel
 
     // ---------- state ----------
 
+    readonly Dictionary<SuspectAgent, int> lastStress = new();
+
     void OnAgentChanged(SuspectAgent agent)
     {
+        lastStress.TryGetValue(agent, out int before);
+        lastStress[agent] = agent.Stress;
+        int delta = agent.Stress - before;
+        if (agent == current && delta != 0) ui.StartCoroutine(FloatDelta(delta));
         UpdateCard(agent);
         if (agent == current) UpdateHeader();
         SuspectPortraits.Instance?.React(agent.Data, agent.Broken && agent.Stress >= 60 ? "broken" : agent.Emotion, agent.Stress);

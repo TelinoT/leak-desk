@@ -29,7 +29,11 @@ public class EvidenceTray
             TextAlignmentOptions.Center);
         emptyHint = hint.gameObject;
 
-        ui.Game.Evidence.Added += _ => Refresh(pulseLast: true);
+        ui.Game.Evidence.Added += _ =>
+        {
+            Refresh(pulseLast: true);
+            UiFx.Punch(header.transform, 0.18f, 0.4f);
+        };
     }
 
     public void Refresh(bool pulseLast = false)

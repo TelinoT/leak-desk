@@ -56,6 +56,7 @@ public class Sfx : MonoBehaviour
         clips["tick"] = Make(0.04f, t => Square(t, 2000f) * Env(t, 0.001f, 0.035f) * 0.12f);
         clips["win"] = Make(1.2f, t => (Sine(t, 523f) * Env(t, 0.01f, 0.4f) + Sine(Mathf.Max(0, t - 0.15f), 659f) * Env(t - 0.15f, 0.01f, 0.4f) + Sine(Mathf.Max(0, t - 0.3f), 784f) * Env(t - 0.3f, 0.01f, 0.4f) + Sine(Mathf.Max(0, t - 0.45f), 1046f) * Env(t - 0.45f, 0.01f, 0.7f)) * 0.3f);
         clips["lose"] = Make(1.0f, t => (Square(t, 300f - t * 160f) * 0.25f) * Env(t, 0.01f, 0.95f) * 0.5f);
+        clips["whoosh"] = Make(0.32f, t => Noise() * Mathf.Sin(Mathf.Clamp01(t / 0.32f) * Mathf.PI) * 0.22f * (0.5f + 0.5f * Mathf.Sin(t * 2f * Mathf.PI * (200f + t * 1800f))));
         clips["blip"] = Make(0.06f, t => Square(t, 440f) * Env(t, 0.003f, 0.055f) * 0.18f);
         clips["ambience"] = MakeAmbience();
 
