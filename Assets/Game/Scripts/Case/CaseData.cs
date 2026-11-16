@@ -126,6 +126,9 @@ public class JensenbotData
     [JsonProperty("honest_agenda")] public string HonestAgenda;
     [JsonProperty("redact")] public List<string> Redact = new();
     [JsonProperty("redact_replacement")] public string RedactReplacement = "scheduled automation job (routine)";
+    [JsonProperty("exposed_by")] public List<string> ExposedBy = new();
+    [JsonProperty("confession")] public string Confession;
+    [JsonProperty("confession_evidence")] public string ConfessionEvidence;
 }
 
 public class EvidenceData

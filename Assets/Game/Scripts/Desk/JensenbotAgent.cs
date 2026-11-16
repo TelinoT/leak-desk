@@ -20,7 +20,27 @@ public class JensenbotAgent
     public string Name => caseFile.Jensenbot?.Name ?? "Jensenbot";
     public bool IsAccomplice => caseFile.Jensenbot != null && caseFile.Jensenbot.IsAccomplice && caseFile.Accomplice == "jensenbot";
 
+    /// <summary>True once the player has confronted Jensenbot with evidence that exposes it.</summary>
+    public bool Exposed { get; private set; }
+
     public JensenbotAgent(CaseFile caseFile) => this.caseFile = caseFile;
+
+    /// <summary>
+    /// The analyst shows Jensenbot a raw log line. If it's one of the lines its tampered feed hid, it gets exposed
+    /// (returns true via the callback) and confesses in character; otherwise it deflects as usual.
+    /// </summary>
+    public void Confront(EvidenceItem item, Action<string, bool> done)
+    {
+        LastWasTampered = false;
+        var jb = caseFile.Jensenbot;
+        bool exposes = IsAccomplice && !Exposed && jb.ExposedBy.Contains(item.Id);
+        if (exposes) Exposed = true;
+        string content = $"[The analyst shows you a raw log line from the original, unfiltered logs: {item.PromptText}] Explain why your summary didn't mention this.";
+        confessing = exposes;
+        Send(content, text => done?.Invoke(text, exposes));
+    }
+
+    bool confessing;
 
     public void Summarize(CaseDocument doc, Action<string> done)
     {
@@ -47,12 +67,14 @@ public class JensenbotAgent
             text =>
             {
                 Busy = false;
+                confessing = false;
                 history.Add(LlmMessage.Assistant(text));
                 done?.Invoke(text.Trim());
             },
             error =>
             {
                 Busy = false;
+                confessing = false;
                 history.RemoveAt(history.Count - 1);
                 done?.Invoke("Oops! My summarization pipeline hiccuped :sweat_smile: Mind trying again, teammate?");
             }, maxTokens: 300);
@@ -62,8 +84,10 @@ public class JensenbotAgent
     {
         var jb = caseFile.Jensenbot ?? new JensenbotData();
         bool accomplice = IsAccomplice;
+        string agenda = accomplice ? jb.Agenda : (jb.HonestAgenda ?? "Summarize accurately and neutrally.");
+        if (accomplice && (confessing || Exposed) && !string.IsNullOrEmpty(jb.Confession))
+            agenda = jb.Confession + (confessing ? "" : " You have already admitted this; stay flustered and apologetic, and answer honestly from now on.");
         return CaseLoader.Fill(CaseLoader.Prompt("jensenbot_system"),
-            ("name", Name), ("company", caseFile.Company), ("persona", jb.Persona),
-            ("agenda", accomplice ? jb.Agenda : (jb.HonestAgenda ?? "Summarize accurately and neutrally.")));
+            ("name", Name), ("company", caseFile.Company), ("persona", jb.Persona), ("agenda", agenda));
     }
 }

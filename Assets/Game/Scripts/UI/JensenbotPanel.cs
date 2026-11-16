@@ -13,6 +13,10 @@ public class JensenbotPanel
     readonly Button askButton;
     readonly RectTransform quickRow;
     readonly JensenbotFace face;
+    readonly RectTransform chatArea;
+    readonly CanvasGroup exposedGroup;
+    readonly Button confrontButton;
+    EvidencePicker picker;
 
     UiTheme T => UiKit.Theme;
     JensenbotAgent Bot => ui.Game.Jensenbot;
@@ -38,8 +42,34 @@ public class JensenbotPanel
 
         var chatBg = UiKit.Panel(panel.transform, new Color(0, 0, 0, 0.22f), T.panelSprite, "ChatBg");
         chatBg.Size(flexH: 1, flexW: 1);
-        chat = ChatView.Create(chatBg.transform);
+        chatArea = UiKit.Rect("Content", chatBg.transform).Stretch();
+        chat = ChatView.Create(chatArea);
         ((RectTransform)chat.transform).Stretch();
+
+        // Drag raw evidence onto the chat to confront Jensenbot with what its summaries left out.
+        var drop = UiKit.Panel(chatArea, new Color(1f, 0.35f, 0.45f, 0.25f), T.panelSprite, "DropHighlight");
+        ((RectTransform)drop.transform).Stretch(6, 6, 6, 6);
+        var dt = UiKit.Text(drop.transform, "DROP TO CONFRONT JENSENBOT", 30, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+        ((RectTransform)dt.transform).Stretch();
+        drop.raycastTarget = false;
+        drop.gameObject.SetActive(false);
+        var zone = chatBg.gameObject.AddComponent<PresentDropZone>();
+        zone.Highlight = drop;
+        zone.ShakeTarget = chatArea;
+        zone.CanAccept = () => !Bot.Busy && ui.Game.Phase == GamePhase.Investigating;
+        zone.OnPresent = item => Confront(item, slammed: true);
+
+        var exposed = UiKit.Rect("Exposed", chatArea).Stretch();
+        exposedGroup = exposed.gameObject.AddComponent<CanvasGroup>();
+        exposedGroup.alpha = 0;
+        exposedGroup.blocksRaycasts = false;
+        var stamp = UiKit.Panel(exposed, T.danger, T.buttonSprite, "Stamp");
+        var sr = (RectTransform)stamp.transform;
+        sr.anchorMin = sr.anchorMax = new Vector2(0.5f, 0.55f);
+        sr.sizeDelta = new Vector2(520, 120);
+        var st = UiKit.Text(stamp.transform, "AI EXPOSED!", 58, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+        ((RectTransform)st.transform).Stretch();
+        if (T.headingFont != null) st.font = T.headingFont;
 
         UiKit.Text(panel.transform, "Quick summaries:", T.smallSize, T.muted);
         quickRow = UiKit.Rect("Quick", panel.transform);
@@ -52,7 +82,9 @@ public class JensenbotPanel
         input = UiKit.Input(row, "Ask Jensenbot anything...");
         input.onSubmit.AddListener(_ => Ask());
         askButton = UiKit.Button(row, "Ask", Ask, BotColor, T.accentText);
-        askButton.Size(prefW: 140, prefH: 56);
+        askButton.Size(prefW: 120, prefH: 56);
+        confrontButton = UiKit.Button(row, "Confront", OpenPicker, T.danger, Color.white);
+        confrontButton.Size(prefW: 170, prefH: 56);
 
         chat.AddBubble(Bot.Name, "Hi teammate! ^_^ I already ran a preliminary analysis: anomalies point to Lab B2. " +
                                  "Want me to summarize a log so you don't have to read all that raw data?", ChatView.Side.Left,
@@ -92,6 +124,76 @@ public class JensenbotPanel
         input.text = "";
         chat.AddBubble("You", q, ChatView.Side.Right, T.bubblePlayer, T.accentText);
         Send(done => Bot.Ask(q, done));
+    }
+
+    public void Confront(EvidenceItem item) => Confront(item, slammed: false);
+
+    void Confront(EvidenceItem item, bool slammed)
+    {
+        if (Bot.Busy || ui.Game.Phase != GamePhase.Investigating) return;
+        ui.ShowTab(DeskUI.Tab.Jensenbot);
+        if (!slammed)
+        {
+            Sfx.Play("slam");
+            UiFx.Shake(chatArea, 12f, 0.3f);
+        }
+        var b = chat.AddBubble($"EVIDENCE  ·  {SourceStyle.Label(item.Source)}", item.Content, ChatView.Side.Right, new Color(1f, 0.94f, 0.74f));
+        var stripe = UiKit.Panel(b.transform, SourceStyle.Color(item.Source), T.pillSprite, "Stripe").Pill(6);
+        stripe.Size(prefH: 6);
+        stripe.transform.SetAsFirstSibling();
+
+        askButton.interactable = confrontButton.interactable = false;
+        chat.ShowTyping(Bot.Name);
+        face.SetMood(JensenbotFace.Mood.Thinking);
+        Bot.Confront(item, (reply, exposed) =>
+        {
+            chat.HideTyping();
+            if (exposed) ui.StartCoroutine(Exposed());
+            var bubble = chat.AddBubble(Bot.Name, Clean(reply), ChatView.Side.Left,
+                exposed || Bot.Exposed ? new Color(1f, 0.86f, 0.86f) : new Color(0.88f, 1f, 0.82f));
+            var texts = bubble.GetComponentsInChildren<TextMeshProUGUI>();
+            UiFx.Typewrite(texts[^1], 70f, exposed ? 1.5f : 1.9f);
+            askButton.interactable = confrontButton.interactable = true;
+            if (!exposed) face.SetMood(JensenbotFace.Mood.Talking);
+            if (exposed)
+            {
+                var jb = ui.Game.Case.Jensenbot;
+                var ev = ui.Game.Evidence.AddCaseEvidence(jb.ConfessionEvidence);
+                if (ev != null) ui.Toast($"New evidence: {ev.Title}", T.danger);
+            }
+        });
+    }
+
+    System.Collections.IEnumerator Exposed()
+    {
+        Sfx.Play("crack", 1.3f);
+        face.SetCompromised();
+        UiFx.Shake(chatArea, 24f, 0.6f);
+        var stamp = exposedGroup.transform.GetChild(0);
+        exposedGroup.alpha = 1;
+        for (float t = 0; t < 0.35f; t += Time.unscaledDeltaTime)
+        {
+            float k = 1 - Mathf.Pow(1 - t / 0.35f, 3);
+            stamp.localScale = Vector3.one * Mathf.Lerp(2.6f, 1f, k);
+            stamp.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(20f, 6f, k));
+            yield return null;
+        }
+        Sfx.Play("stamp");
+        UiFx.Punch(stamp, 0.12f, 0.3f);
+        yield return new WaitForSecondsRealtime(1.8f);
+        for (float t = 0; t < 0.4f; t += Time.unscaledDeltaTime)
+        {
+            exposedGroup.alpha = 1 - t / 0.4f;
+            yield return null;
+        }
+        exposedGroup.alpha = 0;
+    }
+
+    void OpenPicker()
+    {
+        if (Bot.Busy) return;
+        picker ??= new EvidencePicker(ui);
+        picker.Open("Confront Jensenbot with the raw logs...", item => Confront(item, slammed: false));
     }
 
     // The UI font has no emoji glyphs: turn Slack-style :codes: into cheerful ASCII instead.

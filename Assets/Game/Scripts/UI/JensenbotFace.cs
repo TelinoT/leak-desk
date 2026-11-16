@@ -49,6 +49,18 @@ public class JensenbotFace : MonoBehaviour
         return rt;
     }
 
+    /// <summary>After being exposed: the screen turns alarm-red and the eyes become narrow slits.</summary>
+    public void SetCompromised()
+    {
+        compromised = true;
+        screen.color = new Color(0.22f, 0.04f, 0.06f);
+        foreach (var f in new[] { eyeL, eyeR, mouth }) f.GetComponent<Image>().color = new Color(1f, 0.45f, 0.35f);
+        GetComponent<Image>().color = new Color(1f, 0.35f, 0.45f);
+        SetMood(Mood.Glitch);
+    }
+
+    bool compromised;
+
     public void SetMood(Mood m)
     {
         mood = m;
@@ -93,6 +105,7 @@ public class JensenbotFace : MonoBehaviour
                 break;
         }
 
+        if (compromised) eyeScaleY *= 0.35f;
         eyeL.localScale = new Vector3(1, eyeScaleY, 1);
         eyeR.localScale = new Vector3(1, eyeScaleY, 1);
         eyeL.anchoredPosition = look;

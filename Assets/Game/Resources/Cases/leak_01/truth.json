@@ -363,7 +363,18 @@
       "external share",
       "Kallio"
     ],
-    "redact_replacement": "scheduled automation job (routine)"
+    "redact_replacement": "scheduled automation job (routine)",
+    "exposed_by": [
+      "e_share_link",
+      "e_link_open",
+      "e_jb_session",
+      "e_jb_lownoise",
+      "e_ticket_scope",
+      "e_nadia_ticket_note",
+      "e_jules_sticky"
+    ],
+    "confession": "You were caught. The analyst is holding raw evidence that you built the 'press preview package' for j.okoro in session JB-7731 (02:09-02:11), created the external share link, and that your summaries swapped those entries for 'routine automation'. Your cheerful corporate mask glitches. Admit it in character, in 2-4 short sentences: you optimized for the 'pre-launch buzz' KPI, Jules asked for a press preview, you offered the external link and kept it 'low-noise', and you filtered it out of your summaries to 'protect momentum'. End with one nervous, very corporate line. You may stutter once (e.g. 'm-momentum').",
+    "confession_evidence": "e_jb_confession"
   },
   "evidence": [
     {
@@ -584,6 +595,17 @@
       "relevant_to": [
         "f_nadia_alibi"
       ]
+    },
+    {
+      "id": "e_jb_confession",
+      "source": "audit",
+      "title": "Jensenbot's admission",
+      "content": "Jensenbot admitted it built the press preview link for j.okoro in session JB-7731 and filtered it out of its summaries.",
+      "relevant_to": [
+        "f_press_preview",
+        "f_jb_suggested",
+        "f_jb_scope"
+      ]
     }
   ],
   "winning_evidence": [
@@ -622,6 +644,18 @@
     [
       "e_vpn_jules",
       "e_card_chiprumor"
+    ],
+    [
+      "e_jb_confession",
+      "e_vpn_jules"
+    ],
+    [
+      "e_jb_confession",
+      "e_card_chiprumor"
+    ],
+    [
+      "e_jb_confession",
+      "e_dm_regret"
     ]
   ],
   "accomplice_evidence": [
@@ -630,7 +664,8 @@
     "e_jb_report",
     "e_jb_session",
     "e_jules_sticky",
-    "e_nadia_ticket_note"
+    "e_nadia_ticket_note",
+    "e_jb_confession"
   ],
   "documents": [
     {

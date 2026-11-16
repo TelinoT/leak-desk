@@ -43,12 +43,15 @@ public class EvidenceTray
         }
         emptyHint.SetActive(items.Count == 0);
 
-        bool canPresent = ui.CurrentTab == DeskUI.Tab.Interrogate && ui.Game.Phase == GamePhase.Investigating;
+        bool canPresent = (ui.CurrentTab == DeskUI.Tab.Interrogate || ui.CurrentTab == DeskUI.Tab.Jensenbot)
+                          && ui.Game.Phase == GamePhase.Investigating;
         // Newest first, so fresh finds are visible without scrolling.
         for (int i = items.Count - 1; i >= 0; i--)
         {
             var item = items[i];
-            var card = EvidenceCard(content, item, canPresent ? () => ui.Interrogation.Present(item) : null);
+            var card = EvidenceCard(content, item, canPresent
+                ? () => { if (ui.CurrentTab == DeskUI.Tab.Jensenbot) ui.JensenbotView.Confront(item); else ui.Interrogation.Present(item); }
+                : null);
             if (pulseLast && i == items.Count - 1) ui.StartCoroutine(DeskUI.PopModal(card.transform));
         }
     }
