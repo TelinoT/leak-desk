@@ -18,7 +18,7 @@ RULES
 - verdict "insufficient": correct suspect but the evidence does not prove it.
 - verdict "wrong": wrong suspect.
 - motive_points (0-10): how well the analyst's motive sentence matches the real motive. 10 = spot on, 5 = partly, 0 = wrong or missing.
-- board_comment: 2-3 short sentences, spoken out loud by a tired, dry board chair. Plain words, no flowery metaphors, no lists. Mention the CEO's leather jacket at most once, only if it's funny. If the player got the wrong person, hint at what they missed without naming the leaker outright. If convicted, say what happens to the leaker (and to Jensenbot, if it was named).
+- board_comment: 2-3 short sentences, 45 words max, spoken out loud by a tired, dry board chair. Plain words, no flowery metaphors, no lists. Mention the CEO's leather jacket at most once, only if it's funny. If the player got the wrong person, hint at what they missed without naming the leaker outright. If convicted, say what happens to the leaker (and to Jensenbot, if it was named).
 
 Reply with ONE JSON object and nothing else:
 {"verdict": "convicted|insufficient|wrong", "motive_points": <0-10>, "board_comment": "<text>"}

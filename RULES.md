@@ -22,15 +22,18 @@ Press **ACCUSE** at any time (or get dragged in when the clock hits 09:00):
 3. Optionally tick **"Jensenbot helped them"**.
 4. Write the **motive** in one sentence.
 
-The **board** (an AI judge that knows the truth) reads your case and returns a verdict:
+The **board** (an AI judge that knows the truth) reads your case. A case holds up when your evidence shows **how the deck got out** plus **why or when** they did it. The accusation screen shows whether you have both.
 
-| Verdict | Meaning | Score |
-|---|---|---|
-| **CASE CLOSED** | Right person, and your evidence proves it | 60–100 |
-| **NOT ENOUGH PROOF** | Right person, weak file | 25–55 |
-| **WRONG PERSON** | Someone innocent gets fired | 0–25 |
+| Verdict | Meaning |
+|---|---|
+| **CASE CLOSED** | Right person, and your evidence proves it |
+| **NOT ENOUGH PROOF** | Right person, weak file |
+| **WRONG PERSON** | Someone innocent gets fired |
 
-Bonus points go to a motive that matches the truth and to correctly exposing an accomplice.
+**Score (max 100):** right person 30 · proof that holds up 25 · motive 10 (judged by the board) · catching the AI accomplice 15 · leads uncovered 10 · time to spare 10. Grades: S (90+), A, B, C, D.
+
+## Leads
+The sidebar lists five **leads**: Motive, Opportunity, Method, Inside help and Loose ends. Each one ticks off when you find evidence for it, and clicking an open lead gets you a nudge from Rosa. Evidence cards show which lead they help with; anything that doesn't help can be thrown out with the ✕.
 
 ## Tips
 - Raw logs don't lie. Summaries might.

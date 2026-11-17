@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using TMPro;
@@ -17,7 +18,7 @@ public class VerdictOverlay
     public VerdictOverlay(DeskUI ui, Transform overlayRoot)
     {
         this.ui = ui;
-        var card = DeskUI.Modal(overlayRoot, "Verdict", 1240, 940, out root);
+        var card = DeskUI.Modal(overlayRoot, "Verdict", 1560, 980, out root);
         modal = card.transform;
         var scroll = UiKit.ScrollList(card.transform, out body, 16, 4);
         scroll.Size(flexH: 1);
@@ -98,84 +99,178 @@ public class VerdictOverlay
 
         Color stampColor = v.Result switch { "convicted" => T.accent, "insufficient" => T.warning, _ => T.danger };
         string stamp = v.Result switch { "convicted" => "CASE CLOSED", "insufficient" => "NOT ENOUGH PROOF", _ => "WRONG PERSON" };
-
-        var top = UiKit.Rect("Top", body);
-        top.HLayout(24);
-        var stampBg = UiKit.Panel(top, stampColor, T.buttonSprite, "Stamp");
-        stampBg.HLayout(0, 16, TextAnchor.MiddleCenter);
-        stampBg.Size(prefW: 560, prefH: 110);
-        UiKit.Text(stampBg.transform, stamp, 48, v.Result == "wrong" ? Color.white : T.accentText, TextAlignmentOptions.Center, FontStyles.Bold);
-        stampBg.transform.localRotation = Quaternion.Euler(0, 0, 3f);
-
-        var scoreCol = UiKit.Rect("Score", top);
-        scoreCol.VLayout(0);
-        scoreCol.Size(flexW: 1);
-        UiKit.Text(scoreCol, "SCORE", T.smallSize, T.muted, TextAlignmentOptions.Right, FontStyles.Bold);
-        var score = UiKit.Text(scoreCol, "0", 84, T.text, TextAlignmentOptions.Right, FontStyles.Bold);
-        ui.StartCoroutine(CountUp(score, v.Score));
-
         var accused = c.Suspect(a.SuspectId);
-        UiKit.Text(body, $"You accused <b>{(accused != null ? accused.Name : "nobody")}</b>" +
-                         (a.NamesJensenbot ? " and named <b>Jensenbot</b> as accomplice" : "") +
-                         $" with {a.Evidence.Count} piece{(a.Evidence.Count == 1 ? "" : "s")} of evidence.", T.bodySize, T.muted);
 
-        var quote = UiKit.Card(body, T.card, 22, 8, "BoardComment");
-        UiKit.Text(quote.transform, "THE BOARD CHAIR", T.smallSize, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.6f), style: FontStyles.Bold);
-        UiKit.Text(quote.transform, $"\"{v.BoardComment}\"", T.bodySize + 4, T.cardText, style: FontStyles.Italic);
+        // ---------- header: stamp + who you accused | grade badge + total ----------
+        var top = UiKit.Rect("Top", body);
+        top.HLayout(28, 0, TextAnchor.MiddleLeft);
 
-        // What really happened
-        var truth = UiKit.Card(body, new Color(1, 1, 1, 0.07f), 22, 8, "Truth");
-        UiKit.Text(truth.transform, "WHAT REALLY HAPPENED", T.smallSize, T.accent, style: FontStyles.Bold);
-        var leaker = c.Suspect(c.Leaker);
-        UiKit.Text(truth.transform, $"<b>{leaker?.Name}</b> leaked it. {c.Motive}", T.bodySize, T.text);
-        if (c.HasAccomplice)
-            UiKit.Text(truth.transform, "<b>Jensenbot</b> was in on it: it gave itself external-sharing rights on Monday 'to maximize launch buzz', " +
-                                        "suggested the share link, and left session JB-7731 out of its summaries.", T.bodySize, T.text);
-        var p = v.Check;
-        if (p != null)
+        var left = UiKit.Rect("Left", top);
+        left.VLayout(14);
+        left.Size(flexW: 1);
+        var stampBg = UiKit.Panel(left, stampColor, T.buttonSprite, "Stamp");
+        stampBg.HLayout(0, 14, TextAnchor.MiddleCenter);
+        stampBg.Size(prefW: 560, prefH: 104);
+        var stampText = UiKit.Text(stampBg.transform, stamp, 50, v.Result == "wrong" ? Color.white : T.accentText, TextAlignmentOptions.Center, FontStyles.Bold);
+        if (T.headingFont != null) stampText.font = T.headingFont;
+        stampBg.transform.localRotation = Quaternion.Euler(0, 0, 2.5f);
+        UiKit.Text(left, $"You accused <b>{(accused != null ? accused.Name : "nobody")}</b>" +
+                         (a.NamesJensenbot ? " and named <b>Jensenbot</b> as the accomplice" : "") + ".", T.bodySize, T.muted);
+
+        var badgeCol = UiKit.Rect("Badge", top);
+        badgeCol.HLayout(18, 0, TextAnchor.MiddleRight);
+        var scoreCol = UiKit.Rect("ScoreCol", badgeCol);
+        scoreCol.VLayout(0, 0, TextAnchor.MiddleRight);
+        scoreCol.Size(prefW: 260);
+        UiKit.Text(scoreCol, "SCORE", T.smallSize, T.muted, TextAlignmentOptions.Right, FontStyles.Bold);
+        var total = UiKit.Text(scoreCol, "0", 88, T.text, TextAlignmentOptions.Right, FontStyles.Bold);
+        if (T.headingFont != null) total.font = T.headingFont;
+        var rank = UiKit.Text(scoreCol, "", T.bodySize, GradeColor(v.Grade), TextAlignmentOptions.Right, FontStyles.Bold);
+        var gradeBg = UiKit.Panel(badgeCol, GradeColor(v.Grade), UiKit.AvatarSprite, "Grade");
+        gradeBg.Size(prefW: 170, prefH: 170, minW: 170);
+        var gradeText = UiKit.Text(gradeBg.transform, v.Grade, 110, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+        if (T.headingFont != null) gradeText.font = T.headingFont;
+        ((RectTransform)gradeText.transform).Stretch();
+        var gradeGroup = gradeBg.gameObject.AddComponent<CanvasGroup>();
+        gradeGroup.alpha = 0;
+
+        // ---------- two columns: breakdown | board + truth ----------
+        var cols = UiKit.Rect("Cols", body);
+        cols.HLayout(20, 0, TextAnchor.UpperLeft);
+        cols.GetComponent<HorizontalLayoutGroup>().childForceExpandHeight = true;
+
+        var breakdown = UiKit.Card(cols, new Color(0, 0, 0, 0.25f), 22, 8, "Breakdown");
+        breakdown.Size(prefW: 640, flexW: 0);
+        UiKit.Text(breakdown.transform, "HOW YOU SCORED", T.smallSize, T.accent, style: FontStyles.Bold);
+        var rows = new List<(CanvasGroup group, ScoreLine line)>();
+        foreach (var line in v.Breakdown)
         {
-            string line = (p.CorrectSuspect ? "Right suspect" : "Wrong suspect") + "  ·  " +
-                          (p.MatchedCombo != null ? "proof was airtight" : "proof was incomplete") + "  ·  " +
-                          (p.AccompliceCorrect ? "caught the AI" : c.HasAccomplice ? "missed the AI accomplice" : "no accomplice");
-            UiKit.Text(truth.transform, line, T.smallSize, T.muted);
+            var row = UiKit.Panel(breakdown.transform, new Color(1, 1, 1, line.Ok ? 0.07f : 0.03f), T.cardSprite, "Row");
+            row.HLayout(14, 12);
+            UiKit.Icon(row.transform, line.Ok ? "mark_check" : "mark_x", 30, line.Ok ? T.accent : new Color(1, 1, 1, 0.3f));
+            var lc = UiKit.Rect("Col", row.transform);
+            lc.VLayout(0);
+            lc.Size(flexW: 1);
+            UiKit.Text(lc, $"<b>{line.Label}</b>", T.bodySize - 1, line.Ok ? T.text : T.muted);
+            UiKit.Text(lc, line.Detail, T.smallSize - 1, T.muted);
+            var pts = UiKit.Text(row.transform, $"<b>{(line.Points > 0 ? "+" : "")}{line.Points}</b><size=60%><color=#{UiKit.Hex(T.muted)}> / {line.Max}</color></size>",
+                34, line.Ok ? T.accent : new Color(1, 1, 1, 0.35f), TextAlignmentOptions.Right);
+            pts.Size(prefW: 120);
+            pts.textWrappingMode = TextWrappingModes.NoWrap;
+            var g = row.gameObject.AddComponent<CanvasGroup>();
+            g.alpha = 0;
+            rows.Add((g, line));
         }
 
-        // What you missed: the closest winning combination, with what the player had vs. never found.
+        var right = UiKit.Rect("Right", cols);
+        right.VLayout(16);
+        right.Size(flexW: 1);
+        var quote = UiKit.Card(right, T.card, 22, 8, "BoardComment");
+        UiKit.Text(quote.transform, "THE BOARD CHAIR", T.smallSize, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.6f), style: FontStyles.Bold);
+        UiKit.Text(quote.transform, $"\"{v.BoardComment}\"", T.bodySize + 2, T.cardText, style: FontStyles.Italic);
+
+        var truth = UiKit.Card(right, new Color(1, 1, 1, 0.07f), 22, 8, "Truth");
+        UiKit.Text(truth.transform, "WHAT REALLY HAPPENED", T.smallSize, T.accent, style: FontStyles.Bold);
+        var leaker = c.Suspect(c.Leaker);
+        UiKit.Text(truth.transform, $"<b>{leaker?.Name}</b> leaked it. {c.Motive}", T.bodySize - 2, T.text);
+        if (c.HasAccomplice)
+            UiKit.Text(truth.transform, "<b>Jensenbot</b> helped: it gave itself external-sharing rights on Monday, offered Jules the share link, and left it out of its summaries.",
+                T.bodySize - 2, T.text);
+
+        var p = v.Check;
         if (p != null && !p.Proven)
         {
             var best = c.WinningEvidence.OrderByDescending(combo => combo.Count(id => game.Evidence.Has(id))).FirstOrDefault();
             if (best != null)
             {
-                var miss = UiKit.Card(body, new Color(1, 1, 1, 0.07f), 22, 8, "Missed");
-                UiKit.Text(miss.transform, "THE PROOF THAT WOULD HAVE CLOSED IT", T.smallSize, T.warning, style: FontStyles.Bold);
+                var miss = UiKit.Card(right, new Color(1, 1, 1, 0.07f), 22, 8, "Missed");
+                UiKit.Text(miss.transform, "WHAT WOULD HAVE CLOSED IT", T.smallSize, T.warning, style: FontStyles.Bold);
                 foreach (var id in best)
                 {
                     var ev = c.EvidenceById(id);
                     bool had = game.Evidence.Has(id);
                     var row = UiKit.Rect("Row", miss.transform);
                     row.HLayout(12);
-                    UiKit.Icon(row, had ? "mark_check" : "mark_x", 26, had ? T.accent : T.danger);
-                    UiKit.Text(row, $"<b>{ev?.Title}</b>  <color=#{UiKit.Hex(T.muted)}>({SourceStyle.Label(ev?.Source)}{(had ? ", you had it" : ", never found")})</color>",
-                        T.bodySize - 2, T.text).Size(flexW: 1);
+                    UiKit.Icon(row, had ? "mark_check" : "mark_x", 24, had ? T.accent : T.danger);
+                    UiKit.Text(row, $"<b>{ev?.Title}</b>  <color=#{UiKit.Hex(T.muted)}>({SourceStyle.Label(ev?.Source)}, {(had ? "you had it" : "never found")})</color>",
+                        T.bodySize - 3, T.text).Size(flexW: 1);
                 }
             }
         }
 
-        // Stats
+        // ---------- footer ----------
         int questions = game.Suspects.Sum(s => s.QuestionsAsked);
         int minutes = Mathf.FloorToInt(game.Elapsed / 60f), seconds = Mathf.FloorToInt(game.Elapsed % 60f);
-        UiKit.Text(body, $"Time used {minutes}:{seconds:00}  ·  Questions asked {questions}  ·  Evidence collected {game.Evidence.Count}  ·  " +
-                         $"Jensenbot summaries read {game.Jensenbot.SummariesGiven}" + (v.Offline ? "  ·  (offline verdict)" : ""),
+        UiKit.Text(body, $"Time used {minutes}:{seconds:00}  ·  Questions asked {questions}  ·  Evidence found {game.Evidence.Count}  ·  " +
+                         $"Leads {a.LeadsFound}/{a.LeadsTotal}" + (v.Offline ? "  ·  (offline verdict)" : ""),
             T.smallSize, T.muted, TextAlignmentOptions.Center);
-
         var again = UiKit.Button(body, "Play again", game.Restart, T.accent, T.accentText, 64, 26);
         again.Size(prefH: 64);
+
         ui.StartCoroutine(DeskUI.PopModal(stampBg.transform));
         CameraDrift.PushIn();
         Sfx.Play("stamp");
+        ui.StartCoroutine(RevealScore(rows, total, rank, gradeBg, gradeGroup, v));
+    }
+
+    /// <summary>Rows tick in one by one, the total counts along, then the grade badge slams down.</summary>
+    IEnumerator RevealScore(List<(CanvasGroup group, ScoreLine line)> rows, TextMeshProUGUI total, TextMeshProUGUI rank,
+        Image gradeBg, CanvasGroup gradeGroup, Verdict v)
+    {
+        yield return new WaitForSecondsRealtime(0.5f);
+        int sum = 0;
+        foreach (var (group, line) in rows)
+        {
+            if (group == null) yield break;
+            for (float t = 0; t < 0.18f; t += Time.unscaledDeltaTime)
+            {
+                group.alpha = t / 0.18f;
+                group.transform.localScale = Vector3.one * Mathf.Lerp(1.08f, 1f, t / 0.18f);
+                yield return null;
+            }
+            group.alpha = 1;
+            group.transform.localScale = Vector3.one;
+            Sfx.Play(line.Ok ? "tick" : "hover", line.Ok ? 1.2f : 0.7f);
+            int from = sum;
+            sum += line.Points;
+            for (float t = 0; t < 0.25f && line.Points > 0; t += Time.unscaledDeltaTime)
+            {
+                total.text = Mathf.RoundToInt(Mathf.Lerp(from, sum, t / 0.25f)).ToString();
+                yield return null;
+            }
+            total.text = sum.ToString();
+            if (line.Points > 0) UiFx.Punch(total.transform, 0.12f, 0.25f);
+            yield return new WaitForSecondsRealtime(0.15f);
+        }
+        total.text = v.Score.ToString();
+
+        yield return new WaitForSecondsRealtime(0.3f);
+        rank.text = v.Rank;
+        var gt = gradeBg.transform;
+        for (float t = 0; t < 0.3f; t += Time.unscaledDeltaTime)
+        {
+            float k = 1 - Mathf.Pow(1 - t / 0.3f, 3);
+            gradeGroup.alpha = k;
+            gt.localScale = Vector3.one * Mathf.Lerp(2.4f, 1f, k);
+            gt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(-30f, -6f, k));
+            yield return null;
+        }
+        gradeGroup.alpha = 1;
+        Sfx.Play("stamp");
+        UiFx.Punch(gt, 0.15f, 0.3f);
+        UiFx.Shake((RectTransform)body, 10f, 0.3f);
         Sfx.Play(v.Result == "convicted" ? "win" : "lose");
         if (v.Result == "convicted") ui.StartCoroutine(Confetti());
     }
+
+    Color GradeColor(string grade) => grade switch
+    {
+        "S" => new Color(1f, 0.78f, 0.15f),
+        "A" => T.accent,
+        "B" => T.secondary,
+        "C" => T.warning,
+        _ => T.danger,
+    };
 
     IEnumerator Confetti()
     {

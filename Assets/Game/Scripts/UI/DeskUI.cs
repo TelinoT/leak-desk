@@ -233,7 +233,7 @@ public class DeskUI : MonoBehaviour
 
     void OnLeadFound(CaseLead lead)
     {
-        Toast($"<b>Lead found: {lead.Title}</b>\n{lead.Question} You've got something for it now.", T.accent, "mark_check");
+        Toast($"<b>Lead found: {lead.Title}</b>\n{lead.Question}", T.accent, "mark_check");
         Sfx.Play("unlock", 1.2f);
         if (leadRows.TryGetValue(lead.Id, out var r)) UiFx.Punch(r.row.transform, 0.12f, 0.4f);
     }

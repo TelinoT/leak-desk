@@ -35,7 +35,8 @@ Someone is leaking, and the company AI might be in on it.
 - Prompts are text assets under `Assets/Game/Resources/Prompts/` (suspect_system, jensenbot_system, judge_system), tunable without recompiling.
 - UI is uGUI built at runtime from code (`UiKit`, `DeskUI` + panels), skinned by `Resources/UiTheme.asset` (GUI Pro sprites in gitignored `Assets/ThirdParty/GuiPro`).
 - Jensenbot never gets asked to lie: the game redacts its input lines; the model summarizes faithfully.
-- Judge verdict class comes from a code pre-check (`Judge.Check`); the LLM only flavors score + comment.
+- Judge verdict class comes from a code pre-check (`Judge.Check`); points come from `ScoreCard` (code). The LLM only gives motive points (0-10) + the board comment.
+- Leads (`truth.json` `leads`, `Leads.cs`) show players what to look for; proof = Method lead + Motive or Opportunity lead.
 - Paid assets (Synty, GUI Pro) and `Resources/LlmConfig.asset` are gitignored – never commit them.
 - Show a typing indicator while waiting; LLM latency must feel like the suspect thinking.
 
