@@ -6,7 +6,7 @@ public static class SourceStyle
     public static string Label(string source) => source switch
     {
         "email" => "EMAIL",
-        "slack" => "SLACK",
+        "slack" => "SNACK",
         "badge" => "BADGE",
         "transfer" => "FILES",
         "vpn" => "VPN",

@@ -26,7 +26,8 @@ public class DeskUI : MonoBehaviour
     RectTransform centerRoot;
     Button muteButton;
     Image muteIcon;
-    TextMeshProUGUI progEvidence, progCracked, progDesks, progBot;
+    TextMeshProUGUI leadsHeader;
+    readonly Dictionary<string, (Image icon, TextMeshProUGUI title, TextMeshProUGUI sub, Image row)> leadRows = new();
     public Button AccuseButton => accuseButton;
     public RectTransform NavRect(Tab tab) => navButtons.TryGetValue(tab, out var b) ? (RectTransform)b.transform : null;
     public Tutorial Tutorial { get; private set; }
@@ -52,6 +53,7 @@ public class DeskUI : MonoBehaviour
         ui.BuildLayout();
         game.PhaseChanged += ui.OnPhaseChanged;
         game.WaveUnlocked += ui.OnWave;
+        game.LeadFound += ui.OnLeadFound;
         canvas.gameObject.AddComponent<DeskDirector>();
         ui.Tutorial = canvas.gameObject.AddComponent<Tutorial>();
         return ui;
@@ -174,35 +176,66 @@ public class DeskUI : MonoBehaviour
         AddNav(nav.transform, Tab.Interrogate, "mic", "Interrogate");
         AddNav(nav.transform, Tab.Jensenbot, "brain", "Jensenbot");
         UiKit.Spacer(nav.transform, 0, 1);
-        var card = UiKit.Card(nav.transform, new Color(0, 0, 0, 0.25f), 12, 8, "CaseFile");
-        UiKit.Text(card.transform, "CASE FILE", 14, T.accent, style: FontStyles.Bold).characterSpacing = 6;
-        progEvidence = ProgressRow(card.transform, "folder");
-        progCracked = ProgressRow(card.transform, "mic");
-        progDesks = ProgressRow(card.transform, "find");
-        progBot = ProgressRow(card.transform, "brain");
+        // LEADS: the questions the case needs answered. Click one for a nudge from Rosa.
+        var card = UiKit.Card(nav.transform, new Color(0, 0, 0, 0.25f), 12, 6, "Leads");
+        leadsHeader = UiKit.Text(card.transform, "LEADS", 14, T.accent, style: FontStyles.Bold);
+        leadsHeader.characterSpacing = 4;
+        foreach (var lead in Game.Case.Leads) AddLeadRow(card.transform, lead);
     }
 
-    TextMeshProUGUI ProgressRow(Transform parent, string icon)
+    void AddLeadRow(Transform parent, CaseLead lead)
     {
-        var row = UiKit.Rect("Row", parent);
-        row.HLayout(8);
-        UiKit.Icon(row, icon, 18, T.muted);
-        var t = UiKit.Text(row, "", 15, T.text);
-        t.textWrappingMode = TextWrappingModes.NoWrap;
-        t.Size(flexW: 1);
-        return t;
+        var row = UiKit.Panel(parent, new Color(1, 1, 1, 0.04f), T.cardSprite, "Lead: " + lead.Id);
+        row.HLayout(8, 6);
+        var b = row.gameObject.AddComponent<Button>();
+        b.transition = Selectable.Transition.None;
+        b.onClick.AddListener(() => ShowLeadHint(lead));
+        row.gameObject.AddComponent<ButtonPop>();
+        var icon = UiKit.Icon(row.transform, "mark_x", 20, new Color(1, 1, 1, 0.25f));
+        var col = UiKit.Rect("Col", row.transform);
+        col.VLayout(0);
+        col.Size(flexW: 1);
+        var title = UiKit.Text(col, lead.Title, 16, T.text, style: FontStyles.Bold);
+        title.textWrappingMode = TextWrappingModes.NoWrap;
+        var sub = UiKit.Text(col, lead.Question, 15, T.muted);
+        sub.textWrappingMode = TextWrappingModes.NoWrap;
+        sub.overflowMode = TextOverflowModes.Ellipsis;
+        leadRows[lead.Id] = (icon, title, sub, row);
+    }
+
+    void ShowLeadHint(CaseLead lead)
+    {
+        Sfx.Play("click");
+        int got = Leads.PartsFound(lead, Game.Evidence, Game.Jensenbot.Exposed);
+        if (got >= lead.Parts.Count)
+            Toast($"<b>{lead.Title}:</b> covered. You've got evidence for this one.", T.accent, "mark_check");
+        else
+            Toast($"<b>Rosa:</b> {lead.Hint}", T.secondary, "bulb");
     }
 
     public void UpdateProgress()
     {
-        int cracked = 0, met = 0;
-        foreach (var s in Game.Suspects) { if (s.Broken) cracked++; if (s.Met) met++; }
-        int spots = 0;
-        foreach (var d in Game.Case.Desks) spots += d.Spots.Count;
-        progEvidence.text = $"<b>{Game.Evidence.Count}</b> evidence";
-        progCracked.text = $"<b>{cracked}</b>/{Game.Suspects.Count} cracked";
-        progDesks.text = $"<b>{Game.SpotsSearched}</b>/{spots} spots";
-        progBot.text = Game.Jensenbot.Exposed ? $"<color=#{UiKit.Hex(T.danger)}><b>AI EXPOSED</b></color>" : "AI: trusted";
+        int done = 0;
+        foreach (var lead in Game.Case.Leads)
+        {
+            if (!leadRows.TryGetValue(lead.Id, out var r)) continue;
+            int got = Leads.PartsFound(lead, Game.Evidence, Game.Jensenbot.Exposed);
+            bool found = got >= lead.Parts.Count;
+            if (found) done++;
+            r.icon.sprite = T.Icon(found ? "mark_check" : "mark_x");
+            r.icon.color = found ? T.accent : new Color(1, 1, 1, 0.22f);
+            r.row.color = found ? new Color(T.accent.r, T.accent.g, T.accent.b, 0.14f) : new Color(1, 1, 1, 0.04f);
+            r.sub.text = found ? "Found" : lead.Parts.Count > 1 ? $"{lead.Question} ({got}/{lead.Parts.Count})" : lead.Question;
+            r.sub.color = found ? T.accent : T.muted;
+        }
+        leadsHeader.text = $"LEADS  {done}/{Game.Case.Leads.Count}";
+    }
+
+    void OnLeadFound(CaseLead lead)
+    {
+        Toast($"<b>Lead found: {lead.Title}</b>\n{lead.Question} You've got something for it now.", T.accent, "mark_check");
+        Sfx.Play("unlock", 1.2f);
+        if (leadRows.TryGetValue(lead.Id, out var r)) UiFx.Punch(r.row.transform, 0.12f, 0.4f);
     }
 
     void ToggleMute()
@@ -214,13 +247,13 @@ public class DeskUI : MonoBehaviour
 
     void AddNav(Transform parent, Tab tab, string icon, string label)
     {
-        var b = UiKit.Button(parent, "", () => { Sfx.Play("click"); ShowTab(tab); }, T.panelAlt, T.text, 112, 21);
+        var b = UiKit.Button(parent, "", () => { Sfx.Play("click"); ShowTab(tab); }, T.panelAlt, T.text, 92, 21);
         navButtons[tab] = b;
         Destroy(b.GetComponentInChildren<TMP_Text>().gameObject);
         b.image.VLayout(4, 12, TextAnchor.MiddleCenter);
         var iconRow = UiKit.Rect("IconRow", b.transform);
         iconRow.HLayout(0, 0, TextAnchor.MiddleCenter);
-        navIcons[tab] = UiKit.Icon(iconRow, icon, 40, T.text);
+        navIcons[tab] = UiKit.Icon(iconRow, icon, 34, T.text);
         var t = UiKit.Text(b.transform, label, 20, T.text, TextAlignmentOptions.Center, FontStyles.Bold);
         t.textWrappingMode = TextWrappingModes.NoWrap;
         navLabels[tab] = t;

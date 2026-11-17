@@ -95,7 +95,7 @@ public class BriefingOverlay
         how.VLayout(14);
         how.Size(flexW: 1, flexH: 1);
         UiKit.Text(how, "WHAT YOU'VE GOT", T.smallSize, T.accent, style: FontStyles.Bold);
-        Tile(how, "folder", "Logs", "Emails, Slack, badge swipes, VPN and file logs from last night. Flag anything odd, or search for a name.", SourceStyle.Color("email"));
+        Tile(how, "folder", "Logs", "Emails, Snack chats, badge swipes, VPN and file logs from last night. Flag anything odd, or search for a name.", SourceStyle.Color("email"));
         Tile(how, "find", "Desks", "Go through monitors, drawers and bins. Each search takes 30 seconds.", SourceStyle.Color("desk"));
         Tile(how, "mic", "Interrogate", "Talk to the four people who had the deck. Drag evidence onto them and see what happens.", SourceStyle.Color("badge"));
         Tile(how, "mallet", "Accuse", "Name one person before 09:00, with up to three pieces of evidence.", T.danger);

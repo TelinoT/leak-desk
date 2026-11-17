@@ -8,7 +8,7 @@ Name the leaker and prove it. Bonus: find out whether anyone (or anything) helpe
 ## The desk
 | App | What you do |
 |---|---|
-| **Logs** | Read the overnight emails, Slack, badge, VPN, file-transfer and audit logs. Click **Flag** on any suspicious line to add it to your **Evidence** tray. Use **Search** to find a name or a time across every log. |
+| **Logs** | Read the overnight emails, Snack chats (the company chat app), badge, VPN, file-transfer and audit logs. Click **Flag** on any suspicious line to add it to your **Evidence** tray. Use **Search** to find a name or a time across every log. |
 | **Desks** | Search each suspect's monitor, drawer and trash bin for physical clues. Every search costs **30 seconds** of the clock, so choose where to look. |
 | **Interrogate** | Question the suspects in free text. They are AI characters with their own stories, secrets and lies. **Drag evidence onto a suspect** to confront them. Watch their **stress** (heart-rate monitor) and **emotion**. Crack them and their admissions become new **statements** in your evidence. |
 | **Jensenbot** | Envydia's AI desk assistant summarizes any log in seconds. It's fast and confident. Whether it's right is for you to check. |

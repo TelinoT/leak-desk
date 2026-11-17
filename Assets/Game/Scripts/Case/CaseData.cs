@@ -30,6 +30,7 @@ public class CaseFile
     [JsonProperty("documents")] public List<CaseDocument> Documents = new();
     [JsonProperty("waves")] public List<CaseWave> Waves = new();
     [JsonProperty("desks")] public List<CaseDesk> Desks = new();
+    [JsonProperty("leads")] public List<CaseLead> Leads = new();
     [JsonProperty("desk_search_seconds")] public float DeskSearchSeconds = 30f;
 
     public SuspectData Suspect(string id) => Suspects.FirstOrDefault(s => s.Id == id);
@@ -53,6 +54,27 @@ public class CaseWave
     [JsonProperty("triggers")] public List<string> Triggers = new();
     [JsonProperty("documents")] public List<string> Documents = new();
     [JsonProperty("suspects")] public List<string> Suspects = new();
+}
+
+/// <summary>
+/// A question the player has to answer (motive, opportunity, method...). A lead is "found" when every part
+/// has at least one matching evidence item (or statement about one of its facts) in the tray.
+/// </summary>
+public class CaseLead
+{
+    [JsonProperty("id")] public string Id;
+    [JsonProperty("title")] public string Title;
+    [JsonProperty("question")] public string Question;
+    [JsonProperty("hint")] public string Hint;
+    [JsonProperty("jensenbot_exposed")] public bool CountsJensenbotExposed;
+    [JsonProperty("parts")] public List<LeadPart> Parts = new();
+}
+
+public class LeadPart
+{
+    [JsonProperty("label")] public string Label;
+    [JsonProperty("evidence")] public List<string> Evidence = new();
+    [JsonProperty("facts")] public List<string> Facts = new();
 }
 
 /// <summary>A suspect's desk: a few spots the player can search (each costs clock time).</summary>

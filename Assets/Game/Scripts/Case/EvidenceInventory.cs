@@ -26,6 +26,16 @@ public class EvidenceInventory
     readonly List<EvidenceItem> items = new();
 
     public event Action<EvidenceItem> Added;
+    public event Action<EvidenceItem> Removed;
+
+    /// <summary>Throws an item out of the tray (flagged lines can be flagged again later).</summary>
+    public void Remove(string id)
+    {
+        var item = Get(id);
+        if (item == null) return;
+        items.Remove(item);
+        Removed?.Invoke(item);
+    }
 
     public IReadOnlyList<EvidenceItem> Items => items;
     public int Count => items.Count;

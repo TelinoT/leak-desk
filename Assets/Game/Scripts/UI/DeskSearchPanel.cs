@@ -89,6 +89,7 @@ public class DeskSearchPanel
         }
 
         Game.WaveUnlocked += _ => RefreshCards();
+        Game.Evidence.Removed += _ => { if (current != null && root.activeInHierarchy) RebuildSpots(); };
         if (Game.Case.Desks.Count > 0) Select(Game.Case.Desks[0]);
     }
 
@@ -110,8 +111,6 @@ public class DeskSearchPanel
         var av = UiKit.Panel(card.transform, s.Color, UiKit.AvatarSprite, "Avatar");
         av.Size(prefW: 64, prefH: 64, minW: 64);
         av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-        var ini = UiKit.Text(av.transform, InterrogationPanel.Initials(s.Name), 24, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-        ((RectTransform)ini.transform).Stretch();
         var head = UiKit.Rect("Head", av.transform).Stretch().gameObject.AddComponent<RawImage>();
         head.raycastTarget = false;
         head.enabled = false;
@@ -212,8 +211,21 @@ public class DeskSearchPanel
                 UiKit.Icon(row, "find", 22, T.cardText);
                 UiKit.Text(row, $"<b>{ev?.Title}</b>", T.smallSize, T.cardText).Size(flexW: 1);
                 UiKit.Text(note.transform, ev?.Content, T.smallSize - 1, T.cardText);
-                var chip = UiKit.Chip(note.transform, T.accent, 210, 30, "Added");
-                UiKit.Text(chip.transform, "ADDED TO EVIDENCE", 13, T.accentText, TextAlignmentOptions.Center, FontStyles.Bold);
+                if (Game.Evidence.Has(spot.EvidenceId))
+                {
+                    var chip = UiKit.Chip(note.transform, T.accent, 210, 30, "Added");
+                    UiKit.Text(chip.transform, "IN YOUR EVIDENCE", 13, T.accentText, TextAlignmentOptions.Center, FontStyles.Bold);
+                }
+                else
+                {
+                    var id = spot.EvidenceId;
+                    var back = UiKit.Button(note.transform, "Put it back in evidence", () =>
+                    {
+                        Game.Evidence.AddCaseEvidence(id);
+                        RebuildSpots();
+                    }, T.warning, T.cardText, 36, 15);
+                    back.Size(prefH: 36);
+                }
             }
             UiKit.Spacer(tile.transform, 0, 1);
         }

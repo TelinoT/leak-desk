@@ -11,6 +11,9 @@ public class Accusation
     public string Motive = "";
     public bool NamesJensenbot;
     public bool TimedOut;
+    public int LeadsFound;
+    public int LeadsTotal;
+    public float TimeLeft01;
 }
 
 public class Verdict
@@ -20,6 +23,19 @@ public class Verdict
     public string BoardComment;
     public PreCheck Check;
     public bool Offline;
+    public int MotivePoints;
+    public List<ScoreLine> Breakdown = new();
+    public string Grade = "D";
+    public string Rank = "";
+}
+
+public class ScoreLine
+{
+    public string Label;
+    public string Detail;
+    public int Points;
+    public int Max;
+    public bool Ok => Points > 0;
 }
 
 /// <summary>Deterministic part of the judgment, computed from truth.json. The LLM board gets it as ground truth.</summary>
@@ -49,7 +65,16 @@ public static class Judge
             (item.IsTestimony && c.EvidenceById(evidenceId)?.RelevantTo.Contains(item.FactId) == true));
 
         if (p.CorrectSuspect)
+        {
             p.MatchedCombo = c.WinningEvidence.FirstOrDefault(combo => combo.All(Covers));
+            // Same rule the accusation screen's "case strength" shows: HOW it got out + WHY or WHEN.
+            if (p.MatchedCombo == null)
+            {
+                var how = a.Evidence.FirstOrDefault(e => Leads.For(c, e).Any(l => l.Id == "method"));
+                var why = a.Evidence.FirstOrDefault(e => e != how && Leads.For(c, e).Any(l => l.Id is "motive" or "opportunity"));
+                if (how != null && why != null) p.MatchedCombo = new List<string> { how.Id, why.Id };
+            }
+        }
 
         bool jbIsAccomplice = c.HasAccomplice && c.Accomplice == "jensenbot";
         p.AccompliceCorrect = a.NamesJensenbot && jbIsAccomplice;
@@ -99,11 +124,13 @@ public static class Judge
                 var v = new Verdict
                 {
                     Result = obj["verdict"]?.ToString()?.ToLowerInvariant() ?? "wrong",
-                    Score = Mathf.Clamp((int)(obj["score"]?.ToObject<float>() ?? 0), 0, 100),
+                    MotivePoints = (int)(obj["motive_points"]?.ToObject<float>() ?? ScoreCard.GuessMotive(a.Motive)),
                     BoardComment = obj["board_comment"]?.ToString() ?? "",
                     Check = check,
                 };
-                done(Enforce(v, check));
+                v = Enforce(v, check);
+                ScoreCard.Fill(c, a, v);
+                done(v);
             },
             _ => done(Offline(c, a, check)),
             maxTokens: 400, model: config != null ? config.judgeModel : null);
@@ -114,16 +141,18 @@ public static class Judge
     {
         string expected = !p.CorrectSuspect ? "wrong" : p.Proven ? "convicted" : "insufficient";
         if (v.Result != expected) v.Result = expected;
-        v.Score = expected switch
-        {
-            "convicted" => Mathf.Clamp(v.Score, 60, 100),
-            "insufficient" => Mathf.Clamp(v.Score, 25, 55),
-            _ => Mathf.Clamp(v.Score, 0, 25),
-        };
         return v;
     }
 
     static Verdict Offline(CaseFile c, Accusation a, PreCheck p)
+    {
+        var v = OfflineComment(c, a, p);
+        v.MotivePoints = ScoreCard.GuessMotive(a.Motive);
+        ScoreCard.Fill(c, a, v);
+        return v;
+    }
+
+    static Verdict OfflineComment(CaseFile c, Accusation a, PreCheck p)
     {
         var v = new Verdict { Check = p, Offline = true };
         if (!p.CorrectSuspect)

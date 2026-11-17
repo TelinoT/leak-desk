@@ -107,6 +107,7 @@ public class FeedPanel
         ((RectTransform)linesScroll.transform).Stretch();
 
         Game.Evidence.Added += _ => Refresh();
+        Game.Evidence.Removed += _ => Refresh();
         Select(Game.Case.Documents[0]);
     }
 

@@ -241,8 +241,6 @@ public class InterrogationPanel
         var av = UiKit.Panel(card.transform, agent.Data.Color, UiKit.AvatarSprite, "Avatar");
         av.Size(prefW: 68, prefH: 68, minW: 68);
         av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-        var ini = UiKit.Text(av.transform, Initials(agent.Data.Name), 26, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-        ((RectTransform)ini.transform).Stretch();
         var head = UiKit.Rect("Headshot", av.transform).Stretch().gameObject.AddComponent<RawImage>();
         head.raycastTarget = false;
         head.enabled = false;

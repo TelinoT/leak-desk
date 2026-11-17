@@ -19,6 +19,29 @@ public class AccusationOverlay
     readonly TMP_InputField motive;
     readonly Button jensenToggle, submit, back;
     readonly HashSet<string> selectedEvidence = new();
+    readonly (Image bg, Image icon) slotMethod, slotWhy;
+    readonly TextMeshProUGUI strengthText;
+
+    (Image, Image) Slot(Transform parent, string title, string sub)
+    {
+        var bg = UiKit.Panel(parent, new Color(1, 1, 1, 0.06f), T.cardSprite, "Slot");
+        bg.HLayout(10, 10);
+        bg.Size(prefW: 330, prefH: 62);
+        var icon = UiKit.Icon(bg.transform, "mark_x", 26, new Color(1, 1, 1, 0.3f));
+        var col = UiKit.Rect("Col", bg.transform);
+        col.VLayout(0);
+        col.Size(flexW: 1);
+        UiKit.Text(col, $"<b>{title}</b>", 16, T.text);
+        UiKit.Text(col, sub, 15, T.muted);
+        return (bg, icon);
+    }
+
+    void SetSlot((Image bg, Image icon) s, bool on)
+    {
+        s.icon.sprite = T.Icon(on ? "mark_check" : "mark_x");
+        s.icon.color = on ? T.accent : new Color(1, 1, 1, 0.3f);
+        s.bg.color = on ? new Color(T.accent.r, T.accent.g, T.accent.b, 0.2f) : new Color(1, 1, 1, 0.06f);
+    }
     readonly Dictionary<string, Image> evidenceCards = new();
     string selectedSuspect;
     bool namesJensenbot;
@@ -50,8 +73,6 @@ public class AccusationOverlay
             var av = UiKit.Panel(sc.transform, s.Color, UiKit.AvatarSprite, "Avatar");
             av.Size(prefW: 72, prefH: 72, minW: 72);
             av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-            var ini = UiKit.Text(av.transform, InterrogationPanel.Initials(s.Name), 24, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-            ((RectTransform)ini.transform).Stretch();
             var head = UiKit.Rect("Headshot", av.transform).Stretch().gameObject.AddComponent<RawImage>();
             head.raycastTarget = false;
             var tex = SuspectPortraits.Instance != null ? SuspectPortraits.Instance.Headshot(s.Id) : null;
@@ -72,6 +93,14 @@ public class AccusationOverlay
         UiKit.Text(evHeader, "<b>2. Attach up to 3 pieces of evidence</b>", T.bodySize + 2, T.text).Size(flexW: 1);
         evidenceCount = UiKit.Text(evHeader, "0 / 3", T.bodySize, T.muted, TextAlignmentOptions.Right);
         evidenceCount.Size(prefW: 120);
+
+        // Case strength: a case holds up when it shows HOW the deck got out plus WHY or WHEN they did it.
+        var strength = UiKit.Rect("Strength", card.transform);
+        strength.HLayout(12);
+        slotMethod = Slot(strength, "HOW IT GOT OUT", "Method");
+        slotWhy = Slot(strength, "WHY OR WHEN", "Motive or Opportunity");
+        strengthText = UiKit.Text(strength, "", T.smallSize, T.muted);
+        strengthText.Size(flexW: 1);
         var evBg = UiKit.Panel(card.transform, new Color(0, 0, 0, 0.22f), T.panelSprite, "EvidenceBg");
         evBg.Size(flexH: 1);
         var scroll = UiKit.ScrollList(evBg.transform, out evidenceContent, 10, 12);
@@ -79,7 +108,7 @@ public class AccusationOverlay
         var grid = evidenceContent.gameObject;
         Object.DestroyImmediate(grid.GetComponent<VerticalLayoutGroup>());
         var g = grid.AddComponent<GridLayoutGroup>();
-        g.cellSize = new Vector2(452, 130);
+        g.cellSize = new Vector2(452, 168);
         g.spacing = new Vector2(12, 12);
         g.padding = new RectOffset(12, 12, 12, 12);
 
@@ -179,6 +208,15 @@ public class AccusationOverlay
         foreach (var kv in evidenceCards)
             kv.Value.color = selectedEvidence.Contains(kv.Key) ? new Color(1f, 0.9f, 0.55f) : T.card;
         evidenceCount.text = $"{selectedEvidence.Count} / {MaxEvidence}";
+        var chosen = selectedEvidence.Select(id => Game.Evidence.Get(id)).Where(e => e != null).ToList();
+        bool Covers(params string[] leadIds) => chosen.Any(e => Leads.For(Game.Case, e).Any(l => leadIds.Contains(l.Id)));
+        bool how = Covers("method"), why = Covers("motive", "opportunity");
+        SetSlot(slotMethod, how);
+        SetSlot(slotWhy, why);
+        strengthText.text = how && why ? "<color=#" + UiKit.Hex(T.accent) + "><b>That's a solid case.</b></color> Now make sure it's the right person."
+            : chosen.Count == 0 ? "A case that holds up shows how the deck got out, and why or when they did it."
+            : !how ? "Missing: something that shows <b>how</b> the deck got out."
+            : "Missing: something that shows <b>why</b> they did it or that they were <b>awake</b> at 02:14.";
 
         jensenToggle.SetLabel(namesJensenbot ? "[X] Jensenbot helped them" : "[ ] Jensenbot helped them");
         jensenToggle.image.color = namesJensenbot ? new Color(0.46f, 0.85f, 0.25f) : T.panelAlt;

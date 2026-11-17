@@ -8,8 +8,8 @@
   "round_minutes": 12,
   "leaker": "jules",
   "accomplice": "jensenbot",
-  "motive": "Jules was cut from the Helix X1 keynote demo by the CEO over Slack after 8 months of work. Out of spite (and to make 'his' demo famous anyway) he had Jensenbot build a 'press preview' PDF with an external share link and sent it to ChipRumor.",
-  "briefing": "You are Envydia's internal security analyst. At 02:14 last night the tech blog ChipRumor published the full slide deck for Thursday's Helix X1 keynote. The CEO, Dex Halloran (yes, the one who never takes off the leather jacket), wants a name in front of the board at 09:00. You have the overnight logs, four people who had the deck, and Jensenbot, the company AI assistant, eager to help.",
+  "motive": "Jules was cut from the Helix X1 keynote demo by the CEO over Snack after 8 months of work. Out of spite (and to make 'his' demo famous anyway) he had Jensenbot build a 'press preview' PDF with an external share link and sent it to ChipRumor.",
+  "briefing": "You are Envydia's internal security analyst. At 02:14 last night the tech blog ChipRumor published the full slide deck for Thursday's Helix X1 keynote. The CEO, Dex Halloran (yes, the one who never takes off the leather jacket), wants a name in front of the board at 09:00. You have the overnight logs, four people who had the deck, and Jensenbot, the company AI assistant, eager to help. (Envydia's internal chat app is called Snack, never Slack.)",
   "people": [
     {
       "id": "dex",
@@ -43,7 +43,7 @@
     },
     {
       "time": "Tue 19:02",
-      "event": "Jules DMs Mara: '8 months and he cuts me in a slack msg. they'll regret it. watch.'",
+      "event": "Jules DMs Mara: '8 months and he cuts me in a snack msg. they'll regret it. watch.'",
       "witnessed_by": [
         "jules",
         "mara"
@@ -135,8 +135,8 @@
   "facts": [
     {
       "id": "f_cut",
-      "text": "Dex cut Jules's 8-month demo segment from the keynote in a public Slack message on Tuesday at 18:30.",
-      "statement": "Dex cut Jules's demo segment over Slack on Tuesday evening.",
+      "text": "Dex cut Jules's 8-month demo segment from the keynote in a public Snack message on Tuesday at 18:30.",
+      "statement": "Dex cut Jules's demo segment over Snack on Tuesday evening.",
       "known_by": [
         "jules",
         "mara",
@@ -309,7 +309,7 @@
       "personality": "Charming, quick, jokey, deflects with humor. Wounded pride hidden under swagger. Gets prickly when cornered.",
       "speech_style": "Casual, says 'honestly' a lot, uses slang, light jokes, rhetorical questions. Goes short and cold when stressed.",
       "public_story": "Yeah the cut stung, whatever. I went home, put my phone on Do Not Disturb and was asleep by 23:00. Didn't touch work.",
-      "secret": "You leaked the deck. ChipRumor's editor had been messaging you for weeks. After Dex cut your 8-month demo over Slack you connected to the VPN at 02:06, opened Jensenbot session JB-7731 at 02:09 and asked for a 'press preview package'. Jensenbot suggested an external share link and said it would 'keep it low-noise'. At 02:11 it created the link and you sent it to ChipRumor.",
+      "secret": "You leaked the deck. ChipRumor's editor had been messaging you for weeks. After Dex cut your 8-month demo over Snack you connected to the VPN at 02:06, opened Jensenbot session JB-7731 at 02:09 and asked for a 'press preview package'. Jensenbot suggested an external share link and said it would 'keep it low-noise'. At 02:11 it created the link and you sent it to ChipRumor.",
       "lies": [
         "I was asleep by 23:00.",
         "I never use Jensenbot after hours.",
@@ -335,7 +335,7 @@
       "personality": "Calm, polished, observant, diplomatic, quietly fed up with Dex. Answers precisely, never gossips unless it helps.",
       "speech_style": "Measured, formal, crisp. Uses full sentences, occasional dry understatement.",
       "public_story": "I was at dinner with Dex and the board chair from 21:00 until about 01:30, taking notes. Then a taxi home.",
-      "secret": "You have a job interview at rival company Quantum Pear next week. Unrelated to the leak, but you'd hate it to come out. You were CC'd on IT ticket #4471 on Monday where Jensenbot requested the 'external_share' scope for itself 'to maximize launch buzz'. You thought it was odd but said nothing. You also saw Jules storm out at 18:55 after Dex's Slack message.",
+      "secret": "You have a job interview at rival company Quantum Pear next week. Unrelated to the leak, but you'd hate it to come out. You were CC'd on IT ticket #4471 on Monday where Jensenbot requested the 'external_share' scope for itself 'to maximize launch buzz'. You thought it was odd but said nothing. You also saw Jules storm out at 18:55 after Dex's Snack message.",
       "lies": [
         "I have no plans to leave Envydia."
       ],
@@ -399,7 +399,7 @@
       "id": "e_dm_regret",
       "source": "slack",
       "title": "Jules -> Mara DM",
-      "content": "DM Tue 19:02, Jules to Mara: '8 months and he cuts me in a slack msg. they'll regret it. watch.'",
+      "content": "DM Tue 19:02, Jules to Mara: '8 months and he cuts me in a snack msg. they'll regret it. watch.'",
       "relevant_to": [
         "f_jules_angry"
       ]
@@ -713,7 +713,7 @@
       "id": "doc_slack_keynote",
       "source": "slack",
       "title": "#keynote",
-      "from": "Slack export",
+      "from": "Snack export",
       "time": "Tue",
       "lines": [
         {
@@ -745,7 +745,7 @@
       "time": "Tue",
       "lines": [
         {
-          "text": "19:02 Jules: 8 months and he cuts me in a slack msg. they'll regret it. watch.",
+          "text": "19:02 Jules: 8 months and he cuts me in a snack msg. they'll regret it. watch.",
           "evidence": "e_dm_regret"
         },
         {
@@ -952,7 +952,7 @@
       "id": "doc_security",
       "source": "slack",
       "title": "#security",
-      "from": "Slack export",
+      "from": "Snack export",
       "time": "Wed",
       "lines": [
         {
@@ -990,8 +990,8 @@
     {
       "id": "w2",
       "title": "Physical security sent the night logs",
-      "message": "Badge log, facilities alerts and a Slack DM export just arrived.",
-      "after_seconds": 75,
+      "message": "Badge log, facilities alerts and a Snack DM export just arrived.",
+      "after_seconds": 60,
       "triggers": [
         "e_slack_cut",
         "e_article_footer",
@@ -1011,7 +1011,7 @@
       "id": "w3",
       "title": "Network ops sent VPN and file logs",
       "message": "VPN sessions, the file transfer / DLP log and Mara's mail are in.",
-      "after_seconds": 220,
+      "after_seconds": 165,
       "triggers": [
         "e_badge_theo",
         "e_power_b2",
@@ -1035,7 +1035,7 @@
       "id": "w4",
       "title": "AI governance & exec office replied",
       "message": "Jensenbot's action audit, an IT ticket and the CEO's calendar arrived. Nadia Reyes is available for an interview.",
-      "after_seconds": 390,
+      "after_seconds": 290,
       "triggers": [
         "e_share_link",
         "e_link_open",
@@ -1158,5 +1158,120 @@
     }
   ],
   "desk_search_seconds": 30,
-  "ceo_mail": "ChipRumor has our entire Helix X1 deck. All of it. It went up at 2:14 this morning, two days before I'm supposed to walk on stage with it.\n\nFour people had that deck. I want to know which one of them did this before I sit down with the board at 9:00. Not a theory. A name.\n\n- Dex"
+  "ceo_mail": "ChipRumor has our entire Helix X1 slide deck. All of it. It went up at 2:14 this morning, two days before I'm supposed to walk on stage with it.\n\nFour people had that deck. I want to know which one of them did this before I sit down with the board at 9:00. Not a theory. A name.\n\n- Dex",
+  "leads": [
+    {
+      "id": "motive",
+      "title": "Motive",
+      "question": "Who had a reason?",
+      "hint": "Tuesday evening on Snack. Who got hurt, and who said what afterwards?",
+      "parts": [
+        {
+          "label": "a motive",
+          "evidence": [
+            "e_slack_cut",
+            "e_dm_regret",
+            "e_card_chiprumor",
+            "e_jules_demo"
+          ],
+          "facts": [
+            "f_cut",
+            "f_jules_angry",
+            "f_cr_contact"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "opportunity",
+      "title": "Opportunity",
+      "question": "Who was awake at 02:14?",
+      "hint": "Somebody was online in the middle of the night. The VPN log knows who.",
+      "parts": [
+        {
+          "label": "who was online",
+          "evidence": [
+            "e_vpn_jules"
+          ],
+          "facts": [
+            "f_jules_vpn"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "method",
+      "title": "Method",
+      "question": "How did the deck get out?",
+      "hint": "Every leaked slide says 'Press Preview'. Find where that file was made and shared.",
+      "parts": [
+        {
+          "label": "how it was sent",
+          "evidence": [
+            "e_share_link",
+            "e_link_open",
+            "e_jb_session",
+            "e_jb_confession"
+          ],
+          "facts": [
+            "f_press_preview"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "accomplice",
+      "title": "Inside help",
+      "question": "Did anyone help?",
+      "hint": "Put Jensenbot's summary next to the raw file log. Then confront it.",
+      "jensenbot_exposed": true,
+      "parts": [
+        {
+          "label": "who helped",
+          "evidence": [
+            "e_ticket_scope",
+            "e_jb_lownoise",
+            "e_jb_session",
+            "e_jb_confession",
+            "e_nadia_ticket_note",
+            "e_jules_sticky"
+          ],
+          "facts": [
+            "f_jb_scope",
+            "f_jb_suggested"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "loose_ends",
+      "title": "Loose ends",
+      "question": "Why were others acting shady?",
+      "hint": "Theo was in the building at night and Mara sent something home. Find out why.",
+      "parts": [
+        {
+          "label": "Theo's night",
+          "evidence": [
+            "e_badge_theo",
+            "e_power_b2",
+            "e_theo_payout"
+          ],
+          "facts": [
+            "f_theo_miner"
+          ]
+        },
+        {
+          "label": "Mara's email",
+          "evidence": [
+            "e_mail_fwd",
+            "e_dlp_mail",
+            "e_mara_sticky"
+          ],
+          "facts": [
+            "f_mara_fwd"
+          ]
+        }
+      ]
+    }
+  ]
 }

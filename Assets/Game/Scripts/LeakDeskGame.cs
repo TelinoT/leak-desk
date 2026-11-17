@@ -64,7 +64,9 @@ public class LeakDeskGame : MonoBehaviour
         {
             Trigger(item.Id);
             if (item.FactId != null) Trigger(item.FactId);
+            CheckLeads();
         };
+        Evidence.Removed += _ => CheckLeads();
 
         // Waves due at t=0 are open from the start (no announcement).
         foreach (var w in Case.Waves)
@@ -135,6 +137,9 @@ public class LeakDeskGame : MonoBehaviour
     {
         if (Phase is GamePhase.Deliberating or GamePhase.Verdict) return;
         SetPhase(GamePhase.Deliberating);
+        accusation.LeadsTotal = Case.Leads.Count;
+        accusation.LeadsFound = Case.Leads.Count(l => Leads.Found(l, Evidence, Jensenbot.Exposed));
+        accusation.TimeLeft01 = RoundSeconds <= 0 ? 0 : TimeLeft / RoundSeconds;
         ui.ShowDeliberation(accusation);
         Judge.Run(Case, accusation, verdict =>
         {
@@ -179,6 +184,24 @@ public class LeakDeskGame : MonoBehaviour
     {
         if (Overtime) return;
         Elapsed = Mathf.Min(RoundSeconds - 1f, Elapsed + seconds);
+    }
+
+    // ---------- leads ----------
+
+    readonly HashSet<string> foundLeads = new();
+
+    /// <summary>Raised the first time a lead gets covered by evidence.</summary>
+    public event Action<CaseLead> LeadFound;
+
+    /// <summary>Re-checks leads (also call after Jensenbot gets exposed).</summary>
+    public void CheckLeads()
+    {
+        foreach (var l in Case.Leads)
+        {
+            bool found = Leads.Found(l, Evidence, Jensenbot.Exposed);
+            if (found && foundLeads.Add(l.Id)) LeadFound?.Invoke(l);
+            if (!found) foundLeads.Remove(l.Id);
+        }
     }
 
     // ---------- progressive unlocks ----------

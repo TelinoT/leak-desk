@@ -111,7 +111,7 @@ public class Tutorial : MonoBehaviour
         },
         new Step
         {
-            Text = "Now <b>drag that Slack line</b> from your tray onto him. Keep an eye on his stress.",
+            Text = "Now <b>drag that Snack message</b> from your tray onto him. Keep an eye on his stress.",
             OnEnter = () => ui.Interrogation.Open("jules"),
             Target = () => ui.Tray.FirstCard,
             Target2 = () => ui.Interrogation.StageRect,
@@ -168,8 +168,6 @@ public class Tutorial : MonoBehaviour
         var av = UiKit.Panel(card.transform, SourceStyle.Color("calendar"), UiKit.AvatarSprite, "Avatar");
         av.Size(prefW: 110, prefH: 110, minW: 110);
         av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
-        var ini = UiKit.Text(av.transform, "RV", 40, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-        ((RectTransform)ini.transform).Stretch();
         guideHead = UiKit.Rect("Head", av.transform).Stretch().gameObject.AddComponent<RawImage>();
         guideHead.raycastTarget = false;
         guideHead.enabled = false;

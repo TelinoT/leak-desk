@@ -1,3 +1,4 @@
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,6 +6,15 @@ using UnityEngine.UI;
 /// <summary>Right-hand column listing collected evidence. While interrogating, each card has a "Show" button.</summary>
 public class EvidenceTray
 {
+    public static Color LeadColor(string leadId) => leadId switch
+    {
+        "motive" => new Color(0.95f, 0.45f, 0.35f),
+        "opportunity" => new Color(0.25f, 0.65f, 0.95f),
+        "method" => new Color(0.85f, 0.35f, 0.85f),
+        "accomplice" => new Color(0.35f, 0.75f, 0.35f),
+        _ => new Color(0.55f, 0.55f, 0.65f),
+    };
+
     readonly DeskUI ui;
     readonly RectTransform content;
 
@@ -47,6 +57,7 @@ public class EvidenceTray
             T.smallSize, T.muted, TextAlignmentOptions.Center);
         emptyHint = hint.gameObject;
 
+        ui.Game.Evidence.Removed += _ => Refresh();
         ui.Game.Evidence.Added += _ =>
         {
             Refresh(pulseLast: true);
@@ -73,13 +84,21 @@ public class EvidenceTray
             var item = items[i];
             var card = EvidenceCard(content, item, canPresent
                 ? () => { if (ui.CurrentTab == DeskUI.Tab.Jensenbot) ui.JensenbotView.Confront(item); else ui.Interrogation.Present(item); }
-                : null);
+                : null, onRemove: ui.Game.Phase == GamePhase.Investigating ? () => RemoveItem(item) : null);
             if (pulseLast && i == items.Count - 1) ui.StartCoroutine(DeskUI.PopModal(card.transform));
         }
     }
 
-    /// <summary>Shared evidence card visual (tray, picker, accusation).</summary>
-    public static Image EvidenceCard(Transform parent, EvidenceItem item, System.Action onShow, string buttonLabel = "Show")
+    void RemoveItem(EvidenceItem item)
+    {
+        Sfx.Play("whoosh", 1.3f);
+        ui.Game.Evidence.Remove(item.Id);
+        ui.Toast($"Threw out: {item.Title}", UiKit.Theme.muted, "delete_1");
+    }
+
+    /// <summary>Shared evidence card visual (tray, picker, accusation). Shows which leads the item helps with.</summary>
+    public static Image EvidenceCard(Transform parent, EvidenceItem item, System.Action onShow, string buttonLabel = "Show",
+        System.Action onRemove = null)
     {
         var T = UiKit.Theme;
         var card = UiKit.Card(parent, T.card, 12, 4, "Evidence: " + item.Id);
@@ -98,7 +117,40 @@ public class EvidenceTray
             var b = UiKit.Button(top, buttonLabel, onShow, T.warning, T.cardText, 30, 15);
             b.Size(prefW: 74, prefH: 30, minW: 74);
         }
+        if (onRemove != null)
+        {
+            var x = UiKit.Button(top, "", onRemove, new Color(0, 0, 0, 0.08f), T.cardText, 30, 15);
+            x.Size(prefW: 30, prefH: 30, minW: 30);
+            var xi = UiKit.Icon(x.transform, "mark_x", 18, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.6f));
+            var xr = (RectTransform)xi.transform;
+            xr.anchorMin = xr.anchorMax = new Vector2(0.5f, 0.5f);
+            xr.sizeDelta = new Vector2(18, 18);
+        }
         UiKit.Text(card.transform, item.Content, T.smallSize - 1, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.85f));
+
+        // Lead chips: what this piece of evidence is good for.
+        var c = LeakDeskGame.Instance != null ? LeakDeskGame.Instance.Case : null;
+        if (c != null)
+        {
+            var leads = Leads.For(c, item).ToList();
+            if (leads.Count > 0)
+            {
+                var row = UiKit.Rect("Leads", card.transform);
+                row.HLayout(6);
+                foreach (var l in leads)
+                {
+                    var chip = UiKit.Chip(row, LeadColor(l.Id), 0, 24, "Lead");
+                    chip.GetComponent<LayoutElement>().preferredWidth = -1;
+                    chip.GetComponent<LayoutElement>().minWidth = -1;
+                    chip.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(10, 10, 2, 2);
+                    chip.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+                    var lt = UiKit.Text(chip.transform, l.Title.ToUpperInvariant(), 13, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+                    lt.textWrappingMode = TextWrappingModes.NoWrap;
+                    chip.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                }
+                UiKit.Spacer(row, 1);
+            }
+        }
         card.gameObject.AddComponent<EvidenceDrag>().Item = item;
         card.gameObject.AddComponent<ButtonPop>();
         return card;
