@@ -162,6 +162,14 @@ public class VerdictOverlay
             rows.Add((g, line));
         }
 
+        // What you left on the table: the categories you didn't max, biggest first.
+        var missed = v.Breakdown.Where(l => l.Points < l.Max).OrderByDescending(l => l.Max - l.Points).Take(3).ToList();
+        if (missed.Count > 0 && v.Grade != "S")
+        {
+            UiKit.Text(breakdown.transform, "LEFT ON THE TABLE", T.smallSize, T.warning, style: FontStyles.Bold);
+            UiKit.Text(breakdown.transform, string.Join("   ", missed.Select(l => $"{l.Label} <b>+{l.Max - l.Points}</b>")), T.smallSize, T.muted);
+        }
+
         var right = UiKit.Rect("Right", cols);
         right.VLayout(16);
         right.Size(flexW: 1);

@@ -63,6 +63,8 @@ public static class ScoreCard
             >= 40 => ("C", "Intern with Potential"),
             _ => ("D", "Badge Revoked"),
         };
+        // Naming the right person is worth something on its own.
+        if (right && v.Grade == "D") (v.Grade, v.Rank) = ("C", "Right Hunch");
     }
 
     /// <summary>Offline fallback: does the motive mention the real reason?</summary>

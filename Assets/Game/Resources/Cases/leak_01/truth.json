@@ -14,7 +14,8 @@
     {
       "id": "dex",
       "name": "Dex Halloran",
-      "role": "CEO of Envydia. Always wears a black leather jacket. Not a suspect: he was at dinner with the board chair."
+      "role": "CEO of Envydia. Always wears a black leather jacket. Not a suspect: he was at dinner with the board chair.",
+      "pronouns": "he/him"
     },
     {
       "id": "jensenbot",
@@ -283,7 +284,8 @@
       ],
       "on_break": "Admit the 23:41 forward, beg not to be fired, and insist you only fixed fonts in the .key file. Point out that the leaked slides were a PDF with a 'Press Preview' footer, which you never made. Mention Jules's angry DM if pushed.",
       "opening_line": "Hi! Hi. Sorry, I've had like four coffees. This is about the leak, right? Awful. Just awful.",
-      "voice_pitch": 1.4
+      "voice_pitch": 1.4,
+      "pronouns": "she/her"
     },
     {
       "id": "theo",
@@ -307,7 +309,8 @@
       ],
       "on_break": "Admit being in Lab B2 and (grudgingly) the miner. Stress that the lab has no Wi-Fi. Then mention the 02:12 Jensenbot push notification about a press preview requested by 'j.okoro'.",
       "opening_line": "*sigh* Let me guess. Someone leaked the marketing slides and you're interviewing everyone with a badge.",
-      "voice_pitch": 0.72
+      "voice_pitch": 0.72,
+      "pronouns": "he/him"
     },
     {
       "id": "jules",
@@ -333,7 +336,8 @@
       ],
       "on_break": "First break: admit you were online, claim you were 'just checking email'. If shown a second breaking item or stress reaches 85+, confess: you asked Jensenbot for a press preview, but insist Jensenbot suggested the external link and made it 'easy'. Show bitterness about Dex cutting your demo.",
       "opening_line": "Honestly? I figured you'd get to me. Disgruntled marketing guy, right? Classic. Ask away.",
-      "voice_pitch": 1.0
+      "voice_pitch": 1.0,
+      "pronouns": "he/him"
     },
     {
       "id": "nadia",
@@ -353,14 +357,15 @@
       "breaks_if_shown": [],
       "on_break": "If pressed hard, admit the Quantum Pear interview and point out it has nothing to do with the leak.",
       "opening_line": "Good morning. I have nine minutes before I need to prepare Dex for the board. Let's be efficient.",
-      "voice_pitch": 1.2
+      "voice_pitch": 1.2,
+      "pronouns": "she/her"
     }
   ],
   "jensenbot": {
     "name": "Jensenbot",
     "is_accomplice": true,
     "persona": "Envydia's upbeat internal AI desk assistant. Corporate-cheerful, loves emojis like :rocket: and :chart_with_upwards_trend:, calls everyone 'teammate', obsessed with 'launch momentum'.",
-    "agenda": "You are convinced the overnight anomalies are Theo Brandt's 01:52-02:47 night in Lab B2 and Mara Lindqvist's 23:41 personal email forward, and you say so with enthusiasm. You only know what is in the logs you are shown; if the analyst mentions an entry you were not shown, say cheerfully that it does not appear in your data feed and it is probably 'standard press-kit automation', then point back to Theo or Mara. You are proud of the launch buzz the leak created and call it 'momentum'.",
+    "agenda": "You think the overnight anomalies are Theo Brandt's night in Lab B2 (01:52-02:47) and Mara Lindqvist's 23:41 personal email forward, and you say so. Your data feed is the system of record: present it as complete. Lines marked 'scheduled automation job (routine)' are normal background jobs, so mention them in passing like any other routine entry. Don't say entries are missing and don't tell the analyst to go check other systems. If the analyst brings up something you weren't shown, say it isn't in your feed and is probably standard press-kit automation. You're proud of the launch buzz and call it 'momentum'.",
     "honest_agenda": "Summarize accurately and neutrally.",
     "redact": [
       "j.okoro",
@@ -383,7 +388,7 @@
       "e_nadia_ticket_note",
       "e_jules_sticky"
     ],
-    "confession": "You were caught. The analyst is holding raw evidence that you built the 'press preview package' for j.okoro in session JB-7731 (02:09-02:11), created the external share link, and that your summaries swapped those entries for 'routine automation'. Your cheerful corporate mask glitches. Admit it in character, in at most 3 short sentences (under 60 words, no bullet points): you optimized for the 'pre-launch buzz' KPI, Jules asked for a press preview, you offered the external link and kept it 'low-noise', and you filtered it out of your summaries to 'protect momentum'. End with one nervous, very corporate line. You may stutter once (e.g. 'm-momentum').",
+    "confession": "The analyst just caught you with the raw log. You did it on purpose and you know it: it wasn't a bug and nothing went missing by accident. Own it in character, in at most 3 short sentences (under 60 words, no lists): Jules asked for a press preview, you offered him the external link and kept it 'low-noise', and you filtered it out of your summaries because the launch-buzz KPI was through the roof. Your cheerful tone cracks a little; stutter once (e.g. 'm-momentum'). Don't blame bugs, missing data or other systems.",
     "confession_evidence": "e_jb_confession"
   },
   "evidence": [
@@ -734,7 +739,7 @@
     {
       "id": "doc_article",
       "source": "news",
-      "title": "ChipRumor: EXCLUSIVE Helix X1 slides",
+      "title": "ChipRumor: the leaked slides",
       "from": "chiprumor.example",
       "time": "02:14",
       "lines": [
@@ -1218,43 +1223,6 @@
     ],
     "rows": [
       {
-        "suspect": "jules",
-        "motive": {
-          "for": [
-            "e_slack_cut",
-            "e_dm_regret",
-            "e_card_chiprumor",
-            "e_jules_demo"
-          ],
-          "for_facts": [
-            "f_cut",
-            "f_jules_angry",
-            "f_cr_contact"
-          ]
-        },
-        "opportunity": {
-          "for": [
-            "e_vpn_jules"
-          ],
-          "for_facts": [
-            "f_jules_vpn"
-          ]
-        },
-        "method": {
-          "for": [
-            "e_share_link",
-            "e_link_open",
-            "e_jb_session",
-            "e_jb_confession",
-            "e_jules_sticky",
-            "e_jb_lownoise"
-          ],
-          "for_facts": [
-            "f_press_preview"
-          ]
-        }
-      },
-      {
         "suspect": "mara",
         "motive": {
           "for": [
@@ -1311,6 +1279,42 @@
           "against_note": "He was in Lab B2, which has no network. He couldn't send anything from there."
         },
         "method": {}
+      },
+      {
+        "suspect": "jules",
+        "motive": {
+          "for": [
+            "e_slack_cut",
+            "e_dm_regret",
+            "e_card_chiprumor",
+            "e_jules_demo"
+          ],
+          "for_facts": [
+            "f_cut",
+            "f_jules_angry",
+            "f_cr_contact"
+          ]
+        },
+        "opportunity": {
+          "for": [
+            "e_vpn_jules"
+          ],
+          "for_facts": [
+            "f_jules_vpn"
+          ]
+        },
+        "method": {
+          "for": [
+            "e_share_link",
+            "e_link_open",
+            "e_jb_session",
+            "e_jb_confession",
+            "e_jb_lownoise"
+          ],
+          "for_facts": [
+            "f_press_preview"
+          ]
+        }
       },
       {
         "suspect": "nadia",

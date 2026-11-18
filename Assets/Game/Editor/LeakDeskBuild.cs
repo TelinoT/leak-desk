@@ -23,13 +23,14 @@ public static class LeakDeskBuild
         }
 
         PlayerSettings.productName = "Leak Desk";
-        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
+        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Brotli; // smaller; the fallback decompresses it on hosts without Brotli headers
         PlayerSettings.WebGL.decompressionFallback = true; // itch.io doesn't send Content-Encoding headers
         PlayerSettings.WebGL.dataCaching = true;
         PlayerSettings.WebGL.exceptionSupport = WebGLExceptionSupport.ExplicitlyThrownExceptionsOnly;
         PlayerSettings.defaultWebScreenWidth = 1280;
         PlayerSettings.defaultWebScreenHeight = 720;
         PlayerSettings.runInBackground = true;
+        PlayerSettings.SetIl2CppCodeGeneration(UnityEditor.Build.NamedBuildTarget.WebGL, UnityEditor.Build.Il2CppCodeGeneration.OptimizeSize);
         PlayerSettings.WebGL.template = "PROJECT:LeakDesk"; // responsive: fills the browser window / itch.io frame
 
         var options = new BuildPlayerOptions

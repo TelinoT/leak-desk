@@ -19,6 +19,21 @@ public class AccusationOverlay
     readonly TMP_InputField motive;
     readonly Button jensenToggle, submit, back;
     readonly HashSet<string> selectedEvidence = new();
+    readonly TextMeshProUGUI countdown;
+    int lastSecond = -1;
+
+    /// <summary>Called every frame by DeskUI: the board's patience, shown right in the dialog.</summary>
+    public void Tick()
+    {
+        if (!root.activeSelf || !Game.Overtime) { if (countdown.text.Length > 0) countdown.text = ""; return; }
+        int s = Mathf.CeilToInt(Mathf.Max(0, Game.GraceLeft));
+        countdown.text = $"0:{s:00}";
+        if (s != lastSecond)
+        {
+            lastSecond = s;
+            UiFx.Punch(countdown.transform, s <= 10 ? 0.15f : 0.06f, 0.25f);
+        }
+    }
     readonly (Image bg, Image icon) slotMethod, slotWhy;
     readonly TextMeshProUGUI strengthText;
 
@@ -56,7 +71,12 @@ public class AccusationOverlay
         var card = DeskUI.Modal(overlayRoot, "Accusation", 1500, 960, out root);
         modal = card.transform;
 
-        UiKit.Heading(card.transform, "Present your case to the board", 38);
+        var titleRow = UiKit.Rect("TitleRow", card.transform);
+        titleRow.HLayout(16);
+        UiKit.Heading(titleRow, "Present your case to the board", 38).Size(flexW: 1);
+        countdown = UiKit.Text(titleRow, "", 44, T.danger, TextAlignmentOptions.Right, FontStyles.Bold);
+        countdown.Size(prefW: 220);
+        if (T.headingFont != null) countdown.font = T.headingFont;
         subtitle = UiKit.Text(card.transform, "", T.bodySize, T.muted);
 
         // 1. Suspect

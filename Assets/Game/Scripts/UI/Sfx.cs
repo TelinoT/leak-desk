@@ -58,12 +58,11 @@ public class Sfx : MonoBehaviour
         clips["lose"] = Make(1.0f, t => (Square(t, 300f - t * 160f) * 0.25f) * Env(t, 0.01f, 0.95f) * 0.5f);
         clips["whoosh"] = Make(0.32f, t => Noise() * Mathf.Sin(Mathf.Clamp01(t / 0.32f) * Mathf.PI) * 0.22f * (0.5f + 0.5f * Mathf.Sin(t * 2f * Mathf.PI * (200f + t * 1800f))));
         clips["blip"] = Make(0.06f, t => Square(t, 440f) * Env(t, 0.003f, 0.055f) * 0.18f);
-        clips["ambience"] = MakeAmbience();
-
-        ambience.clip = clips["ambience"];
         ambience.loop = true;
-        ambience.volume = 0.18f * Volume;
-        // No background bed: the filtered-noise hum read as hiss. Kept the clip for a possible later music track.
+        // Quiet music bed: a slow, warm chord pad (pure tones, no noise). The speaker button mutes it.
+        ambience.clip = MakePad();
+        ambience.volume = 0.11f * Volume;
+        ambience.Play();
     }
 
     // ---------- public API ----------
@@ -94,6 +93,44 @@ public class Sfx : MonoBehaviour
         var data = new float[n];
         for (int i = 0; i < n; i++) data[i] = Mathf.Clamp(f(i / (float)Rate), -1f, 1f);
         var clip = AudioClip.Create("sfx", n, 1, Rate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    /// <summary>16 s loop, four chords (Am9, Fmaj7, Cmaj7, G6) with slow swells. Seamless because every
+    /// chord fades fully in and out inside its own 4 s slot.</summary>
+    static AudioClip MakePad()
+    {
+        const int rate = 22050;
+        const float chordLen = 4f;
+        float[][] chords =
+        {
+            new[] { 110.00f, 164.81f, 196.00f, 261.63f, 246.94f },   // Am9
+            new[] { 87.31f, 130.81f, 164.81f, 220.00f, 261.63f },    // Fmaj7
+            new[] { 130.81f, 164.81f, 196.00f, 246.94f, 329.63f },   // Cmaj7
+            new[] { 98.00f, 146.83f, 196.00f, 246.94f, 329.63f },    // G6
+        };
+        int n = Mathf.RoundToInt(rate * chordLen * chords.Length);
+        var data = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = i / (float)rate;
+            int ci = Mathf.Min(chords.Length - 1, (int)(t / chordLen));
+            float local = t - ci * chordLen;
+            float env = Mathf.Sin(Mathf.Clamp01(local / chordLen) * Mathf.PI); // swell in and out
+            // (no squaring: keeps the swell broad so the gaps between chords stay short)
+            float v = 0f;
+            var ch = chords[ci];
+            for (int k = 0; k < ch.Length; k++)
+            {
+                float f = ch[k];
+                float vib = 1f + 0.0025f * Mathf.Sin(t * 2f * Mathf.PI * (0.3f + k * 0.07f));
+                v += Mathf.Sin(t * 2f * Mathf.PI * f * vib) * (k == 0 ? 0.5f : 0.28f);
+                v += Mathf.Sin(t * 2f * Mathf.PI * f * 2.001f) * 0.05f; // soft octave shimmer
+            }
+            data[i] = v * env * 0.22f;
+        }
+        var clip = AudioClip.Create("pad", n, 1, rate, false);
         clip.SetData(data, 0);
         return clip;
     }

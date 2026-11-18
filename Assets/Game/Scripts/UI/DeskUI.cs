@@ -207,13 +207,19 @@ public class DeskUI : MonoBehaviour
         var sd = Game.Case.Suspect(suspectId);
         var row = UiKit.Rect("Row: " + suspectId, parent);
         row.HLayout(6);
-        var av = UiKit.Panel(row, sd.Color, UiKit.AvatarSprite, "Avatar");
+        var who = UiKit.Rect("Who", row);
+        who.VLayout(0, 0, TextAnchor.UpperCenter);
+        who.Size(prefW: 38);
+        var av = UiKit.Panel(who, sd.Color, UiKit.AvatarSprite, "Avatar");
         av.Size(prefW: 38, prefH: 38, minW: 38);
         av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
         var raw = UiKit.Rect("Head", av.transform).Stretch().gameObject.AddComponent<RawImage>();
         raw.raycastTarget = false;
         raw.enabled = false;
         boardHeads[suspectId] = raw;
+        var nm = UiKit.Text(who, sd.FirstName, 15, T.muted, TextAlignmentOptions.Center);
+        nm.textWrappingMode = TextWrappingModes.NoWrap;
+        nm.overflowMode = TextOverflowModes.Overflow;
         foreach (var slot in Board.Slots) Pip(row, suspectId, slot);
     }
 
@@ -372,6 +378,7 @@ public class DeskUI : MonoBehaviour
     {
         if (Game == null || Game.Case == null) return;
         Feed.Tick();
+        Accusation.Tick();
         int unread = Feed.UnreadCount;
         navLabels[Tab.Logs].text = unread > 0 ? $"Logs <color=#{Hex(CurrentTab == Tab.Logs ? T.accentText : T.warning)}>({unread})</color>" : "Logs";
         clockText.text = Game.ClockText;

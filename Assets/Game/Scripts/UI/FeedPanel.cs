@@ -97,6 +97,8 @@ public class FeedPanel
         titles.VLayout(2);
         titles.Size(flexW: 1);
         docTitle = UiKit.Heading(titles, "", 32);
+        docTitle.textWrappingMode = TextWrappingModes.NoWrap;
+        docTitle.overflowMode = TextOverflowModes.Ellipsis;
         docMeta = UiKit.Text(titles, "", T.smallSize, T.muted);
         summarizeButton = UiKit.Button(header, "Summarize with Jensenbot", Summarize, T.secondary, Color.white, 52, 18);
         summarizeButton.Size(prefW: 300, prefH: 52);

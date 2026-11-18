@@ -256,7 +256,7 @@ public class InterrogationPanel
         role.overflowMode = TextOverflowModes.Ellipsis;
         var row = UiKit.Rect("Row", col);
         row.HLayout(8);
-        var emoBg = UiKit.Chip(row, SourceStyle.EmotionColor("calm"), 92, 24, "Emotion");
+        var emoBg = UiKit.Chip(row, SourceStyle.EmotionColor("calm"), 118, 24, "Emotion");
         var emo = UiKit.Text(emoBg.transform, "CALM", 13, T.cardText, TextAlignmentOptions.Center, FontStyles.Bold);
         var fill = UiKit.Bar(row, T.warning, 10);
 
@@ -407,7 +407,10 @@ public class InterrogationPanel
         Sfx.Play("crack");
         StartFlash(0.8f);
         UiFx.Shake(stageContent, 22f, 0.5f);
-        ui.Toast($"{current.Data.FirstName} is cracking.", T.danger);
+        bool leaker = current.Data.Id == Game.Case.Leaker;
+        crackedText.text = leaker ? "CRACKED!" : "SECRET OUT";
+        crackedText.transform.parent.GetComponent<Image>().color = leaker ? T.danger : T.warning;
+        ui.Toast(leaker ? $"{current.Data.FirstName} is cracking." : $"{current.Data.FirstName} came clean about something.", leaker ? T.danger : T.warning);
         var stamp = crackedText.transform.parent;
         crackedGroup.alpha = 1;
         for (float t = 0; t < 0.35f; t += Time.unscaledDeltaTime)
@@ -489,13 +492,13 @@ public class InterrogationPanel
         }
         UiKit.SetBar(c.StressFill, agent.Stress / 100f);
         c.StressFill.color = StressColor(agent.Stress);
-        c.Emotion.text = !agent.Met ? "NOT MET" : agent.Broken ? "CRACKED" : SourceStyle.EmotionLabel(agent.Emotion);
+        c.Emotion.text = !agent.Met ? "NOT MET" : agent.Broken ? BrokenLabel(agent) : SourceStyle.EmotionLabel(agent.Emotion);
         c.EmotionBg.color = !agent.Met ? new Color(0.6f, 0.62f, 0.7f) : agent.Broken ? T.danger : SourceStyle.EmotionColor(agent.Emotion);
     }
 
     void UpdateHeader()
     {
-        stageEmotion.text = current.Broken ? "CRACKED" : SourceStyle.EmotionLabel(current.Emotion);
+        stageEmotion.text = current.Broken ? BrokenLabel(current) : SourceStyle.EmotionLabel(current.Emotion);
         stageEmotionBg.color = current.Broken ? T.danger : SourceStyle.EmotionColor(current.Emotion);
         stageStress.text = current.Stress.ToString();
         stageStress.color = StressColor(current.Stress);
@@ -520,6 +523,9 @@ public class InterrogationPanel
         picker ??= new EvidencePicker(ui);
         picker.Open($"Confront {current.Data.FirstName} with...", Present);
     }
+
+    // Only the leaker "cracks"; everyone else just has their own secret come out.
+    string BrokenLabel(SuspectAgent a) => a.Data.Id == Game.Case.Leaker ? "CRACKED" : "SECRET OUT";
 
     public static string Initials(string name)
     {

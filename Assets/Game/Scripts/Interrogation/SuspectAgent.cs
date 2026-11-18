@@ -74,8 +74,11 @@ public class SuspectAgent
             Log.Add(new ChatEntry { Type = ChatEntry.Kind.Suspect, Text = Data.OpeningLine, Emotion = "calm" });
     }
 
+    bool questionTurn;
+
     public void Ask(string question, Action<SuspectReply> done)
     {
+        questionTurn = true;
         Log.Add(new ChatEntry { Type = ChatEntry.Kind.Player, Text = question });
         QuestionsAsked++;
         Send(question, done);
@@ -83,6 +86,7 @@ public class SuspectAgent
 
     public void Present(EvidenceItem evidence, Action<SuspectReply> done)
     {
+        questionTurn = false;
         Log.Add(new ChatEntry { Type = ChatEntry.Kind.Evidence, Text = evidence.Content, EvidenceSource = evidence.Source });
         bool breaking = Data.BreaksIfShown.Contains(evidence.Id);
         bool first = shown.Add(evidence.Id);
@@ -157,7 +161,10 @@ public class SuspectAgent
 
     void Apply(SuspectReply reply)
     {
-        Stress = Mathf.Clamp(Stress + Mathf.Clamp(reply.StressDelta, -10, 40), 0, 100);
+        // Questions alone shouldn't push anyone to the edge: they cool off a little each time,
+        // and only evidence on the table can spike the stress meter.
+        int delta = questionTurn ? Mathf.Clamp(reply.StressDelta, -10, 12) - 3 : Mathf.Clamp(reply.StressDelta, -10, 40);
+        Stress = Mathf.Clamp(Stress + delta, 0, 100);
         if (Stress >= 80) Broken = true;
         Emotion = reply.Emotion;
         Log.Add(new ChatEntry { Type = ChatEntry.Kind.Suspect, Text = reply.Reply, Emotion = reply.Emotion });
@@ -211,9 +218,9 @@ public class SuspectAgent
 
         var people = new StringBuilder();
         foreach (var s in caseFile.Suspects.Where(s => s.Id != Data.Id))
-            people.AppendLine($"- {s.Name}, {s.Role}");
+            people.AppendLine($"- {s.Name} ({s.Pronouns}), {s.Role}");
         foreach (var p in caseFile.People)
-            people.AppendLine($"- {p.Name}: {p.Role}");
+            people.AppendLine($"- {p.Name}{(string.IsNullOrEmpty(p.Pronouns) ? "" : $" ({p.Pronouns})")}: {p.Role}");
 
         string breaks = Data.BreaksIfShown.Count == 0
             ? "none (you have nothing to hide about the leak)"

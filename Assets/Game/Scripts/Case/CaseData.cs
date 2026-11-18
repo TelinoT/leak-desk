@@ -110,6 +110,7 @@ public class CasePerson
     [JsonProperty("id")] public string Id;
     [JsonProperty("name")] public string Name;
     [JsonProperty("role")] public string Role;
+    [JsonProperty("pronouns")] public string Pronouns;
 }
 
 public class TimelineEntry
@@ -146,6 +147,7 @@ public class SuspectData
     [JsonProperty("on_break")] public string OnBreak;
     [JsonProperty("opening_line")] public string OpeningLine;
     [JsonProperty("voice_pitch")] public float VoicePitch = 1f;
+    [JsonProperty("pronouns")] public string Pronouns = "they/them";
 
     public string FirstName => string.IsNullOrEmpty(Name) ? Id : Name.Split(' ')[0];
 
