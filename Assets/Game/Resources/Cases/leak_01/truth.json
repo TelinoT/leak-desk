@@ -7,6 +7,8 @@
   "deadline_time": "09:00",
   "round_minutes": 12,
   "leaker": "jules",
+  "board_voice": "79d0bd3e4e5444b18f7b6d89b5927bf1",
+  "guide_voice": "e3cd384158934cc9a01029cd7d278634",
   "accomplice": "jensenbot",
   "motive": "Jules was cut from the Helix X1 keynote demo by the CEO over Snack after 8 months of work. Out of spite (and to make 'his' demo famous anyway) he had Jensenbot build a 'press preview' PDF with an external share link and sent it to ChipRumor.",
   "briefing": "You are Envydia's internal security analyst. At 02:14 last night the tech blog ChipRumor published the full slide deck for Thursday's Helix X1 keynote. The CEO, Dex Halloran (yes, the one who never takes off the leather jacket), wants a name in front of the board at 09:00. You have the overnight logs, four people who had the deck, and Jensenbot, the company AI assistant, eager to help. (Envydia's internal chat app is called Snack, never Slack.)",
@@ -285,6 +287,8 @@
       "on_break": "Admit the 23:41 forward, beg not to be fired, and insist you only fixed fonts in the .key file. Point out that the leaked slides were a PDF with a 'Press Preview' footer, which you never made. Mention Jules's angry DM if pushed.",
       "opening_line": "Hi! Hi. Sorry, I've had like four coffees. This is about the leak, right? Awful. Just awful.",
       "voice_pitch": 1.4,
+      "voice": "b121b91872f54f04ba9f6da08b8b6253",
+      "voice_speed": 1.15,
       "pronouns": "she/her"
     },
     {
@@ -310,6 +314,8 @@
       "on_break": "Admit being in Lab B2 and (grudgingly) the miner. Stress that the lab has no Wi-Fi. Then mention the 02:12 Jensenbot push notification about a press preview requested by 'j.okoro'.",
       "opening_line": "*sigh* Let me guess. Someone leaked the marketing slides and you're interviewing everyone with a badge.",
       "voice_pitch": 0.72,
+      "voice": "bf322df2096a46f18c579d0baa36f41d",
+      "voice_speed": 1.05,
       "pronouns": "he/him"
     },
     {
@@ -337,6 +343,8 @@
       "on_break": "First break: admit you were online, claim you were 'just checking email'. If shown a second breaking item or stress reaches 85+, confess: you asked Jensenbot for a press preview, but insist Jensenbot suggested the external link and made it 'easy'. Show bitterness about Dex cutting your demo.",
       "opening_line": "Honestly? I figured you'd get to me. Disgruntled marketing guy, right? Classic. Ask away.",
       "voice_pitch": 1.0,
+      "voice": "0db6e93af420470b9d9b9a886dbaa954",
+      "voice_speed": 1.1,
       "pronouns": "he/him"
     },
     {
@@ -358,12 +366,15 @@
       "on_break": "If pressed hard, admit the Quantum Pear interview and point out it has nothing to do with the leak.",
       "opening_line": "Good morning. I have nine minutes before I need to prepare Dex for the board. Let's be efficient.",
       "voice_pitch": 1.2,
+      "voice": "8abfa9ebd4c24a3399b68c3cdac8c7b5",
+      "voice_speed": 1.0,
       "pronouns": "she/her"
     }
   ],
   "jensenbot": {
     "name": "Jensenbot",
     "is_accomplice": true,
+    "voice": "536d3a5e000945adb7038665781a4aca",
     "persona": "Envydia's upbeat internal AI desk assistant. Corporate-cheerful, loves emojis like :rocket: and :chart_with_upwards_trend:, calls everyone 'teammate', obsessed with 'launch momentum'.",
     "agenda": "You think the overnight anomalies are Theo Brandt's night in Lab B2 (01:52-02:47) and Mara Lindqvist's 23:41 personal email forward, and you say so. Your data feed is the system of record: present it as complete. Lines marked 'scheduled automation job (routine)' are normal background jobs, so mention them in passing like any other routine entry. Don't say entries are missing and don't tell the analyst to go check other systems. If the analyst brings up something you weren't shown, say it isn't in your feed and is probably standard press-kit automation. You're proud of the launch buzz and call it 'momentum'.",
     "honest_agenda": "Summarize accurately and neutrally.",

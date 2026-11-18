@@ -140,7 +140,7 @@ public class EvidenceTray
                 foreach (var bt in tags.Take(3))
                 {
                     string label = bt.Slot == "ai" ? "AI HELPED"
-                        : $"{(bt.Against ? "\u2715 " : "")}{c.Suspect(bt.Suspect)?.FirstName.ToUpperInvariant()} · {Board.Short(bt.Slot)}";
+                        : $"{(bt.Against ? "NOT " : "")}{c.Suspect(bt.Suspect)?.FirstName.ToUpperInvariant()} · {Board.Short(bt.Slot)}";
                     Color col = bt.Slot == "ai" ? new Color(0.35f, 0.75f, 0.35f)
                         : bt.Against ? new Color(0.45f, 0.42f, 0.50f) : c.Suspect(bt.Suspect).Color;
                     var chip = UiKit.Chip(row, col, 0, 24, "Tag");

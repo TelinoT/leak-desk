@@ -70,6 +70,15 @@ public class Tutorial : MonoBehaviour
         Next();
     }
 
+    string GuideVoice => Game.Case.GuideVoice;
+    AudioClip guideClip;
+
+    // Rosa waits for a suspect to finish their line before she moves on (so she doesn't talk over them).
+    bool SomeoneElseTalking => ui.Interrogation.Voicing || (Voice.Current != null && Voice.Current != guideClip);
+
+    /// <summary>Starts loading Rosa's lines while the player reads the briefing.</summary>
+    public void PrefetchVoice() => Voice.Prefetch(GuideVoice, Script().ConvertAll(s => s.Text), 1.08f);
+
     List<Step> Script() => new()
     {
         new Step
@@ -218,7 +227,8 @@ public class Tutorial : MonoBehaviour
         var s = steps[index];
         s.OnEnter?.Invoke();
         coachText.text = s.Text;
-        UiFx.Typewrite(coachText, 120f, 1.25f);
+        guideClip = Voice.Cached(GuideVoice, s.Text);
+        Voice.TypeAlong(coachText, guideClip, 120f, 1.25f);
         stepLabel.text = $"{index + 1} / {steps.Count}";
         nextButton.gameObject.SetActive(!string.IsNullOrEmpty(s.Button));
         if (!string.IsNullOrEmpty(s.Button)) nextButton.SetLabel(s.Button);
@@ -269,7 +279,7 @@ public class Tutorial : MonoBehaviour
         PlaceCoach(hole, s.CoachTop);
         root.SetAsLastSibling();
 
-        if (s.Done != null && !advancing && s.Done())
+        if (s.Done != null && !advancing && !SomeoneElseTalking && s.Done())
         {
             advancing = true;
             StartCoroutine(AdvanceSoon());

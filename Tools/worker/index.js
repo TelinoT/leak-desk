@@ -78,7 +78,8 @@ async function tts(body, env) {
 // Voice library search (used once to pick voices; returns only what we need).
 async function voices(body, env) {
   if (!env.FISH_API_KEY) return json({ error: "tts not configured" }, 503);
-  const q = new URLSearchParams({ page_size: "20", page_number: "1", sort_by: "score" });
+  const q = new URLSearchParams({ page_size: String(Math.min(100, Number(body.page_size) || 20)),
+                                  page_number: String(Number(body.page) || 1), sort_by: "score" });
   if (body.title) q.set("title", body.title);
   if (body.tag) q.set("tag", body.tag);
   if (body.language) q.set("language", body.language);

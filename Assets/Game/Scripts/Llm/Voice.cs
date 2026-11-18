@@ -47,6 +47,35 @@ public class Voice : MonoBehaviour
         }
     }
 
+    readonly System.Collections.Generic.Dictionary<string, AudioClip> cache = new();
+
+    static string Key(string voiceId, string text) => voiceId + "|" + Spoken(text);
+
+    /// <summary>Fixed lines (the tutorial) are fetched one by one in the background and kept for later.</summary>
+    public static void Prefetch(string voiceId, System.Collections.Generic.IEnumerable<string> lines, float speed = 1.08f)
+    {
+        if (!Enabled || string.IsNullOrEmpty(voiceId)) return;
+        var v = Instance;
+        v.StartCoroutine(v.PrefetchRoutine(voiceId, new System.Collections.Generic.List<string>(lines), speed));
+    }
+
+    IEnumerator PrefetchRoutine(string voiceId, System.Collections.Generic.List<string> lines, float speed)
+    {
+        foreach (var line in lines)
+        {
+            string key = Key(voiceId, line);
+            if (cache.ContainsKey(key) || !Enabled) continue;
+            AudioClip got = null;
+            yield return Fetch(-1, voiceId, Spoken(line), speed, clip => got = clip);
+            if (got != null) cache[key] = got;
+        }
+    }
+
+    public static AudioClip Cached(string voiceId, string text) =>
+        instance != null && !string.IsNullOrEmpty(voiceId) && instance.cache.TryGetValue(Key(voiceId, text), out var c) ? c : null;
+
+    public static AudioClip Current => instance != null && instance.source != null && instance.source.isPlaying ? instance.source.clip : null;
+
     public static bool Speaking => instance != null && instance.source != null && instance.source.isPlaying;
 
     void Awake()
@@ -106,7 +135,7 @@ public class Voice : MonoBehaviour
         var op = req.SendWebRequest();
         while (!op.isDone)
         {
-            if (!gaveUp && Time.unscaledTime - start > Timeout)
+            if (!gaveUp && id >= 0 && Time.unscaledTime - start > Timeout)
             {
                 gaveUp = true;          // the UI moves on with babble; this request finishes in the background
                 ready?.Invoke(null);
@@ -136,7 +165,7 @@ public class Voice : MonoBehaviour
             yield break;
         }
         failures = 0;
-        if (id != requestId) { ready?.Invoke(null); yield break; } // superseded (switched suspect, ...): show text, no audio
+        if (id >= 0 && id != requestId) { ready?.Invoke(null); yield break; } // superseded (switched suspect, ...): show text, no audio
         ready?.Invoke(clip);
     }
 

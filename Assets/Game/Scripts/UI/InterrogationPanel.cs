@@ -396,6 +396,7 @@ public class InterrogationPanel
 
     // True while a reply's voice line is loading (the typing dots stay up: it reads as the suspect thinking).
     bool voicing;
+    public bool Voicing => voicing;
 
     void OnReply(SuspectAgent agent, bool wasBroken)
     {

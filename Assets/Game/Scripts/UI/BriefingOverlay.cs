@@ -128,6 +128,7 @@ public class BriefingOverlay
     public void Show()
     {
         RefreshToggle();
+        if (Tutorial.ShouldRun) ui.Tutorial.PrefetchVoice();
         ui.StartCoroutine(Sequence());
     }
 
