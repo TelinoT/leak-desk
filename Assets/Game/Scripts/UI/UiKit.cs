@@ -261,8 +261,10 @@ public static class UiKit
         scroll.content = content;
         scroll.horizontal = false;
         scroll.movementType = ScrollRect.MovementType.Clamped;
-        scroll.scrollSensitivity = 35;
+        // Browsers send much bigger wheel deltas than the Editor; keep scrolling calm so nothing gets skipped.
+        scroll.scrollSensitivity = Application.platform == RuntimePlatform.WebGLPlayer ? 5f : 18f;
         scroll.inertia = true;
+        scroll.decelerationRate = 0.05f;
         return scroll;
     }
 

@@ -30,7 +30,7 @@ public class CaseFile
     [JsonProperty("documents")] public List<CaseDocument> Documents = new();
     [JsonProperty("waves")] public List<CaseWave> Waves = new();
     [JsonProperty("desks")] public List<CaseDesk> Desks = new();
-    [JsonProperty("leads")] public List<CaseLead> Leads = new();
+    [JsonProperty("board")] public CaseBoard Board = new();
     [JsonProperty("desk_search_seconds")] public float DeskSearchSeconds = 30f;
 
     public SuspectData Suspect(string id) => Suspects.FirstOrDefault(s => s.Id == id);
@@ -57,24 +57,36 @@ public class CaseWave
 }
 
 /// <summary>
-/// A question the player has to answer (motive, opportunity, method...). A lead is "found" when every part
-/// has at least one matching evidence item (or statement about one of its facts) in the tray.
+/// The suspect board: for every suspect, which evidence supports or rules out their motive, opportunity and method.
+/// Only the real leaker can end up with all three supported; the others' leads fall apart as evidence turns up.
 /// </summary>
-public class CaseLead
+public class CaseBoard
 {
-    [JsonProperty("id")] public string Id;
-    [JsonProperty("title")] public string Title;
-    [JsonProperty("question")] public string Question;
-    [JsonProperty("hint")] public string Hint;
-    [JsonProperty("jensenbot_exposed")] public bool CountsJensenbotExposed;
-    [JsonProperty("parts")] public List<LeadPart> Parts = new();
+    [JsonProperty("slots")] public List<string> Slots = new() { "motive", "opportunity", "method" };
+    [JsonProperty("rows")] public List<BoardRow> Rows = new();
+    [JsonProperty("ai")] public BoardCell Ai = new();
 }
 
-public class LeadPart
+public class BoardRow
+{
+    [JsonProperty("suspect")] public string Suspect;
+    [JsonProperty("motive")] public BoardCell Motive = new();
+    [JsonProperty("opportunity")] public BoardCell Opportunity = new();
+    [JsonProperty("method")] public BoardCell Method = new();
+
+    public BoardCell Cell(string slot) => slot switch { "motive" => Motive, "opportunity" => Opportunity, _ => Method };
+}
+
+public class BoardCell
 {
     [JsonProperty("label")] public string Label;
-    [JsonProperty("evidence")] public List<string> Evidence = new();
-    [JsonProperty("facts")] public List<string> Facts = new();
+    [JsonProperty("for")] public List<string> For = new();
+    [JsonProperty("for_facts")] public List<string> ForFacts = new();
+    [JsonProperty("against")] public List<string> Against = new();
+    [JsonProperty("against_facts")] public List<string> AgainstFacts = new();
+    [JsonProperty("against_note")] public string AgainstNote;
+
+    public bool IsEmpty => For.Count + ForFacts.Count + Against.Count + AgainstFacts.Count == 0;
 }
 
 /// <summary>A suspect's desk: a few spots the player can search (each costs clock time).</summary>

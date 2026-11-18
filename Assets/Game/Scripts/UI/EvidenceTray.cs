@@ -132,19 +132,24 @@ public class EvidenceTray
         var c = LeakDeskGame.Instance != null ? LeakDeskGame.Instance.Case : null;
         if (c != null)
         {
-            var leads = Leads.For(c, item).ToList();
-            if (leads.Count > 0)
+            var tags = Board.Tags(c, item);
+            if (tags.Count > 0)
             {
-                var row = UiKit.Rect("Leads", card.transform);
+                var row = UiKit.Rect("Tags", card.transform);
                 row.HLayout(6);
-                foreach (var l in leads)
+                foreach (var bt in tags.Take(3))
                 {
-                    var chip = UiKit.Chip(row, LeadColor(l.Id), 0, 24, "Lead");
+                    string label = bt.Slot == "ai" ? "AI HELPED"
+                        : $"{(bt.Against ? "\u2715 " : "")}{c.Suspect(bt.Suspect)?.FirstName.ToUpperInvariant()} · {Board.Short(bt.Slot)}";
+                    Color col = bt.Slot == "ai" ? new Color(0.35f, 0.75f, 0.35f)
+                        : bt.Against ? new Color(0.45f, 0.42f, 0.50f) : c.Suspect(bt.Suspect).Color;
+                    var chip = UiKit.Chip(row, col, 0, 24, "Tag");
                     chip.GetComponent<LayoutElement>().preferredWidth = -1;
                     chip.GetComponent<LayoutElement>().minWidth = -1;
-                    chip.GetComponent<HorizontalLayoutGroup>().padding = new RectOffset(10, 10, 2, 2);
-                    chip.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
-                    var lt = UiKit.Text(chip.transform, l.Title.ToUpperInvariant(), 13, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+                    var hl = chip.GetComponent<HorizontalLayoutGroup>();
+                    hl.padding = new RectOffset(10, 10, 2, 2);
+                    hl.childForceExpandWidth = false;
+                    var lt = UiKit.Text(chip.transform, label, 13, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
                     lt.textWrappingMode = TextWrappingModes.NoWrap;
                     chip.gameObject.AddComponent<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
                 }

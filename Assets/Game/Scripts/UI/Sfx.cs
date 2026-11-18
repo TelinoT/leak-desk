@@ -63,7 +63,7 @@ public class Sfx : MonoBehaviour
         ambience.clip = clips["ambience"];
         ambience.loop = true;
         ambience.volume = 0.18f * Volume;
-        ambience.Play();
+        // No background bed: the filtered-noise hum read as hiss. Kept the clip for a possible later music track.
     }
 
     // ---------- public API ----------

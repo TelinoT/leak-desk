@@ -137,8 +137,7 @@ public class LeakDeskGame : MonoBehaviour
     {
         if (Phase is GamePhase.Deliberating or GamePhase.Verdict) return;
         SetPhase(GamePhase.Deliberating);
-        accusation.LeadsTotal = Case.Leads.Count;
-        accusation.LeadsFound = Case.Leads.Count(l => Leads.Found(l, Evidence, Jensenbot.Exposed));
+        (accusation.LeadsFound, accusation.LeadsTotal) = Board.Progress(Case, Evidence.Items, Jensenbot.Exposed);
         accusation.TimeLeft01 = RoundSeconds <= 0 ? 0 : TimeLeft / RoundSeconds;
         ui.ShowDeliberation(accusation);
         Judge.Run(Case, accusation, verdict =>
@@ -186,21 +185,32 @@ public class LeakDeskGame : MonoBehaviour
         Elapsed = Mathf.Min(RoundSeconds - 1f, Elapsed + seconds);
     }
 
-    // ---------- leads ----------
+    // ---------- suspect board ----------
 
-    readonly HashSet<string> foundLeads = new();
+    readonly Dictionary<string, CellStatus> boardState = new();
+    bool aiFound;
 
-    /// <summary>Raised the first time a lead gets covered by evidence.</summary>
-    public event Action<CaseLead> LeadFound;
+    /// <summary>(suspect, slot, new status) whenever a board entry changes. Suspect is null for the AI question.</summary>
+    public event Action<string, string, CellStatus> BoardChanged;
 
-    /// <summary>Re-checks leads (also call after Jensenbot gets exposed).</summary>
+    /// <summary>Re-evaluates the board (also call after Jensenbot gets exposed).</summary>
     public void CheckLeads()
     {
-        foreach (var l in Case.Leads)
+        foreach (var row in Case.Board.Rows)
+            foreach (var slot in Board.Slots)
+            {
+                var st = Board.Status(Case, Evidence.Items, row.Suspect, slot);
+                string key = row.Suspect + ":" + slot;
+                boardState.TryGetValue(key, out var before);
+                if (st == before) continue;
+                boardState[key] = st;
+                BoardChanged?.Invoke(row.Suspect, slot, st);
+            }
+        bool ai = Board.AiFound(Case, Evidence.Items, Jensenbot.Exposed);
+        if (ai != aiFound)
         {
-            bool found = Leads.Found(l, Evidence, Jensenbot.Exposed);
-            if (found && foundLeads.Add(l.Id)) LeadFound?.Invoke(l);
-            if (!found) foundLeads.Remove(l.Id);
+            aiFound = ai;
+            BoardChanged?.Invoke(null, "ai", ai ? CellStatus.Supported : CellStatus.Unknown);
         }
     }
 

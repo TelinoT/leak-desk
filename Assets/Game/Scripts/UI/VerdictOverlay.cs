@@ -202,7 +202,7 @@ public class VerdictOverlay
         int questions = game.Suspects.Sum(s => s.QuestionsAsked);
         int minutes = Mathf.FloorToInt(game.Elapsed / 60f), seconds = Mathf.FloorToInt(game.Elapsed % 60f);
         UiKit.Text(body, $"Time used {minutes}:{seconds:00}  ·  Questions asked {questions}  ·  Evidence found {game.Evidence.Count}  ·  " +
-                         $"Leads {a.LeadsFound}/{a.LeadsTotal}" + (v.Offline ? "  ·  (offline verdict)" : ""),
+                         $"Board {a.LeadsFound}/{a.LeadsTotal}" + (v.Offline ? "  ·  (offline verdict)" : ""),
             T.smallSize, T.muted, TextAlignmentOptions.Center);
         var again = UiKit.Button(body, "Play again", game.Restart, T.accent, T.accentText, 64, 26);
         again.Size(prefH: 64);

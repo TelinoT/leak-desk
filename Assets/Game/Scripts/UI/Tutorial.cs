@@ -98,6 +98,12 @@ public class Tutorial : MonoBehaviour
         },
         new Step
         {
+            Text = "This board is who could have done it: <b>why</b>, <b>when</b> and <b>how</b>. Evidence fills it in, and some of it rules people out. Only one person will check every box.",
+            Target = () => ui.BoardRect,
+            Button = "Okay",
+        },
+        new Step
+        {
             Text = "Right. Let's go talk to someone. <b>Interrogate</b>.",
             Target = () => ui.NavRect(DeskUI.Tab.Interrogate),
             Done = () => ui.CurrentTab == DeskUI.Tab.Interrogate,

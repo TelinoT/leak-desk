@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -27,7 +28,9 @@ public class DeskUI : MonoBehaviour
     Button muteButton;
     Image muteIcon;
     TextMeshProUGUI leadsHeader;
-    readonly Dictionary<string, (Image icon, TextMeshProUGUI title, TextMeshProUGUI sub, Image row)> leadRows = new();
+    readonly Dictionary<string, (Image bg, Image icon)> pips = new();
+    readonly Dictionary<string, RawImage> boardHeads = new();
+    public RectTransform BoardRect { get; private set; }
     public Button AccuseButton => accuseButton;
     public RectTransform NavRect(Tab tab) => navButtons.TryGetValue(tab, out var b) ? (RectTransform)b.transform : null;
     public Tutorial Tutorial { get; private set; }
@@ -53,7 +56,7 @@ public class DeskUI : MonoBehaviour
         ui.BuildLayout();
         game.PhaseChanged += ui.OnPhaseChanged;
         game.WaveUnlocked += ui.OnWave;
-        game.LeadFound += ui.OnLeadFound;
+        game.BoardChanged += ui.OnBoardChanged;
         canvas.gameObject.AddComponent<DeskDirector>();
         ui.Tutorial = canvas.gameObject.AddComponent<Tutorial>();
         return ui;
@@ -176,66 +179,125 @@ public class DeskUI : MonoBehaviour
         AddNav(nav.transform, Tab.Interrogate, "mic", "Interrogate");
         AddNav(nav.transform, Tab.Jensenbot, "brain", "Jensenbot");
         UiKit.Spacer(nav.transform, 0, 1);
-        // LEADS: the questions the case needs answered. Click one for a nudge from Rosa.
-        var card = UiKit.Card(nav.transform, new Color(0, 0, 0, 0.25f), 12, 6, "Leads");
-        leadsHeader = UiKit.Text(card.transform, "LEADS", 14, T.accent, style: FontStyles.Bold);
-        leadsHeader.characterSpacing = 4;
-        foreach (var lead in Game.Case.Leads) AddLeadRow(card.transform, lead);
+        // SUSPECT BOARD: why / when / how for each suspect. Click a pip to see what you've got on it.
+        var card = UiKit.Card(nav.transform, new Color(0, 0, 0, 0.25f), 10, 6, "Board");
+        BoardRect = (RectTransform)card.transform;
+        leadsHeader = UiKit.Text(card.transform, "SUSPECT BOARD", 14, T.accent, style: FontStyles.Bold);
+        var head = UiKit.Rect("Head", card.transform);
+        head.HLayout(6);
+        UiKit.Spacer(head, 0).Size(prefW: 38);
+        foreach (var slot in Board.Slots)
+        {
+            var h = UiKit.Text(head, Board.Short(slot), 15, T.muted, TextAlignmentOptions.Center, FontStyles.Bold);
+            h.textWrappingMode = TextWrappingModes.NoWrap;
+            h.overflowMode = TextOverflowModes.Overflow;
+            h.Size(prefW: 38);
+        }
+        foreach (var row in Game.Case.Board.Rows) AddBoardRow(card.transform, row.Suspect);
+        var ai = UiKit.Rect("AiRow", card.transform);
+        ai.HLayout(6);
+        var aiLabel = UiKit.Text(ai, "AI helped?", 15, T.text, TextAlignmentOptions.Left, FontStyles.Bold);
+        aiLabel.Size(prefW: 38 * 3 + 12);
+        aiLabel.textWrappingMode = TextWrappingModes.NoWrap;
+        Pip(ai, null, "ai");
     }
 
-    void AddLeadRow(Transform parent, CaseLead lead)
+    void AddBoardRow(Transform parent, string suspectId)
     {
-        var row = UiKit.Panel(parent, new Color(1, 1, 1, 0.04f), T.cardSprite, "Lead: " + lead.Id);
-        row.HLayout(8, 6);
-        var b = row.gameObject.AddComponent<Button>();
-        b.transition = Selectable.Transition.None;
-        b.onClick.AddListener(() => ShowLeadHint(lead));
-        row.gameObject.AddComponent<ButtonPop>();
-        var icon = UiKit.Icon(row.transform, "mark_x", 20, new Color(1, 1, 1, 0.25f));
-        var col = UiKit.Rect("Col", row.transform);
-        col.VLayout(0);
-        col.Size(flexW: 1);
-        var title = UiKit.Text(col, lead.Title, 16, T.text, style: FontStyles.Bold);
-        title.textWrappingMode = TextWrappingModes.NoWrap;
-        var sub = UiKit.Text(col, lead.Question, 15, T.muted);
-        sub.textWrappingMode = TextWrappingModes.NoWrap;
-        sub.overflowMode = TextOverflowModes.Ellipsis;
-        leadRows[lead.Id] = (icon, title, sub, row);
+        var sd = Game.Case.Suspect(suspectId);
+        var row = UiKit.Rect("Row: " + suspectId, parent);
+        row.HLayout(6);
+        var av = UiKit.Panel(row, sd.Color, UiKit.AvatarSprite, "Avatar");
+        av.Size(prefW: 38, prefH: 38, minW: 38);
+        av.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+        var raw = UiKit.Rect("Head", av.transform).Stretch().gameObject.AddComponent<RawImage>();
+        raw.raycastTarget = false;
+        raw.enabled = false;
+        boardHeads[suspectId] = raw;
+        foreach (var slot in Board.Slots) Pip(row, suspectId, slot);
     }
 
-    void ShowLeadHint(CaseLead lead)
+    void Pip(Transform parent, string suspectId, string slot)
+    {
+        var bg = UiKit.Panel(parent, new Color(1, 1, 1, 0.08f), UiKit.AvatarSprite, "Pip");
+        bg.Size(prefW: 38, prefH: 38, minW: 38);
+        var holder = UiKit.Rect("H", bg.transform).Stretch(9, 9, 9, 9);
+        var icon = UiKit.Icon(holder, "mark_question", 20, new Color(1, 1, 1, 0.3f));
+        ((RectTransform)icon.transform).Stretch();
+        bg.gameObject.AddComponent<Button>().onClick.AddListener(() => ExplainPip(suspectId, slot));
+        bg.gameObject.AddComponent<ButtonPop>();
+        pips[(suspectId ?? "ai") + ":" + slot] = (bg, icon);
+    }
+
+    void ExplainPip(string suspectId, string slot)
     {
         Sfx.Play("click");
-        int got = Leads.PartsFound(lead, Game.Evidence, Game.Jensenbot.Exposed);
-        if (got >= lead.Parts.Count)
-            Toast($"<b>{lead.Title}:</b> covered. You've got evidence for this one.", T.accent, "mark_check");
-        else
-            Toast($"<b>Rosa:</b> {lead.Hint}", T.secondary, "bulb");
+        if (suspectId == null)
+        {
+            bool found = Board.AiFound(Game.Case, Game.Evidence.Items, Game.Jensenbot.Exposed);
+            Toast(found ? "<b>AI helped?</b> You've got evidence that someone (or something) helped from the inside."
+                        : "<b>AI helped?</b> Nothing yet. Does the company assistant's story match the raw logs?", found ? T.accent : T.secondary, "brain");
+            return;
+        }
+        var sd = Game.Case.Suspect(suspectId);
+        var cell = Board.Row(Game.Case, suspectId).Cell(slot);
+        var st = Board.Status(Game.Case, Game.Evidence.Items, suspectId, slot);
+        var support = Game.Evidence.Items.FirstOrDefault(i => Board.Supports(cell, i));
+        string msg = st switch
+        {
+            CellStatus.RuledOut => $"<b>{sd.FirstName} · {Board.Long(slot)}: doesn't add up.</b> {cell.AgainstNote}",
+            CellStatus.Supported => $"<b>{sd.FirstName} · {Board.Long(slot)}:</b> {support?.Title}.",
+            _ => $"<b>{sd.FirstName} · {Board.Long(slot)}:</b> nothing yet.",
+        };
+        Toast(msg, st == CellStatus.RuledOut ? T.danger : st == CellStatus.Supported ? T.accent : T.muted, "find");
     }
 
     public void UpdateProgress()
     {
-        int done = 0;
-        foreach (var lead in Game.Case.Leads)
+        foreach (var row in Game.Case.Board.Rows)
         {
-            if (!leadRows.TryGetValue(lead.Id, out var r)) continue;
-            int got = Leads.PartsFound(lead, Game.Evidence, Game.Jensenbot.Exposed);
-            bool found = got >= lead.Parts.Count;
-            if (found) done++;
-            r.icon.sprite = T.Icon(found ? "mark_check" : "mark_x");
-            r.icon.color = found ? T.accent : new Color(1, 1, 1, 0.22f);
-            r.row.color = found ? new Color(T.accent.r, T.accent.g, T.accent.b, 0.14f) : new Color(1, 1, 1, 0.04f);
-            r.sub.text = found ? "Found" : lead.Parts.Count > 1 ? $"{lead.Question} ({got}/{lead.Parts.Count})" : lead.Question;
-            r.sub.color = found ? T.accent : T.muted;
+            if (boardHeads.TryGetValue(row.Suspect, out var raw) && !raw.enabled && SuspectPortraits.Instance != null)
+            {
+                raw.texture = SuspectPortraits.Instance.Headshot(row.Suspect);
+                raw.enabled = raw.texture != null;
+            }
+            foreach (var slot in Board.Slots)
+                SetPip(row.Suspect + ":" + slot, Board.Status(Game.Case, Game.Evidence.Items, row.Suspect, slot));
         }
-        leadsHeader.text = $"LEADS  {done}/{Game.Case.Leads.Count}";
+        SetPip("ai:ai", Board.AiFound(Game.Case, Game.Evidence.Items, Game.Jensenbot.Exposed) ? CellStatus.Supported : CellStatus.Unknown);
+        var (done, total) = Board.Progress(Game.Case, Game.Evidence.Items, Game.Jensenbot.Exposed);
+        leadsHeader.text = $"SUSPECT BOARD  {done}/{total}";
     }
 
-    void OnLeadFound(CaseLead lead)
+    void SetPip(string key, CellStatus st)
     {
-        Toast($"<b>Lead found: {lead.Title}</b>\n{lead.Question}", T.accent, "mark_check");
-        Sfx.Play("unlock", 1.2f);
-        if (leadRows.TryGetValue(lead.Id, out var r)) UiFx.Punch(r.row.transform, 0.12f, 0.4f);
+        if (!pips.TryGetValue(key, out var p)) return;
+        p.icon.sprite = T.Icon(st switch { CellStatus.Supported => "mark_check", CellStatus.RuledOut => "mark_x", _ => "mark_question" });
+        p.icon.color = st == CellStatus.Unknown ? new Color(1, 1, 1, 0.3f) : Color.white;
+        p.bg.color = st switch
+        {
+            CellStatus.Supported => T.accent,
+            CellStatus.RuledOut => new Color(0.75f, 0.25f, 0.32f),
+            _ => new Color(1, 1, 1, 0.08f),
+        };
+    }
+
+    void OnBoardChanged(string suspectId, string slot, CellStatus st)
+    {
+        if (st == CellStatus.Unknown) return;
+        if (suspectId == null)
+        {
+            Toast("<b>New on the board:</b> someone had help from the inside.", T.accent, "brain");
+        }
+        else
+        {
+            var sd = Game.Case.Suspect(suspectId);
+            var cell = Board.Row(Game.Case, suspectId).Cell(slot);
+            if (st == CellStatus.RuledOut) Toast($"<b>{sd.FirstName}'s {Board.Long(slot)} doesn't add up.</b>\n{cell.AgainstNote}", T.danger, "mark_x");
+            else Toast($"<b>New on the board:</b> {sd.FirstName} · {Board.Long(slot)}", T.accent, "mark_check");
+        }
+        Sfx.Play("unlock", st == CellStatus.RuledOut ? 0.8f : 1.2f);
+        if (pips.TryGetValue((suspectId ?? "ai") + ":" + slot, out var p)) UiFx.Punch(p.bg.transform, 0.3f, 0.45f);
     }
 
     void ToggleMute()

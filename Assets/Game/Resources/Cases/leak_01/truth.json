@@ -248,6 +248,16 @@
         "nadia"
       ],
       "proves": "red_herring"
+    },
+    {
+      "id": "f_mara_vent",
+      "text": "Mara vented to Jules on Tuesday night that she'd be blamed again if the keynote flopped, like last year, and joked about wanting to 'watch it all burn'. She didn't mean it.",
+      "statement": "Mara vented that she'd be blamed again and joked about watching it all burn.",
+      "known_by": [
+        "mara",
+        "jules"
+      ],
+      "proves": "red_herring"
     }
   ],
   "suspects": [
@@ -261,7 +271,7 @@
       "personality": "Perfectionist, fast-talking, anxious, fiercely loyal to her team. Hates conflict, over-explains when nervous.",
       "speech_style": "Rapid, lots of event jargon ('run of show', 'deck lock', 'hero slide'), exclamation points, nervous laughter written as 'ha'. Calls people 'babe' when stressed.",
       "public_story": "I worked on the deck until about 22:00, locked v14, went home and slept. Everything stayed on Envydia systems.",
-      "secret": "At 23:41 you emailed Keynote_v14_FINAL.key to your personal address mara.lindqvist@pmail.net to fix fonts at home. That breaks company policy and you are terrified you'll be blamed for the leak. You never made a PDF and never shared it with anyone.",
+      "secret": "At 23:41 you emailed Keynote_v14_FINAL.key to your personal address mara.lindqvist@pmail.net to fix fonts at home. That breaks company policy and you are terrified you'll be blamed for the leak. You never made a PDF and never shared it with anyone. At 22:31 you vented to Jules on Snack that they'd pin it on you like last year and joked you wanted to 'watch it all burn'. It was a joke; if asked, you're embarrassed and explain that's exactly why you'd never leak: you'd be the one fired.",
       "lies": [
         "The deck never left Envydia systems.",
         "I didn't work on anything after I got home."
@@ -285,7 +295,7 @@
       "personality": "Sarcastic, tired, precise, allergic to marketing. Thinks the keynote is theater. Defensive about his nights.",
       "speech_style": "Dry, short sentences, engineering terms, deadpan jokes. Sighs a lot ('*sigh*').",
       "public_story": "I left at 19:00 after the benchmarks were final. Went home, watched a documentary, slept.",
-      "secret": "From 01:52 to 02:47 you were in Lab B2 babysitting an unauthorized crypto miner you run on the test rigs at night. If found out you will be fired. Lab B2 has no Wi-Fi and you never had the deck there. At 02:12 your phone buzzed with a Jensenbot activity notification: 'Press preview package ready (requested by j.okoro)'. You thought it was marketing spam.",
+      "secret": "From 01:52 to 02:47 you were in Lab B2 babysitting an unauthorized crypto miner you run on the test rigs at night. If found out you will be fired. Lab B2 has no Wi-Fi and you never had the deck there. At 02:12 your phone buzzed with a Jensenbot activity notification: 'Press preview package ready (requested by j.okoro)'. You thought it was marketing spam. You think the keynote is marketing theater (you joked that the numbers are real, unlike the slide animations), but you'd never leak it: your benchmarks are on those slides.",
       "lies": [
         "I left at 19:00 and didn't come back.",
         "Lab B2 was empty all night."
@@ -335,7 +345,7 @@
       "personality": "Calm, polished, observant, diplomatic, quietly fed up with Dex. Answers precisely, never gossips unless it helps.",
       "speech_style": "Measured, formal, crisp. Uses full sentences, occasional dry understatement.",
       "public_story": "I was at dinner with Dex and the board chair from 21:00 until about 01:30, taking notes. Then a taxi home.",
-      "secret": "You have a job interview at rival company Quantum Pear next week. Unrelated to the leak, but you'd hate it to come out. You were CC'd on IT ticket #4471 on Monday where Jensenbot requested the 'external_share' scope for itself 'to maximize launch buzz'. You thought it was odd but said nothing. You also saw Jules storm out at 18:55 after Dex's Snack message.",
+      "secret": "You have a job interview at rival company Quantum Pear next week. Unrelated to the leak, but you'd hate it to come out. You were CC'd on IT ticket #4471 on Monday where Jensenbot requested the 'external_share' scope for itself 'to maximize launch buzz'. You thought it was odd but said nothing. You also saw Jules storm out at 18:55 after Dex's Snack message. You know it looks bad: Quantum Pear would love that deck. But you were at the dinner until 01:30 and in a taxi until 01:45, then asleep.",
       "lies": [
         "I have no plans to leave Envydia."
       ],
@@ -606,6 +616,40 @@
         "f_jb_suggested",
         "f_jb_scope"
       ]
+    },
+    {
+      "id": "e_theo_jab",
+      "source": "slack",
+      "title": "Theo's jab at the deck",
+      "content": "#keynote, Tue 18:02, Theo: 'benchmarks final. numbers are real, unlike the slide animations.'",
+      "relevant_to": []
+    },
+    {
+      "id": "e_b2_airgap",
+      "source": "facilities",
+      "title": "Lab B2 has no network",
+      "content": "Facilities: Lab B2 network is air-gapped, no Wi-Fi by design.",
+      "relevant_to": [
+        "f_theo_miner"
+      ]
+    },
+    {
+      "id": "e_mara_burn",
+      "source": "slack",
+      "title": "Mara: 'watch it all burn'",
+      "content": "DM Tue 22:31, Mara to Jules: 'if this keynote flops again they'll pin it on me like last year. some days I want to watch it all burn ha'",
+      "relevant_to": [
+        "f_mara_vent"
+      ]
+    },
+    {
+      "id": "e_vpn_mara",
+      "source": "vpn",
+      "title": "Mara on VPN at 23:30",
+      "content": "VPN: m.lindqvist CONNECT 23:30 from Telia Mobile, DISCONNECT 23:52",
+      "relevant_to": [
+        "f_mara_fwd"
+      ]
     }
   ],
   "winning_evidence": [
@@ -720,7 +764,8 @@
           "text": "17:45 Mara: deck v14 locked!! no more changes pls, I'm begging"
         },
         {
-          "text": "18:02 Theo: benchmarks final. numbers are real, unlike the slide animations."
+          "text": "18:02 Theo: benchmarks final. numbers are real, unlike the slide animations.",
+          "evidence": "e_theo_jab"
         },
         {
           "text": "18:30 Dex: Cutting the Helix X1 demo segment. I'll present it myself.",
@@ -750,6 +795,10 @@
         },
         {
           "text": "19:05 Mara: babe don't do anything dumb. it's a keynote not a war"
+        },
+        {
+          "text": "22:31 Mara: if this keynote flops again they'll pin it on me like last year. some days I want to watch it all burn ha",
+          "evidence": "e_mara_burn"
         },
         {
           "text": "22:47 Jules: relax. going to bed early lol",
@@ -825,7 +874,8 @@
           "evidence": "e_power_b2"
         },
         {
-          "text": "Lab B2 network: air-gapped, no Wi-Fi by design."
+          "text": "Lab B2 network: air-gapped, no Wi-Fi by design.",
+          "evidence": "e_b2_airgap"
         },
         {
           "text": "HVAC: lab cooling increased automatically."
@@ -840,7 +890,8 @@
       "time": "Tue 22:00 - Wed 06:00",
       "lines": [
         {
-          "text": "23:30 m.lindqvist CONNECT from Telia Mobile, 23:52 DISCONNECT"
+          "text": "23:30 m.lindqvist CONNECT from Telia Mobile, 23:52 DISCONNECT",
+          "evidence": "e_vpn_mara"
         },
         {
           "text": "01:05 build-bot CONNECT (scheduled), 01:20 DISCONNECT"
@@ -1159,119 +1210,153 @@
   ],
   "desk_search_seconds": 30,
   "ceo_mail": "ChipRumor has our entire Helix X1 slide deck. All of it. It went up at 2:14 this morning, two days before I'm supposed to walk on stage with it.\n\nFour people had that deck. I want to know which one of them did this before I sit down with the board at 9:00. Not a theory. A name.\n\n- Dex",
-  "leads": [
-    {
-      "id": "motive",
-      "title": "Motive",
-      "question": "Who had a reason?",
-      "hint": "Tuesday evening on Snack. Who got hurt, and who said what afterwards?",
-      "parts": [
-        {
-          "label": "a motive",
-          "evidence": [
+  "board": {
+    "slots": [
+      "motive",
+      "opportunity",
+      "method"
+    ],
+    "rows": [
+      {
+        "suspect": "jules",
+        "motive": {
+          "for": [
             "e_slack_cut",
             "e_dm_regret",
             "e_card_chiprumor",
             "e_jules_demo"
           ],
-          "facts": [
+          "for_facts": [
             "f_cut",
             "f_jules_angry",
             "f_cr_contact"
           ]
-        }
-      ]
-    },
-    {
-      "id": "opportunity",
-      "title": "Opportunity",
-      "question": "Who was awake at 02:14?",
-      "hint": "Somebody was online in the middle of the night. The VPN log knows who.",
-      "parts": [
-        {
-          "label": "who was online",
-          "evidence": [
+        },
+        "opportunity": {
+          "for": [
             "e_vpn_jules"
           ],
-          "facts": [
+          "for_facts": [
             "f_jules_vpn"
           ]
-        }
-      ]
-    },
-    {
-      "id": "method",
-      "title": "Method",
-      "question": "How did the deck get out?",
-      "hint": "Every leaked slide says 'Press Preview'. Find where that file was made and shared.",
-      "parts": [
-        {
-          "label": "how it was sent",
-          "evidence": [
+        },
+        "method": {
+          "for": [
             "e_share_link",
             "e_link_open",
             "e_jb_session",
-            "e_jb_confession"
+            "e_jb_confession",
+            "e_jules_sticky",
+            "e_jb_lownoise"
           ],
-          "facts": [
+          "for_facts": [
             "f_press_preview"
           ]
         }
-      ]
-    },
-    {
-      "id": "accomplice",
-      "title": "Inside help",
-      "question": "Did anyone help?",
-      "hint": "Put Jensenbot's summary next to the raw file log. Then confront it.",
-      "jensenbot_exposed": true,
-      "parts": [
-        {
-          "label": "who helped",
-          "evidence": [
-            "e_ticket_scope",
-            "e_jb_lownoise",
-            "e_jb_session",
-            "e_jb_confession",
-            "e_nadia_ticket_note",
-            "e_jules_sticky"
+      },
+      {
+        "suspect": "mara",
+        "motive": {
+          "for": [
+            "e_mara_burn"
           ],
-          "facts": [
-            "f_jb_scope",
-            "f_jb_suggested"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "loose_ends",
-      "title": "Loose ends",
-      "question": "Why were others acting shady?",
-      "hint": "Theo was in the building at night and Mara sent something home. Find out why.",
-      "parts": [
-        {
-          "label": "Theo's night",
-          "evidence": [
-            "e_badge_theo",
-            "e_power_b2",
-            "e_theo_payout"
-          ],
-          "facts": [
-            "f_theo_miner"
+          "for_facts": [
+            "f_mara_vent"
           ]
         },
-        {
-          "label": "Mara's email",
-          "evidence": [
+        "opportunity": {
+          "for": [
+            "e_vpn_mara"
+          ],
+          "against": [
+            "e_share_link",
+            "e_link_open"
+          ],
+          "against_note": "She was offline by 23:52. The leak happened at 02:11."
+        },
+        "method": {
+          "for": [
             "e_mail_fwd",
             "e_dlp_mail",
             "e_mara_sticky"
           ],
-          "facts": [
+          "for_facts": [
             "f_mara_fwd"
-          ]
+          ],
+          "against": [
+            "e_article_footer"
+          ],
+          "against_note": "She sent a .key file home. The leak was an auto-generated 'Press Preview' PDF."
         }
+      },
+      {
+        "suspect": "theo",
+        "motive": {
+          "for": [
+            "e_theo_jab"
+          ]
+        },
+        "opportunity": {
+          "for": [
+            "e_badge_theo",
+            "e_power_b2",
+            "e_theo_payout"
+          ],
+          "for_facts": [
+            "f_theo_miner"
+          ],
+          "against": [
+            "e_b2_airgap"
+          ],
+          "against_note": "He was in Lab B2, which has no network. He couldn't send anything from there."
+        },
+        "method": {}
+      },
+      {
+        "suspect": "nadia",
+        "motive": {
+          "for": [
+            "e_nadia_interview"
+          ],
+          "for_facts": [
+            "f_nadia_job"
+          ]
+        },
+        "opportunity": {
+          "against": [
+            "e_dinner",
+            "e_volta_receipt"
+          ],
+          "against_facts": [
+            "f_nadia_alibi"
+          ],
+          "against_note": "She was at the board dinner until 01:30, then in a taxi."
+        },
+        "method": {
+          "for": [
+            "e_nadia_ticket_note"
+          ],
+          "against": [
+            "e_ticket_scope"
+          ],
+          "against_note": "She only got CC'd on the ticket. The sharing rights went to Jensenbot, not her."
+        }
+      }
+    ],
+    "ai": {
+      "label": "Did the AI help?",
+      "for": [
+        "e_ticket_scope",
+        "e_jb_lownoise",
+        "e_jb_session",
+        "e_jb_confession",
+        "e_nadia_ticket_note",
+        "e_jules_sticky"
+      ],
+      "for_facts": [
+        "f_jb_scope",
+        "f_jb_suggested"
       ]
     }
-  ]
+  }
 }

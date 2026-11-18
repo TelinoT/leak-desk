@@ -22,7 +22,7 @@ Press **ACCUSE** at any time (or get dragged in when the clock hits 09:00):
 3. Optionally tick **"Jensenbot helped them"**.
 4. Write the **motive** in one sentence.
 
-The **board** (an AI judge that knows the truth) reads your case. A case holds up when your evidence shows **how the deck got out** plus **why or when** they did it. The accusation screen shows whether you have both.
+The **board** (an AI judge that knows the truth) reads your case. A case holds up when your evidence shows **how** the person you accuse got the deck out, plus **why or when** they did it, and nothing you found rules that out. The accusation screen checks this for the person you pick.
 
 | Verdict | Meaning |
 |---|---|
@@ -30,10 +30,10 @@ The **board** (an AI judge that knows the truth) reads your case. A case holds u
 | **NOT ENOUGH PROOF** | Right person, weak file |
 | **WRONG PERSON** | Someone innocent gets fired |
 
-**Score (max 100):** right person 30 · proof that holds up 25 · motive 10 (judged by the board) · catching the AI accomplice 15 · leads uncovered 10 · time to spare 10. Grades: S (90+), A, B, C, D.
+**Score (max 100):** right person 30 · proof that holds up 25 · motive 10 (judged by the board) · catching the AI accomplice 15 · board entries settled 10 · time to spare 10. Grades: S (90+), A, B, C, D.
 
-## Leads
-The sidebar lists five **leads**: Motive, Opportunity, Method, Inside help and Loose ends. Each one ticks off when you find evidence for it, and clicking an open lead gets you a nudge from Rosa. Evidence cards show which lead they help with; anything that doesn't help can be thrown out with the ✕.
+## The suspect board
+The sidebar shows every suspect with three boxes: **why** (motive), **when** (opportunity) and **how** (method), plus "AI helped?". Evidence fills the boxes in, and some evidence **rules a box out** (someone was online, but hours before the leak). Everyone has something worth chasing, but only one person can end up with all three boxes. Click a box to see what you've got on it. Evidence cards show what they say about whom; anything useless can be thrown out with the ✕.
 
 ## Tips
 - Raw logs don't lie. Summaries might.

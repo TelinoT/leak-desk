@@ -14,7 +14,7 @@ Deadline: Wed 18 Nov 2026, 21:00 CET. Scope is ruthless: one complete, polished 
 Forked from Too Lucky (Unity jam desk game). The player is Envydia's internal security analyst.
 Someone is leaking, and the company AI might be in on it.
 
-1. **Desk / evidence board** – handwritten case material: emails, Slack excerpts, badge logs, file transfers.
+1. **Desk / evidence board** – handwritten case material: emails, Snack (company chat) excerpts, badge logs, file transfers.
    Player flags suspicious lines; flagged lines become Evidence items.
 2. **Interrogation** – free-text chat with 4 suspects, each an LLM persona built from the case truth file.
    Player can present Evidence into the chat; suspect must respond to it.
@@ -36,7 +36,7 @@ Someone is leaking, and the company AI might be in on it.
 - UI is uGUI built at runtime from code (`UiKit`, `DeskUI` + panels), skinned by `Resources/UiTheme.asset` (GUI Pro sprites in gitignored `Assets/ThirdParty/GuiPro`).
 - Jensenbot never gets asked to lie: the game redacts its input lines; the model summarizes faithfully.
 - Judge verdict class comes from a code pre-check (`Judge.Check`); points come from `ScoreCard` (code). The LLM only gives motive points (0-10) + the board comment.
-- Leads (`truth.json` `leads`, `Leads.cs`) show players what to look for; proof = Method lead + Motive or Opportunity lead.
+- Suspect board (`truth.json` `board`, `Board.cs`): per suspect, evidence for/against motive, opportunity, method. Decoys get ruled out; only the leaker can fill all three. Proof = accused's method + motive or opportunity, none ruled out.
 - Paid assets (Synty, GUI Pro) and `Resources/LlmConfig.asset` are gitignored – never commit them.
 - Show a typing indicator while waiting; LLM latency must feel like the suspect thinking.
 

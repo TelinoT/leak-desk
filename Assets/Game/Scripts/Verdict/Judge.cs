@@ -70,9 +70,13 @@ public static class Judge
             // Same rule the accusation screen's "case strength" shows: HOW it got out + WHY or WHEN.
             if (p.MatchedCombo == null)
             {
-                var how = a.Evidence.FirstOrDefault(e => Leads.For(c, e).Any(l => l.Id == "method"));
-                var why = a.Evidence.FirstOrDefault(e => e != how && Leads.For(c, e).Any(l => l.Id is "motive" or "opportunity"));
-                if (how != null && why != null) p.MatchedCombo = new List<string> { how.Id, why.Id };
+                var row = Board.Row(c, a.SuspectId);
+                if (row != null && Board.Covers(c, a.Evidence, a.SuspectId, "method") && Board.Covers(c, a.Evidence, a.SuspectId, "motive", "opportunity"))
+                {
+                    var how = a.Evidence.First(e => Board.Supports(row.Method, e));
+                    var why = a.Evidence.First(e => Board.Supports(row.Motive, e) || Board.Supports(row.Opportunity, e));
+                    p.MatchedCombo = new List<string> { how.Id, why.Id };
+                }
             }
         }
 

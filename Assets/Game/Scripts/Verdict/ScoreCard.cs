@@ -43,8 +43,8 @@ public static class ScoreCard
         int leads = a.LeadsTotal == 0 ? 0 : Mathf.RoundToInt(LeadsPts * (float)a.LeadsFound / a.LeadsTotal);
         v.Breakdown.Add(new ScoreLine
         {
-            Label = "Leads uncovered", Max = LeadsPts, Points = leads,
-            Detail = $"{a.LeadsFound} of {a.LeadsTotal} leads.",
+            Label = "Investigation", Max = LeadsPts, Points = leads,
+            Detail = $"Settled {a.LeadsFound} of {a.LeadsTotal} entries on the suspect board.",
         });
         int time = right && p.Proven ? Mathf.RoundToInt(TimePts * Mathf.Clamp01(a.TimeLeft01 / 0.5f)) : 0;
         v.Breakdown.Add(new ScoreLine

@@ -209,14 +209,22 @@ public class AccusationOverlay
             kv.Value.color = selectedEvidence.Contains(kv.Key) ? new Color(1f, 0.9f, 0.55f) : T.card;
         evidenceCount.text = $"{selectedEvidence.Count} / {MaxEvidence}";
         var chosen = selectedEvidence.Select(id => Game.Evidence.Get(id)).Where(e => e != null).ToList();
-        bool Covers(params string[] leadIds) => chosen.Any(e => Leads.For(Game.Case, e).Any(l => leadIds.Contains(l.Id)));
-        bool how = Covers("method"), why = Covers("motive", "opportunity");
+        // Judged for the suspect you picked: attached evidence must support them, and nothing you found may rule it out.
+        string who = selectedSuspect;
+        var sname = who != null ? Game.Case.Suspect(who).FirstName : null;
+        bool Supported(params string[] slots) => who != null && Board.Covers(Game.Case, chosen, who, slots);
+        bool Ruled(string slot) => who != null && Board.Status(Game.Case, Game.Evidence.Items, who, slot) == CellStatus.RuledOut;
+        bool how = Supported("method") && !Ruled("method");
+        bool why = (Supported("motive") && !Ruled("motive")) || (Supported("opportunity") && !Ruled("opportunity"));
         SetSlot(slotMethod, how);
         SetSlot(slotWhy, why);
-        strengthText.text = how && why ? "<color=#" + UiKit.Hex(T.accent) + "><b>That's a solid case.</b></color> Now make sure it's the right person."
-            : chosen.Count == 0 ? "A case that holds up shows how the deck got out, and why or when they did it."
-            : !how ? "Missing: something that shows <b>how</b> the deck got out."
-            : "Missing: something that shows <b>why</b> they did it or that they were <b>awake</b> at 02:14.";
+        strengthText.text = who == null ? "Pick who you're accusing first."
+            : how && why ? "<color=#" + UiKit.Hex(T.accent) + $"><b>That holds up against {sname}.</b></color>"
+            : Ruled("method") ? $"Careful: what you found says {sname} couldn't have done it that way."
+            : Ruled("opportunity") && !Supported("motive") ? $"Careful: {sname} wasn't in a position to do it."
+            : chosen.Count == 0 ? $"Attach evidence that shows how {sname} got the deck out, and why or when."
+            : !how ? $"Missing: something that shows <b>how</b> {sname} got the deck out."
+            : $"Missing: something that shows <b>why</b> {sname} did it, or that they were <b>awake</b> at 02:14.";
 
         jensenToggle.SetLabel(namesJensenbot ? "[X] Jensenbot helped them" : "[ ] Jensenbot helped them");
         jensenToggle.image.color = namesJensenbot ? new Color(0.46f, 0.85f, 0.25f) : T.panelAlt;
