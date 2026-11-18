@@ -4,9 +4,6 @@
 
 Someone leaked the keynote. The board wants a name by 09:00. You have 12 minutes, the overnight logs, four suspects who talk back, and a company AI that is *very* eager to help.
 
-- **Play:** _itch.io link goes here_
-- **Rules:** [RULES.md](RULES.md) · **AI stack:** [AI_STACK.md](AI_STACK.md)
-
 ## What it is
 You're the internal security analyst at **Envydia**, a (fictional) chip company. Read raw logs, search suspects' desks, flag suspicious lines, and interrogate four LLM-driven suspects in free text. Each has a public story, a secret and lies that crack when you present the right evidence. Then accuse one of them in front of an AI board that knows the truth.
 
@@ -17,6 +14,7 @@ All characters and companies are fictional.
 ## Tech
 - Unity 6 (6000.0.74f1), URP, uGUI + TextMeshPro, built for WebGL
 - Claude Haiku 5.5 (suspects, Jensenbot) and Claude Sonnet 5.5 (judge) via a Cloudflare Worker proxy
+- Fish Audio (s2.1-pro) for the voices, through the same proxy (Fish Audio's own designed voices, no clones)
 - The whole case lives in one data file: [`Assets/Game/Resources/Cases/leak_01/truth.json`](Assets/Game/Resources/Cases/leak_01/truth.json)
 - Prompts: [`Assets/Game/Resources/Prompts/`](Assets/Game/Resources/Prompts/)
 
@@ -36,7 +34,7 @@ Tools/worker/             Cloudflare Worker proxy (keeps the API key out of the 
 ```
 
 ## Running it yourself
-1. **Proxy:** in `Tools/worker`, run `npx wrangler deploy`, then `npx wrangler secret put ANTHROPIC_API_KEY` and `npx wrangler secret put GAME_TOKEN`.
+1. **Proxy:** in `Tools/worker`, run `npx wrangler deploy`, then `npx wrangler secret put ANTHROPIC_API_KEY`, `npx wrangler secret put GAME_TOKEN` and (optional, for voices) `npx wrangler secret put FISH_API_KEY`.
 2. **Unity:** create `Assets/Game/Resources/LlmConfig.asset` (*Assets > Create > Leak Desk > LLM Config*) with the Worker URL and game token. It's gitignored.
 3. Open `Assets/Game/Scenes/LeakDesk.unity` and press Play, or build with **Leak Desk > Build WebGL**.
 
@@ -49,6 +47,7 @@ Without them the game still runs: the UI falls back to flat shapes and colored i
 
 ## Credits
 - Font: Rubik by the Rubik Project Authors (SIL Open Font License)
-- All sound effects are synthesized in code
+- All sound effects and music are synthesized in code
+- Voices: Fish Audio (designed voices from the Fish Audio library)
 
 Made by TelinoT, built with Claude Code. Forked from our earlier jam game *Too Lucky*.
