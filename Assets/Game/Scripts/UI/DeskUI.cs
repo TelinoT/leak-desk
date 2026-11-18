@@ -249,7 +249,7 @@ public class DeskUI : MonoBehaviour
         var sd = Game.Case.Suspect(suspectId);
         var cell = Board.Row(Game.Case, suspectId).Cell(slot);
         var st = Board.Status(Game.Case, Game.Evidence.Items, suspectId, slot);
-        var support = Game.Evidence.Items.FirstOrDefault(i => Board.Supports(cell, i));
+        var support = Board.FirstSupport(cell, Game.Evidence.Items, Game.Evidence.Items);
         string msg = st switch
         {
             CellStatus.RuledOut => $"<b>{sd.FirstName} · {Board.Long(slot)}: doesn't add up.</b> {cell.AgainstNote}",

@@ -89,6 +89,11 @@ public class BoardCell
     [JsonProperty("against")] public List<string> Against = new();
     [JsonProperty("against_facts")] public List<string> AgainstFacts = new();
     [JsonProperty("against_note")] public string AgainstNote;
+    /// <summary>
+    /// Clues that don't name the suspect on their own: evidence id -> evidence/fact ids, one of which the player must
+    /// also hold before the clue counts here (a Lab B2 power spike says nothing about Theo until something puts him in B2).
+    /// </summary>
+    [JsonProperty("needs")] public Dictionary<string, List<string>> Needs = new();
 
     public bool IsEmpty => For.Count + ForFacts.Count + Against.Count + AgainstFacts.Count == 0;
 }

@@ -16,6 +16,8 @@ public class Accusation
     public float TimeLeft01;
     /// <summary>The player cracked a suspect or exposed Jensenbot (needed for S and A).</summary>
     public bool UsedAi;
+    /// <summary>Everything the player found (not just what they attached): resolves links between clues.</summary>
+    public List<EvidenceItem> Known = new();
 }
 
 public class Verdict
@@ -75,10 +77,11 @@ public static class Judge
             if (p.MatchedCombo == null)
             {
                 var row = Board.Row(c, a.SuspectId);
-                if (row != null && Board.Covers(c, a.Evidence, a.SuspectId, "method") && Board.Covers(c, a.Evidence, a.SuspectId, "motive", "opportunity"))
+                var known = a.Known.Count > 0 ? a.Known : a.Evidence;
+                if (row != null && Board.Covers(c, a.Evidence, a.SuspectId, known, "method") && Board.Covers(c, a.Evidence, a.SuspectId, known, "motive", "opportunity"))
                 {
-                    var how = a.Evidence.First(e => Board.Supports(row.Method, e));
-                    var why = a.Evidence.First(e => Board.Supports(row.Motive, e) || Board.Supports(row.Opportunity, e));
+                    var how = Board.FirstSupport(row.Method, a.Evidence, known);
+                    var why = Board.FirstSupport(row.Motive, a.Evidence, known) ?? Board.FirstSupport(row.Opportunity, a.Evidence, known);
                     p.MatchedCombo = new List<string> { how.Id, why.Id };
                 }
             }

@@ -1298,7 +1298,14 @@
           "against": [
             "e_b2_airgap"
           ],
-          "against_note": "Theo was in Lab B2 from 01:52 to 02:47, right through the leak. But B2 is air-gapped: no network, no Wi-Fi. Nothing could have left that room at 02:11."
+          "against_note": "Theo was in Lab B2 from 01:52 to 02:47, right through the leak. But B2 is air-gapped: no network, no Wi-Fi. Nothing could have left that room at 02:11.",
+          "needs": {
+            "e_power_b2": [
+              "e_badge_theo",
+              "e_theo_payout",
+              "f_theo_miner"
+            ]
+          }
         },
         "method": {}
       },
@@ -1315,7 +1322,15 @@
             "f_cut",
             "f_jules_angry",
             "f_cr_contact"
-          ]
+          ],
+          "needs": {
+            "e_slack_cut": [
+              "e_dm_regret",
+              "e_jules_demo",
+              "f_cut",
+              "f_jules_angry"
+            ]
+          }
         },
         "opportunity": {
           "for": [
@@ -1335,7 +1350,21 @@
           ],
           "for_facts": [
             "f_press_preview"
-          ]
+          ],
+          "needs": {
+            "e_link_open": [
+              "e_share_link",
+              "e_jb_session",
+              "e_jb_confession",
+              "f_press_preview"
+            ],
+            "e_jb_lownoise": [
+              "e_share_link",
+              "e_jb_session",
+              "e_jb_confession",
+              "f_press_preview"
+            ]
+          }
         }
       },
       {
@@ -1383,7 +1412,33 @@
       "for_facts": [
         "f_jb_scope",
         "f_jb_suggested"
-      ]
+      ],
+      "needs": {
+        "e_ticket_scope": [
+          "e_article_footer",
+          "e_share_link",
+          "e_jb_session",
+          "e_jb_lownoise",
+          "e_jb_confession",
+          "f_press_preview"
+        ],
+        "e_nadia_ticket_note": [
+          "e_article_footer",
+          "e_share_link",
+          "e_jb_session",
+          "e_jb_lownoise",
+          "e_jb_confession",
+          "f_press_preview"
+        ],
+        "e_jules_sticky": [
+          "e_article_footer",
+          "e_share_link",
+          "e_jb_session",
+          "e_jb_lownoise",
+          "e_jb_confession",
+          "f_press_preview"
+        ]
+      }
     }
   }
 }

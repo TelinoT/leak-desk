@@ -237,7 +237,7 @@ public class AccusationOverlay
         // Judged for the suspect you picked: attached evidence must support them, and nothing you found may rule it out.
         string who = selectedSuspect;
         var sname = who != null ? Game.Case.Suspect(who).FirstName : null;
-        bool Supported(params string[] slots) => who != null && Board.Covers(Game.Case, chosen, who, slots);
+        bool Supported(params string[] slots) => who != null && Board.Covers(Game.Case, chosen, who, Game.Evidence.Items, slots);
         bool Ruled(string slot) => who != null && Board.Status(Game.Case, Game.Evidence.Items, who, slot) == CellStatus.RuledOut;
         bool how = Supported("method") && !Ruled("method");
         bool why = (Supported("motive") && !Ruled("motive")) || (Supported("opportunity") && !Ruled("opportunity"));
