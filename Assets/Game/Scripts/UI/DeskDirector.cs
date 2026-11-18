@@ -74,8 +74,8 @@ public class DeskDirector : MonoBehaviour
             Hint("drag", "<b>Rosa:</b> They'll keep lying until you show them something. Drag evidence onto them.");
         if (t > 330 && g.SpotsSearched == 0)
             Hint("desk", "<b>Rosa:</b> Nobody's checked the desks. People throw away the strangest things.");
-        if (t > 420 && !g.Jensenbot.Exposed && g.Jensenbot.SummariesGiven > 0)
-            Hint("bot", "<b>Rosa:</b> Jensenbot's summary and the raw log don't say the same thing. Check the times.");
+        if (t > 420 && !g.Jensenbot.Exposed && g.Jensenbot.TamperedSummaries > 0)
+            Hint("bot", $"<b>Rosa:</b> Jensenbot's summary of {g.Jensenbot.LastTamperedTitle} and the raw log don't say the same thing. Go through them line by line.");
         if (t > 480 && g.Evidence.Count < 2)
             Hint("late", "<b>Rosa:</b> Work out how the deck got out, then who was awake to do it.");
     }

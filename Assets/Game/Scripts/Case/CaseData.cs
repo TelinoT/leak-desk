@@ -177,6 +177,11 @@ public class JensenbotData
     [JsonProperty("redact")] public List<string> Redact = new();
     [JsonProperty("redact_replacement")] public string RedactReplacement = "scheduled automation job (routine)";
     [JsonProperty("exposed_by")] public List<string> ExposedBy = new();
+    /// <summary>
+    /// Exposing lines that don't mention the bot themselves: evidence id -> evidence ids, one of which the player must
+    /// also hold. A doctored summary of the document the line comes from also counts (the player saw the omission).
+    /// </summary>
+    [JsonProperty("exposed_needs")] public Dictionary<string, List<string>> ExposedNeeds = new();
     [JsonProperty("confession")] public string Confession;
     [JsonProperty("confession_evidence")] public string ConfessionEvidence;
 }

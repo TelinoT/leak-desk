@@ -153,7 +153,7 @@ public class JensenbotPanel
         askButton.interactable = confrontButton.interactable = false;
         chat.ShowTyping(Bot.Name);
         face.SetMood(JensenbotFace.Mood.Thinking);
-        Bot.Confront(item, (reply, exposed) => Voice.Speak(BotVoice, Clean(reply), clip =>
+        Bot.Confront(item, ui.Game.Evidence.Items, (reply, exposed) => Voice.Speak(BotVoice, Clean(reply), clip =>
         {
             chat.HideTyping();
             if (exposed) ui.StartCoroutine(Exposed());

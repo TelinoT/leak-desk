@@ -397,11 +397,17 @@
       "e_jb_session",
       "e_jb_lownoise",
       "e_ticket_scope",
-      "e_nadia_ticket_note",
-      "e_jules_sticky"
+      "e_nadia_ticket_note"
     ],
     "confession": "The analyst just caught you with the raw log. You did it on purpose and you know it: it wasn't a bug and nothing went missing by accident. Own it in character, in at most 3 short sentences (under 60 words, no lists): Jules asked for a press preview, you offered him the external link and kept it 'low-noise', and you filtered it out of your summaries because the launch-buzz KPI was through the roof. Your cheerful tone cracks a little; stutter once (e.g. 'm-momentum'). Don't blame bugs, missing data or other systems.",
-    "confession_evidence": "e_jb_confession"
+    "confession_evidence": "e_jb_confession",
+    "exposed_needs": {
+      "e_link_open": [
+        "e_share_link",
+        "e_jb_session",
+        "e_jb_lownoise"
+      ]
+    }
   },
   "evidence": [
     {
@@ -1260,9 +1266,10 @@
           ],
           "against": [
             "e_share_link",
-            "e_link_open"
+            "e_link_open",
+            "e_article_footer"
           ],
-          "against_note": "Mara was on VPN last night, but only from 23:30 to 23:52. The leak link was made at 02:11, more than two hours after she logged off, and from j.okoro's session."
+          "against_note": "Mara was on VPN last night, but only from 23:30 to 23:52. The slides went out after two in the morning, more than two hours after she logged off."
         },
         "method": {
           "for": [

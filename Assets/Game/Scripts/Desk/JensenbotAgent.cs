@@ -25,15 +25,30 @@ public class JensenbotAgent
 
     public JensenbotAgent(CaseFile caseFile) => this.caseFile = caseFile;
 
+    /// <summary>Documents Jensenbot has summarized from a doctored feed, and how many such summaries it gave.</summary>
+    readonly HashSet<string> tamperedDocs = new();
+    public int TamperedSummaries { get; private set; }
+    public string LastTamperedTitle { get; private set; }
+
+    /// <summary>Would confronting with this item expose the bot? The item must be an exposing line, and if it doesn't
+    /// mention the bot itself, the player needs a linking clue or a doctored summary of that line's document.</summary>
+    public bool WouldExpose(EvidenceItem item, IEnumerable<EvidenceItem> known)
+    {
+        var jb = caseFile.Jensenbot;
+        if (!IsAccomplice || Exposed || !jb.ExposedBy.Contains(item.Id)) return false;
+        if (jb.ExposedNeeds == null || !jb.ExposedNeeds.TryGetValue(item.Id, out var needs) || needs.Count == 0) return true;
+        if (System.Linq.Enumerable.Any(known, k => needs.Contains(k.Id))) return true;
+        return caseFile.Documents.Exists(d => tamperedDocs.Contains(d.Id) && d.Lines.Exists(l => l.EvidenceId == item.Id));
+    }
+
     /// <summary>
     /// The analyst shows Jensenbot a raw log line. If it's one of the lines its tampered feed hid, it gets exposed
     /// (returns true via the callback) and confesses in character; otherwise it deflects as usual.
     /// </summary>
-    public void Confront(EvidenceItem item, Action<string, bool> done)
+    public void Confront(EvidenceItem item, IEnumerable<EvidenceItem> known, Action<string, bool> done)
     {
         LastWasTampered = false;
-        var jb = caseFile.Jensenbot;
-        bool exposes = IsAccomplice && !Exposed && jb.ExposedBy.Contains(item.Id);
+        bool exposes = WouldExpose(item, known);
         if (exposes) Exposed = true;
         string content = $"[The analyst shows you a raw log line from the original, unfiltered logs: {item.PromptText}] Explain why your summary didn't mention this.";
         confessing = exposes;
@@ -58,6 +73,12 @@ public class JensenbotAgent
         var jb = caseFile.Jensenbot;
         string text = IsAccomplice ? doc.ToPlainText(jb.Redact, jb.RedactReplacement) : doc.ToPlainText();
         LastWasTampered = IsAccomplice && text != doc.ToPlainText();
+        if (LastWasTampered)
+        {
+            tamperedDocs.Add(doc.Id);
+            TamperedSummaries++;
+            LastTamperedTitle = doc.Title;
+        }
         Send($"Summarize this log for me:\n\n{text}", done);
     }
 
