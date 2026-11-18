@@ -26,8 +26,25 @@ public class BriefingOverlay
         RefreshToggle();
     }
 
-    void RefreshToggle() =>
-        tutorialToggle.SetLabel(Tutorial.ShouldRun ? "[X] Guided tutorial" : "[ ] Guided tutorial");
+    Image toggleBox, toggleCheck;
+
+    void RefreshToggle()
+    {
+        tutorialToggle.SetLabel("Guided tutorial");
+        if (toggleCheck == null) return;
+        bool on = Tutorial.ShouldRun;
+        toggleCheck.enabled = on;
+        toggleBox.color = on ? UiKit.Theme.accent : new Color(1, 1, 1, 0.18f);
+    }
+
+    // What Dex reads out: the mail without the sign-off.
+    static string SpokenMail(CaseFile c)
+    {
+        string mail = string.IsNullOrEmpty(c.CeoMail) ? c.Briefing : c.CeoMail;
+        var lines = new System.Collections.Generic.List<string>(mail.Split('\n'));
+        while (lines.Count > 0 && (lines[^1].Trim().Length == 0 || lines[^1].TrimStart().StartsWith("-"))) lines.RemoveAt(lines.Count - 1);
+        return string.Join("\n", lines);
+    }
 
     public BriefingOverlay(DeskUI ui, Transform overlayRoot)
     {
@@ -104,6 +121,18 @@ public class BriefingOverlay
         startRow.HLayout(14);
         tutorialToggle = UiKit.Button(startRow, "", ToggleTutorial, T.panelAlt, T.text, 76, 20);
         tutorialToggle.Size(prefW: 300, prefH: 76);
+        ((RectTransform)tutorialToggle.GetComponentInChildren<TMP_Text>().transform).Stretch(70, 4, 12, 4);
+        toggleBox = UiKit.Panel(tutorialToggle.transform, Color.white, T.pillSprite, "Box").Pill(36);
+        var br = (RectTransform)toggleBox.transform;
+        br.anchorMin = br.anchorMax = new Vector2(0, 0.5f);
+        br.anchoredPosition = new Vector2(44, 0);
+        br.sizeDelta = new Vector2(36, 36);
+        toggleBox.raycastTarget = false;
+        toggleCheck = UiKit.Icon(toggleBox.transform, "mark_check", 26, T.accentText);
+        var cr = (RectTransform)toggleCheck.transform;
+        cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0.5f);
+        cr.anchoredPosition = Vector2.zero;
+        cr.sizeDelta = new Vector2(24, 24);
         RefreshToggle();
         startButton = UiKit.Button(startRow, $"Start investigation  ·  {Mathf.RoundToInt(c.RoundMinutes)} minutes", Start, T.accent, T.accentText, 76, 30);
         startButton.Size(flexW: 1, prefH: 76);
@@ -128,6 +157,7 @@ public class BriefingOverlay
     public void Show()
     {
         RefreshToggle();
+        Voice.Prefetch(ui.Game.Case.CeoVoice, new[] { SpokenMail(ui.Game.Case) }, 1.08f);
         if (Tutorial.ShouldRun) ui.Tutorial.PrefetchVoice();
         ui.StartCoroutine(Sequence());
     }
@@ -162,7 +192,14 @@ public class BriefingOverlay
         briefRoot.transform.SetAsLastSibling();
         Sfx.Play("chime");
         ui.StartCoroutine(DeskUI.PopModal(modal));
-        UiFx.Typewrite(mailBody, 140f);
+        // Dex reads his own mail if the line is ready (the title card buys ~4 s to fetch it).
+        mailBody.maxVisibleCharacters = 0;
+        string spoken = SpokenMail(ui.Game.Case);
+        for (float t = 0; t < 2.5f && Voice.Enabled && !string.IsNullOrEmpty(ui.Game.Case.CeoVoice) && Voice.Cached(ui.Game.Case.CeoVoice, spoken) == null; t += Time.unscaledDeltaTime)
+            yield return null;
+        var dex = Voice.Cached(ui.Game.Case.CeoVoice, spoken);
+        if (dex != null) { Voice.Play(dex); UiFx.Typewrite(mailBody, Mathf.Max(40f, mailBody.text.Length / (dex.length * 0.9f))); }
+        else UiFx.Typewrite(mailBody, 140f);
         // The start button breathes until it's pressed.
         var label = startButton.GetComponentInChildren<TMP_Text>().transform;
         while (briefRoot.activeSelf)
@@ -176,6 +213,7 @@ public class BriefingOverlay
     void Start()
     {
         briefRoot.SetActive(false);
+        Voice.Stop();
         Sfx.Play("click");
         ui.Game.StartInvestigation();
         if (Tutorial.ShouldRun) ui.Tutorial.Begin();

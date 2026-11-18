@@ -34,6 +34,7 @@ public class CaseFile
     /// <summary>Fish Audio voice ids for the board chair (verdict) and Rosa (tutorial).</summary>
     [JsonProperty("board_voice")] public string BoardVoice;
     [JsonProperty("guide_voice")] public string GuideVoice;
+    [JsonProperty("ceo_voice")] public string CeoVoice;
     [JsonProperty("desk_search_seconds")] public float DeskSearchSeconds = 30f;
 
     public SuspectData Suspect(string id) => Suspects.FirstOrDefault(s => s.Id == id);

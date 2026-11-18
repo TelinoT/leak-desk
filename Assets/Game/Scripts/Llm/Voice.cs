@@ -125,7 +125,12 @@ public class Voice : MonoBehaviour
         var body = new JObject { ["text"] = text, ["voice"] = voiceId, ["speed"] = speed };
         using var req = new UnityWebRequest(config.proxyUrl.TrimEnd('/') + "/tts", UnityWebRequest.kHttpVerbPOST);
         req.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(body.ToString(Newtonsoft.Json.Formatting.None)));
-        var dl = new DownloadHandlerAudioClip(req.uri, AudioType.MPEG);
+        var dl = new DownloadHandlerAudioClip(req.uri, AudioType.MPEG)
+        {
+            // Decode the whole line up front: a streamed clip dies with the request (and we dispose it below).
+            streamAudio = false,
+            compressed = false,
+        };
         req.downloadHandler = dl;
         req.SetRequestHeader("content-type", "application/json");
         req.SetRequestHeader("x-game-token", config.gameToken);
