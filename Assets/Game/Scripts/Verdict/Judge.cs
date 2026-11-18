@@ -94,7 +94,9 @@ public static class Judge
         return p;
     }
 
-    public static void Run(CaseFile c, Accusation a, Action<Verdict> done)
+    public static void Run(CaseFile c, Accusation a, Action<Verdict> done) => Run(c, a, done, attempt: 0);
+
+    static void Run(CaseFile c, Accusation a, Action<Verdict> done, int attempt)
     {
         var check = Check(c, a);
         var config = LlmConfig.Load();
@@ -124,7 +126,12 @@ public static class Judge
             text =>
             {
                 var obj = LlmJson.TryParseObject(text);
-                if (obj == null) { done(Offline(c, a, check)); return; }
+                if (obj == null)
+                {
+                    UnityEngine.Debug.LogWarning($"[Judge] unparseable reply (attempt {attempt + 1}):\n{text}");
+                    if (attempt == 0) Run(c, a, done, 1); else done(Offline(c, a, check));
+                    return;
+                }
                 var v = new Verdict
                 {
                     Result = obj["verdict"]?.ToString()?.ToLowerInvariant() ?? "wrong",
@@ -136,8 +143,13 @@ public static class Judge
                 ScoreCard.Fill(c, a, v);
                 done(v);
             },
-            _ => done(Offline(c, a, check)),
-            maxTokens: 400, model: config != null ? config.judgeModel : null);
+            err =>
+            {
+                UnityEngine.Debug.LogWarning($"[Judge] call failed (attempt {attempt + 1}): {err}");
+                if (attempt == 0) Run(c, a, done, 1); else done(Offline(c, a, check));
+            },
+            // Second try goes to the dialogue model: if the judge model is having a bad minute, a fast model still beats a canned line.
+            maxTokens: 400, model: attempt > 0 || config == null ? config?.model : config.judgeModel);
     }
 
     /// <summary>The code pre-check is authoritative about the verdict class; the LLM only flavors score + comment.</summary>

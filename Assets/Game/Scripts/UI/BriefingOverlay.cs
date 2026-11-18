@@ -26,15 +26,10 @@ public class BriefingOverlay
         RefreshToggle();
     }
 
-    Image toggleBox, toggleCheck;
-
     void RefreshToggle()
     {
         tutorialToggle.SetLabel("Guided tutorial");
-        if (toggleCheck == null) return;
-        bool on = Tutorial.ShouldRun;
-        toggleCheck.enabled = on;
-        toggleBox.color = on ? UiKit.Theme.accent : new Color(1, 1, 1, 0.18f);
+        tutorialToggle.SetChecked(Tutorial.ShouldRun);
     }
 
     // What Dex reads out: the mail without the sign-off.
@@ -119,20 +114,9 @@ public class BriefingOverlay
 
         var startRow = UiKit.Rect("StartRow", card.transform);
         startRow.HLayout(14);
-        tutorialToggle = UiKit.Button(startRow, "", ToggleTutorial, T.panelAlt, T.text, 76, 20);
+        tutorialToggle = UiKit.Button(startRow, "Guided tutorial", ToggleTutorial, T.panelAlt, T.text, 76, 20);
         tutorialToggle.Size(prefW: 300, prefH: 76);
-        ((RectTransform)tutorialToggle.GetComponentInChildren<TMP_Text>().transform).Stretch(70, 4, 12, 4);
-        toggleBox = UiKit.Panel(tutorialToggle.transform, Color.white, T.pillSprite, "Box").Pill(36);
-        var br = (RectTransform)toggleBox.transform;
-        br.anchorMin = br.anchorMax = new Vector2(0, 0.5f);
-        br.anchoredPosition = new Vector2(44, 0);
-        br.sizeDelta = new Vector2(36, 36);
-        toggleBox.raycastTarget = false;
-        toggleCheck = UiKit.Icon(toggleBox.transform, "mark_check", 26, T.accentText);
-        var cr = (RectTransform)toggleCheck.transform;
-        cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0.5f);
-        cr.anchoredPosition = Vector2.zero;
-        cr.sizeDelta = new Vector2(24, 24);
+        tutorialToggle.AddCheckBox(36);
         RefreshToggle();
         startButton = UiKit.Button(startRow, $"Start investigation  ·  {Mathf.RoundToInt(c.RoundMinutes)} minutes", Start, T.accent, T.accentText, 76, 30);
         startButton.Size(flexW: 1, prefH: 76);

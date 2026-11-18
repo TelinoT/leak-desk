@@ -135,7 +135,7 @@ public class AccusationOverlay
         // 3. Accomplice + motive
         var bottom = UiKit.Rect("Bottom", card.transform);
         bottom.HLayout(14);
-        jensenToggle = UiKit.Button(bottom, "[ ] Jensenbot helped them", ToggleJensenbot, T.panelAlt, T.text, 56, 20);
+        jensenToggle = UiKit.Button(bottom, "Jensenbot helped them", ToggleJensenbot, T.panelAlt, T.text, 56, 20).AddCheckBox(32);
         jensenToggle.Size(prefW: 360, prefH: 56);
         motive = UiKit.Input(bottom, "3. Motive in one sentence: why did they do it?");
 
@@ -150,8 +150,11 @@ public class AccusationOverlay
         root.SetActive(false);
     }
 
+    public bool IsOpen => root != null && root.activeSelf;
+
     public void Open(bool isForced)
     {
+        ui.ClearToasts(); // the case-strength line already says what matters; no notifications over the modal
         forced = isForced;
         Sfx.Play(forced ? "crack" : "chime");
         if (SuspectPortraits.Instance != null)
@@ -246,9 +249,8 @@ public class AccusationOverlay
             : !how ? $"Missing: something that shows <b>how</b> {sname} got the deck out."
             : $"Missing: something that shows <b>why</b> {sname} did it, or that they were <b>awake</b> at 02:14.";
 
-        jensenToggle.SetLabel(namesJensenbot ? "[X] Jensenbot helped them" : "[ ] Jensenbot helped them");
-        jensenToggle.image.color = namesJensenbot ? new Color(0.46f, 0.85f, 0.25f) : T.panelAlt;
-        jensenToggle.GetComponentInChildren<TMP_Text>().color = namesJensenbot ? T.accentText : T.text;
+        jensenToggle.SetChecked(namesJensenbot, T.danger);
+        jensenToggle.image.color = namesJensenbot ? Color.Lerp(T.panelAlt, T.danger, 0.35f) : T.panelAlt;
 
         submit.interactable = forced || !string.IsNullOrEmpty(selectedSuspect);
     }

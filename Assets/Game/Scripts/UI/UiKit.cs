@@ -197,6 +197,34 @@ public static class UiKit
         return btn;
     }
 
+    /// <summary>Turns a button into a toggle with a round check box on its left (see <see cref="SetChecked"/>).</summary>
+    public static Button AddCheckBox(this Button b, float size = 36)
+    {
+        var label = b.GetComponentInChildren<TMP_Text>();
+        if (label != null) ((RectTransform)label.transform).Stretch(size + 34, 4, 12, 4);
+        var box = Panel(b.transform, Color.white, Theme.pillSprite, "CheckBox").Pill(size);
+        box.raycastTarget = false;
+        var br = (RectTransform)box.transform;
+        br.anchorMin = br.anchorMax = new Vector2(0, 0.5f);
+        br.anchoredPosition = new Vector2(size * 0.5f + 18, 0);
+        br.sizeDelta = new Vector2(size, size);
+        var check = Icon(box.transform, "mark_check", size * 0.66f, Theme.accentText);
+        check.name = "Check";
+        var cr = (RectTransform)check.transform;
+        cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0.5f);
+        cr.anchoredPosition = Vector2.zero;
+        cr.sizeDelta = new Vector2(size * 0.66f, size * 0.66f);
+        return b;
+    }
+
+    public static void SetChecked(this Button b, bool on, Color? onColor = null)
+    {
+        var box = b.transform.Find("CheckBox");
+        if (box == null) return;
+        box.GetComponent<Image>().color = on ? (onColor ?? Theme.accent) : new Color(1, 1, 1, 0.18f);
+        box.Find("Check").GetComponent<Image>().enabled = on;
+    }
+
     public static void SetLabel(this Button b, string label)
     {
         var t = b.GetComponentInChildren<TMP_Text>();

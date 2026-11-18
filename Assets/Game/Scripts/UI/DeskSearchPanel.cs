@@ -124,6 +124,13 @@ public class DeskSearchPanel
         deskCards[desk.Suspect] = card;
     }
 
+    void SetTitleHead(string suspectId)
+    {
+        var tex = SuspectPortraits.Instance != null ? SuspectPortraits.Instance.Headshot(suspectId) : null;
+        titleHead.texture = tex;
+        titleHead.enabled = tex != null;
+    }
+
     void OnPortraitsReady()
     {
         foreach (var kv in headshots)
@@ -132,7 +139,7 @@ public class DeskSearchPanel
             kv.Value.texture = tex;
             kv.Value.enabled = tex != null;
         }
-        if (current != null) titleHead.texture = SuspectPortraits.Instance.Headshot(current.Suspect);
+        if (current != null) SetTitleHead(current.Suspect);
     }
 
     void RefreshCards()
@@ -161,7 +168,7 @@ public class DeskSearchPanel
         subtitle.text = $"{s.Role}. Each search takes {Mathf.RoundToInt(Game.Case.DeskSearchSeconds)} seconds.";
         footerText.text = $"Found something? Take it to {s.FirstName} and see what they say.";
         interrogateButton.SetLabel($"Interrogate {s.FirstName}");
-        if (SuspectPortraits.Instance != null) titleHead.texture = SuspectPortraits.Instance.Headshot(desk.Suspect);
+        SetTitleHead(desk.Suspect);
         titleHead.enabled = titleHead.texture != null;
         RebuildSpots();
         RefreshCards();

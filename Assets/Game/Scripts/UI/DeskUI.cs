@@ -410,9 +410,16 @@ public class DeskUI : MonoBehaviour
     // ---------- toasts ----------
 
     /// <summary>Phone-style notification that slides in at the top right.</summary>
+    public void ClearToasts()
+    {
+        for (int i = toastRoot.childCount - 1; i >= 0; i--) UiKit.Remove(toastRoot.GetChild(i));
+    }
+
     public void Toast(string message, Color? color = null, string icon = "bell_1")
     {
         if (Tutorial != null && Tutorial.Active) return; // Rosa is talking; no competing notifications
+        if (Accusation != null && Accusation.IsOpen) return;
+        if (Game != null && Game.Phase is GamePhase.Deliberating or GamePhase.Verdict) return;
         var c = color ?? T.accent;
         // Never stack more than 3: the oldest one leaves early.
         while (toastRoot.childCount >= 3) UiKit.Remove(toastRoot.GetChild(0));
@@ -463,7 +470,7 @@ public class DeskUI : MonoBehaviour
     /// <summary>Full-screen dimmer + centered modal card. Returns the card (vertical layout).</summary>
     public static Image Modal(Transform overlayRoot, string name, float width, float height, out GameObject root)
     {
-        var dim = UiKit.Panel(overlayRoot, new Color(0.03f, 0.02f, 0.08f, 0.88f), name: name);
+        var dim = UiKit.Panel(overlayRoot, new Color(0.03f, 0.02f, 0.08f, 0.93f), name: name);
         ((RectTransform)dim.transform).Stretch();
         root = dim.gameObject;
 
