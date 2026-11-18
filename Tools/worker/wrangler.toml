@@ -1,3 +1,12 @@
 name = "leakdesk-proxy"
 main = "index.js"
 compatibility_date = "2026-11-01"
+
+# Per-IP rate limit (one player makes well under this; a script hammering the proxy gets 429s).
+[[ratelimits]]
+name = "LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 60
+  period = 60

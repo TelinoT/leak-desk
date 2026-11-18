@@ -3,6 +3,7 @@
 // Routes: POST /        -> Claude chat     {system, messages, max_tokens, model} -> {text}
 //         POST /tts     -> Fish Audio TTS  {text, voice}                         -> audio/mpeg
 //         POST /voices  -> Fish voice library search {title, tags, language}     -> JSON
+// Keys live only in Cloudflare secrets; nothing secret is in this file or the game build.
 
 const DEFAULT_MODEL = "claude-haiku-5-5"; // fast + cheap for live dialogue
 // The game may pick a model per call (e.g. a smarter one for the verdict), but only from this list.
@@ -20,6 +21,13 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
     if (request.method !== "POST") return json({ error: "POST only" }, 405);
     if (request.headers.get("x-game-token") !== env.GAME_TOKEN) return json({ error: "unauthorized" }, 401);
+
+    // The game token ships in the WebGL build, so it is not a real secret: cap requests per IP to stop credit draining.
+    if (env.LIMITER) {
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      const { success } = await env.LIMITER.limit({ key: ip });
+      if (!success) return json({ error: "slow down" }, 429);
+    }
 
     let body;
     try { body = await request.json(); } catch { return json({ error: "bad json" }, 400); }
