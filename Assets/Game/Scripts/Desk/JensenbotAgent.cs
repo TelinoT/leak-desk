@@ -37,10 +37,20 @@ public class JensenbotAgent
         if (exposes) Exposed = true;
         string content = $"[The analyst shows you a raw log line from the original, unfiltered logs: {item.PromptText}] Explain why your summary didn't mention this.";
         confessing = exposes;
-        Send(content, text => done?.Invoke(text, exposes));
+        Send(content, text => done?.Invoke(FirstSentences(text, 3), exposes));
     }
 
     bool confessing;
+
+    /// <summary>Keeps the punchline short: the first N sentences of the reply.</summary>
+    static string FirstSentences(string text, int n)
+    {
+        var matches = System.Text.RegularExpressions.Regex.Matches(text.Replace("\n", " "), @"[^.!?]+[.!?]+[""')]*");
+        if (matches.Count <= n) return text;
+        var sb = new System.Text.StringBuilder();
+        for (int i = 0; i < n; i++) sb.Append(matches[i].Value);
+        return sb.ToString().Trim();
+    }
 
     public void Summarize(CaseDocument doc, Action<string> done)
     {

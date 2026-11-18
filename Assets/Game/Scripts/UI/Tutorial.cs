@@ -54,7 +54,7 @@ public class Tutorial : MonoBehaviour
 
     UiTheme T => UiKit.Theme;
     LeakDeskGame Game => ui.Game;
-    SuspectAgent Jules => Game.Agent("jules");
+    SuspectAgent Theo => Game.Agent("theo");
 
     void Awake() => ui = GetComponent<DeskUI>();
 
@@ -79,16 +79,16 @@ public class Tutorial : MonoBehaviour
         },
         new Step
         {
-            Text = "Last night's logs come in here. Open <b>#keynote</b>, that's where the drama started.",
+            Text = "Last night's logs come in here. Start with <b>#keynote</b>, the team channel for the launch.",
             OnEnter = () => ui.ShowTab(DeskUI.Tab.Logs),
             Target = () => ui.Feed.DocCard("doc_slack_keynote"),
             Done = () => ui.CurrentTab == DeskUI.Tab.Logs && ui.Feed.CurrentDocId == "doc_slack_keynote",
         },
         new Step
         {
-            Text = "Dex killed Jules's demo in front of the whole channel. Somebody didn't take that well. <b>Flag</b> it.",
-            Target = () => ui.Feed.LineRow("doc_slack_keynote", 2),
-            Done = () => Game.Evidence.Has("e_slack_cut"),
+            Text = "Theo from engineering, taking a shot at the slides. Probably nothing, but you never know. <b>Flag</b> it.",
+            Target = () => ui.Feed.LineRow("doc_slack_keynote", 1),
+            Done = () => Game.Evidence.Has("e_theo_jab"),
         },
         new Step
         {
@@ -110,20 +110,20 @@ public class Tutorial : MonoBehaviour
         },
         new Step
         {
-            Text = "That's Jules. Ask him something. Click one of those, or just type.",
-            OnEnter = () => ui.Interrogation.Open("jules"),
+            Text = "Let's start with Theo. Ask him something. Click one of those, or just type.",
+            OnEnter = () => ui.Interrogation.Open("theo"),
             Target = () => ui.Interrogation.QuickRow,
-            Done = () => Jules != null && Jules.QuestionsAsked > 0 && !Jules.Busy,
+            Done = () => Theo != null && Theo.QuestionsAsked > 0 && !Theo.Busy,
         },
         new Step
         {
-            Text = "Now <b>drag that Snack message</b> from your tray onto him. Keep an eye on his stress.",
-            OnEnter = () => ui.Interrogation.Open("jules"),
+            Text = "Now <b>drag his message</b> from your tray onto him. Keep an eye on his stress.",
+            OnEnter = () => ui.Interrogation.Open("theo"),
             Target = () => ui.Tray.FirstCard,
             Target2 = () => ui.Interrogation.StageRect,
             Block = false,
             CoachTop = true,
-            Done = () => Jules != null && !Jules.Busy && Jules.Log.Any(e => e.Type == ChatEntry.Kind.Evidence),
+            Done = () => Theo != null && !Theo.Busy && Theo.Log.Any(e => e.Type == ChatEntry.Kind.Evidence),
         },
         new Step
         {

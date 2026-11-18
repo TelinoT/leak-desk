@@ -30,6 +30,7 @@ public static class LeakDeskBuild
         PlayerSettings.defaultWebScreenWidth = 1280;
         PlayerSettings.defaultWebScreenHeight = 720;
         PlayerSettings.runInBackground = true;
+        PlayerSettings.SplashScreen.show = false; // judges go straight to the title card
         PlayerSettings.SetIl2CppCodeGeneration(UnityEditor.Build.NamedBuildTarget.WebGL, UnityEditor.Build.Il2CppCodeGeneration.OptimizeSize);
         PlayerSettings.WebGL.template = "PROJECT:LeakDesk"; // responsive: fills the browser window / itch.io frame
 

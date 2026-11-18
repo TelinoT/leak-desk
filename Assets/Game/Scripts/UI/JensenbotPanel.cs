@@ -37,7 +37,7 @@ public class JensenbotPanel
         col.VLayout(4);
         col.Size(flexW: 1);
         UiKit.Heading(col, Bot.Name, 34);
-        UiKit.Text(col, "Envydia's AI desk assistant. Summarizes any log in seconds! Trusted by leadership. (!)",
+        UiKit.Text(col, "Envydia's AI desk assistant. Summarizes any log in seconds! Trusted by leadership.",
             T.bodySize - 2, T.muted);
 
         var chatBg = UiKit.Panel(panel.transform, new Color(0, 0, 0, 0.22f), T.panelSprite, "ChatBg");
@@ -206,7 +206,7 @@ public class JensenbotPanel
     // The UI font has no emoji glyphs: turn Slack-style :codes: into cheerful ASCII instead.
     static string Clean(string text)
     {
-        text = Regex.Replace(text, @":(rocket|chart_with_upwards_trend|fire|star2?|sparkles|tada|100):", "<b>(!)</b>");
+        text = Regex.Replace(text, @"\s*:(rocket|chart_with_upwards_trend|fire|star2?|sparkles|tada|100):", "");
         text = Regex.Replace(text, @":(wave|smile|slightly_smiling_face|blush|grin|sweat_smile|wink):", "^_^");
         return Regex.Replace(text, @":[a-z][a-z0-9_+-]{1,29}:", "");
     }
