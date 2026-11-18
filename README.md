@@ -4,6 +4,13 @@
 
 Someone leaked the keynote. The board wants a name by 09:00. You have 12 minutes, the overnight logs, four suspects who talk back, and a company AI that is *very* eager to help.
 
+## The AI is the game
+- **Four suspects, each a live Claude character.** You type any question; they answer in character (and out loud, via Fish Audio), lie about their secrets, and crack when you present the right evidence. What they admit becomes evidence.
+- **Jensenbot, the AI assistant, has holes in its data.** The game strips certain lines from the logs it reads, so its summaries are confident and incomplete. You catch it by comparing them with the raw logs.
+- **An AI board judges your accusation** and your written motive. Code checks the facts; the model writes the verdict.
+
+Without the models there's nobody to interrogate and nobody to judge you.
+
 ## What it is
 You're the internal security analyst at **Envydia**, a (fictional) chip company. Read raw logs, search suspects' desks, flag suspicious lines, and interrogate four LLM-driven suspects in free text. Each has a public story, a secret and lies that crack when you present the right evidence. Then accuse one of them in front of an AI board that knows the truth.
 
