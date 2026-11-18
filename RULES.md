@@ -30,7 +30,7 @@ The **board** (an AI judge that knows the truth) reads your case. A case holds u
 | **NOT ENOUGH PROOF** | Right person, weak file |
 | **WRONG PERSON** | Someone innocent gets fired |
 
-**Score (max 100):** right person 30 · proof that holds up 25 · motive 10 (judged by the board) · catching the AI accomplice 15 · board entries settled 10 · time to spare 10. Grades: S (90+), A, B, C, D.
+**Score (max 100):** right person 30 · proof that holds up 25 · motive 10 (judged by the board) · catching the AI accomplice 15 · board entries settled 10 · time to spare 10. Grades: S (90+), A, B, C, D. S and A also need you to crack a suspect or expose Jensenbot at least once.
 
 ## The suspect board
 The sidebar shows every suspect with three boxes: **why** (motive), **when** (opportunity) and **how** (method), plus "AI helped?". Evidence fills the boxes in, and some evidence **rules a box out** (someone was online, but hours before the leak). Everyone has something worth chasing, but only one person can end up with all three boxes. Click a box to see what you've got on it. Evidence cards show what they say about whom; anything useless can be thrown out with the ✕.

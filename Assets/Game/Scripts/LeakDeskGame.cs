@@ -139,6 +139,7 @@ public class LeakDeskGame : MonoBehaviour
         SetPhase(GamePhase.Deliberating);
         (accusation.LeadsFound, accusation.LeadsTotal) = Board.Progress(Case, Evidence.Items, Jensenbot.Exposed);
         accusation.TimeLeft01 = RoundSeconds <= 0 ? 0 : TimeLeft / RoundSeconds;
+        accusation.UsedAi = Suspects.Any(s => s.Broken) || Jensenbot.Exposed;
         ui.ShowDeliberation(accusation);
         Judge.Run(Case, accusation, verdict =>
         {

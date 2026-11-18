@@ -150,6 +150,8 @@ public class AccusationOverlay
         root.SetActive(false);
     }
 
+    bool UsedAi => ui.Game.Suspects.Exists(x => x.Broken) || ui.Game.Jensenbot.Exposed;
+
     public bool IsOpen => root != null && root.activeSelf;
 
     public void Open(bool isForced)
@@ -242,7 +244,8 @@ public class AccusationOverlay
         SetSlot(slotMethod, how);
         SetSlot(slotWhy, why);
         strengthText.text = who == null ? "Pick who you're accusing first."
-            : how && why ? "<color=#" + UiKit.Hex(T.accent) + $"><b>That holds up against {sname}.</b></color>"
+            : how && why ? "<color=#" + UiKit.Hex(T.accent) + $"><b>That holds up against {sname}.</b></color>" +
+                           (UsedAi ? "" : $" <color=#{UiKit.Hex(T.muted)}>For an S, crack someone first: drag evidence onto them.</color>")
             : Ruled("method") ? $"Careful: what you found says {sname} couldn't have done it that way."
             : Ruled("opportunity") && !Supported("motive") ? $"Careful: {sname} wasn't in a position to do it."
             : chosen.Count == 0 ? $"Attach evidence that shows how {sname} got the deck out, and why or when."

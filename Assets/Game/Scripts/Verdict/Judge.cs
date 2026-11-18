@@ -14,6 +14,8 @@ public class Accusation
     public int LeadsFound;
     public int LeadsTotal;
     public float TimeLeft01;
+    /// <summary>The player cracked a suspect or exposed Jensenbot (needed for S and A).</summary>
+    public bool UsedAi;
 }
 
 public class Verdict
@@ -27,6 +29,8 @@ public class Verdict
     public List<ScoreLine> Breakdown = new();
     public string Grade = "D";
     public string Rank = "";
+    /// <summary>Why the grade was capped, if it was.</summary>
+    public string GradeNote;
 }
 
 public class ScoreLine

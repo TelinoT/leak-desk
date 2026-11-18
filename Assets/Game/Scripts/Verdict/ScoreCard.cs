@@ -63,6 +63,12 @@ public static class ScoreCard
             >= 40 => ("C", "Intern with Potential"),
             _ => ("D", "Badge Revoked"),
         };
+        // The top grades need the AI side of the game: crack someone in interrogation, or catch Jensenbot out.
+        if (!a.UsedAi && v.Grade is "S" or "A")
+        {
+            (v.Grade, v.Rank) = ("B", "Analyst");
+            v.GradeNote = "S and A need you to crack a suspect or catch Jensenbot out. Drag your evidence onto them.";
+        }
         // Naming the right person is worth something on its own.
         if (right && v.Grade == "D") (v.Grade, v.Rank) = ("C", "Right Hunch");
     }

@@ -166,6 +166,11 @@ public class VerdictOverlay
 
         // What you left on the table: the categories you didn't max, biggest first.
         var missed = v.Breakdown.Where(l => l.Points < l.Max).OrderByDescending(l => l.Max - l.Points).Take(3).ToList();
+        if (!string.IsNullOrEmpty(v.GradeNote))
+        {
+            UiKit.Text(breakdown.transform, "GRADE CAPPED AT B", T.smallSize, T.warning, style: FontStyles.Bold);
+            UiKit.Text(breakdown.transform, v.GradeNote, T.smallSize, T.muted);
+        }
         if (missed.Count > 0 && v.Grade != "S")
         {
             UiKit.Text(breakdown.transform, "LEFT ON THE TABLE", T.smallSize, T.warning, style: FontStyles.Bold);
