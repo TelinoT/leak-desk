@@ -160,10 +160,14 @@ public class Voice : MonoBehaviour
         AudioClip clip = null;
         try { clip = dl.audioClip; }
         catch (Exception e) { Debug.LogWarning($"[Voice] could not decode audio: {e.Message}"); }
-        while (clip != null && clip.loadState == AudioDataLoadState.Loading && Time.unscaledTime - start < Timeout + 1f)
+        // In WebGL the browser decodes the mp3 asynchronously: the clip can start out Unloaded, so wait until it
+        // is actually Loaded before touching its length (reading it early counts as a failure and mutes voices).
+        if (clip != null && clip.loadState == AudioDataLoadState.Unloaded) clip.LoadAudioData();
+        while (clip != null && clip.loadState != AudioDataLoadState.Loaded && clip.loadState != AudioDataLoadState.Failed
+               && Time.unscaledTime - start < Timeout + 4f)
             yield return null;
 
-        if (clip == null || clip.loadState == AudioDataLoadState.Failed || clip.length < 0.1f)
+        if (clip == null || clip.loadState != AudioDataLoadState.Loaded || clip.length < 0.1f)
         {
             failures++;
             ready?.Invoke(null);
