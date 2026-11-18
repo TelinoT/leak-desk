@@ -132,7 +132,7 @@ public class EvidenceTray
         var c = LeakDeskGame.Instance != null ? LeakDeskGame.Instance.Case : null;
         if (c != null)
         {
-            var tags = Board.Tags(c, item);
+            var tags = Board.Tags(c, item, LeakDeskGame.Instance.Evidence.Items);
             if (tags.Count > 0)
             {
                 var row = UiKit.Rect("Tags", card.transform);

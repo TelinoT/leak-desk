@@ -32,6 +32,16 @@ public static class Board
     public static bool Supports(BoardCell c, EvidenceItem i) => Hit(c.For, c.ForFacts, i);
     public static bool RulesOut(BoardCell c, EvidenceItem i) => Hit(c.Against, c.AgainstFacts, i);
 
+    /// <summary>Does the cell have anything that puts the suspect in the frame (as opposed to a pure alibi)?</summary>
+    static bool HasClaim(BoardCell c) => c.For.Count + c.ForFacts.Count > 0;
+
+    /// <summary>
+    /// Counter-evidence only counts once the player knows the claim it contradicts: the article footer says
+    /// nothing about Mara until you've seen her send a .key file home. Pure alibis (no claim) count right away.
+    /// </summary>
+    public static bool RulesOut(BoardCell c, EvidenceItem i, ICollection<EvidenceItem> known) =>
+        RulesOut(c, i) && (!HasClaim(c) || known.Any(k => Supports(c, k)));
+
     public static BoardRow Row(CaseFile c, string suspect) => c.Board.Rows.FirstOrDefault(r => r.Suspect == suspect);
 
     public static CellStatus Status(CaseFile c, IEnumerable<EvidenceItem> items, string suspect, string slot)
@@ -40,7 +50,7 @@ public static class Board
         if (row == null) return CellStatus.Unknown;
         var cell = row.Cell(slot);
         var list = items as ICollection<EvidenceItem> ?? items.ToList();
-        if (list.Any(i => RulesOut(cell, i))) return CellStatus.RuledOut;
+        if (list.Any(i => RulesOut(cell, i, list))) return CellStatus.RuledOut;
         if (list.Any(i => Supports(cell, i))) return CellStatus.Supported;
         return CellStatus.Unknown;
     }
@@ -49,14 +59,15 @@ public static class Board
         exposed || items.Any(i => Supports(c.Board.Ai, i));
 
     /// <summary>Everything an item says on the board (for the chips on evidence cards).</summary>
-    public static List<BoardTag> Tags(CaseFile c, EvidenceItem item)
+    public static List<BoardTag> Tags(CaseFile c, EvidenceItem item, IEnumerable<EvidenceItem> known)
     {
         var tags = new List<BoardTag>();
+        var list = known as ICollection<EvidenceItem> ?? known.ToList();
         foreach (var row in c.Board.Rows)
             foreach (var slot in Slots)
             {
                 var cell = row.Cell(slot);
-                if (RulesOut(cell, item)) tags.Add(new BoardTag { Suspect = row.Suspect, Slot = slot, Against = true });
+                if (RulesOut(cell, item, list)) tags.Add(new BoardTag { Suspect = row.Suspect, Slot = slot, Against = true });
                 else if (Supports(cell, item)) tags.Add(new BoardTag { Suspect = row.Suspect, Slot = slot });
             }
         if (Supports(c.Board.Ai, item)) tags.Add(new BoardTag { Slot = "ai" });
@@ -69,7 +80,7 @@ public static class Board
         var row = Row(c, suspect);
         if (row == null) return false;
         var list = items.ToList();
-        return slots.Any(s => list.Any(i => Supports(row.Cell(s), i)) && !list.Any(i => RulesOut(row.Cell(s), i)));
+        return slots.Any(s => list.Any(i => Supports(row.Cell(s), i)) && !list.Any(i => RulesOut(row.Cell(s), i, list)));
     }
 
     /// <summary>(resolved, total): board entries the player has settled either way, plus the AI question.</summary>

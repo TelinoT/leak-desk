@@ -86,8 +86,8 @@ public class DeskDirector : MonoBehaviour
     {
         // At most one hint every 25 seconds, so tips never pile up.
         if (hintsShown.Contains(id) || Time.unscaledTime - lastHint < 25f) return;
+        if (!ui.Toast(text, T.secondary, "bulb", DeskUI.ToastPriority.Low)) return; // busy screen: try again later
         hintsShown.Add(id);
         lastHint = Time.unscaledTime;
-        ui.Toast(text, T.secondary, "bulb");
     }
 }

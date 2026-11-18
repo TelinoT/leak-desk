@@ -90,11 +90,12 @@ public class DeskUI : MonoBehaviour
         Tray = new EvidenceTray(this, body);
 
         toastRoot = UiKit.Rect("Toasts", root);
-        toastRoot.anchorMin = toastRoot.anchorMax = new Vector2(1, 1);
-        toastRoot.pivot = new Vector2(1, 1);
-        toastRoot.anchoredPosition = new Vector2(-24, -128);
+        // Bottom right, stacking upward: over the oldest evidence cards, never the newest one or a button.
+        toastRoot.anchorMin = toastRoot.anchorMax = new Vector2(1, 0);
+        toastRoot.pivot = new Vector2(1, 0);
+        toastRoot.anchoredPosition = new Vector2(-24, 40);
         toastRoot.sizeDelta = new Vector2(520, 0);
-        toastRoot.VLayout(8, 0, TextAnchor.UpperRight);
+        toastRoot.VLayout(8, 0, TextAnchor.LowerRight);
         toastRoot.FitHeight();
 
         overlayRoot = UiKit.Rect("Overlays", root).Stretch();
@@ -293,14 +294,14 @@ public class DeskUI : MonoBehaviour
         if (st == CellStatus.Unknown) return;
         if (suspectId == null)
         {
-            Toast("<b>New on the board:</b> someone had help from the inside.", T.accent, "brain");
+            Toast("<b>New on the board:</b> someone had help from the inside.", T.accent, "brain", ToastPriority.High);
         }
         else
         {
             var sd = Game.Case.Suspect(suspectId);
             var cell = Board.Row(Game.Case, suspectId).Cell(slot);
-            if (st == CellStatus.RuledOut) Toast($"<b>{sd.FirstName}'s {Board.Long(slot)} doesn't add up.</b>\n{cell.AgainstNote}", T.danger, "mark_x");
-            else Toast($"<b>New on the board:</b> {sd.FirstName} · {Board.Long(slot)}", T.accent, "mark_check");
+            if (st == CellStatus.RuledOut) Toast($"<b>{sd.FirstName}'s {Board.Long(slot)} doesn't add up.</b>\n{cell.AgainstNote}", T.danger, "mark_x", ToastPriority.High);
+            else Toast($"<b>New on the board:</b> {sd.FirstName} · {Board.Long(slot)}", T.accent, "mark_check", ToastPriority.High);
         }
         Sfx.Play("unlock", st == CellStatus.RuledOut ? 0.8f : 1.2f);
         if (pips.TryGetValue((suspectId ?? "ai") + ":" + slot, out var p)) UiFx.Punch(p.bg.transform, 0.3f, 0.45f);
@@ -412,18 +413,64 @@ public class DeskUI : MonoBehaviour
     /// <summary>Phone-style notification that slides in at the top right.</summary>
     public void ClearToasts()
     {
+        toastQueue.Clear();
         for (int i = toastRoot.childCount - 1; i >= 0; i--) UiKit.Remove(toastRoot.GetChild(i));
     }
 
-    public void Toast(string message, Color? color = null, string icon = "bell_1")
+    public enum ToastPriority { Low, Normal, High }
+
+    /// <summary>
+    /// Phone-style notification, bottom right. Low = Rosa's hints (dropped if the screen is busy), High = board changes
+    /// (they jump the queue and push out a hint, since they explain what the player just did).
+    /// </summary>
+    public bool Toast(string message, Color? color = null, string icon = "bell_1", ToastPriority priority = ToastPriority.Normal)
     {
-        if (Tutorial != null && Tutorial.Active) return; // Rosa is talking; no competing notifications
-        if (Accusation != null && Accusation.IsOpen) return;
-        if (Game != null && Game.Phase is GamePhase.Deliberating or GamePhase.Verdict) return;
+        if (Tutorial != null && Tutorial.Active) return false; // Rosa is talking; no competing notifications
+        if (Accusation != null && Accusation.IsOpen) return false;
+        if (Game != null && Game.Phase is GamePhase.Deliberating or GamePhase.Verdict) return false;
+        // At most 3 on screen. More wait their turn instead of pushing out one that's still being read.
+        if (priority == ToastPriority.High && toastRoot.childCount >= 3)
+        {
+            // Make room by retiring a hint, if one is showing.
+            for (int i = 0; i < toastRoot.childCount; i++)
+                if (toastRoot.GetChild(i).name == "Toast_Low") { UiKit.Remove(toastRoot.GetChild(i)); break; }
+        }
+        if (toastRoot.childCount >= 3 || toastQueue.Count > 0)
+        {
+            if (priority == ToastPriority.Low) return false; // a hint can wait for a quieter moment (it fires again later)
+            var item = (message, color, icon, priority);
+            if (priority == ToastPriority.High) toastQueue.Insert(toastQueue.FindLastIndex(q => q.priority == ToastPriority.High) + 1, item);
+            else toastQueue.Add(item);
+            if (!drainingToasts) StartCoroutine(DrainToasts());
+            return true;
+        }
+        ShowToast(message, color, icon, priority);
+        return true;
+    }
+
+    readonly List<(string msg, Color? color, string icon, ToastPriority priority)> toastQueue = new();
+
+    bool drainingToasts;
+
+    IEnumerator DrainToasts()
+    {
+        drainingToasts = true;
+        while (toastQueue.Count > 0)
+        {
+            while (toastRoot.childCount >= 3) yield return null;
+            if (toastQueue.Count == 0) break;
+            var (m, c, i, p) = toastQueue[0];
+            toastQueue.RemoveAt(0);
+            ShowToast(m, c, i, p);
+            yield return new WaitForSecondsRealtime(0.25f);
+        }
+        drainingToasts = false;
+    }
+
+    void ShowToast(string message, Color? color, string icon, ToastPriority priority)
+    {
         var c = color ?? T.accent;
-        // Never stack more than 3: the oldest one leaves early.
-        while (toastRoot.childCount >= 3) UiKit.Remove(toastRoot.GetChild(0));
-        var holder = UiKit.Rect("Toast", toastRoot);
+        var holder = UiKit.Rect("Toast_" + priority, toastRoot);
         holder.Size(prefW: 500);
         holder.VLayout(0);
         var card = UiKit.Panel(holder, new Color(0.11f, 0.08f, 0.24f, 0.97f), T.cardSprite, "Card");
@@ -436,32 +483,46 @@ public class DeskUI : MonoBehaviour
         t.Size(flexW: 1);
         var stripe = UiKit.Panel(card.transform, c, T.pillSprite, "Stripe").Pill(6);
         stripe.Size(prefW: 6, prefH: 40);
-        StartCoroutine(ToastLife(holder.gameObject, (RectTransform)card.transform));
+        // Long enough to actually read: ~15 characters a second, 4 to 12 seconds.
+        int chars = System.Text.RegularExpressions.Regex.Replace(message, "<[^>]+>", "").Length;
+        float readTime = Mathf.Clamp(2.5f + chars * 0.065f, 4f, 12f);
+        holder.transform.SetAsLastSibling();
+        StartCoroutine(ToastLife(holder.gameObject, (RectTransform)card.transform, readTime));
     }
 
-    IEnumerator ToastLife(GameObject go, RectTransform card)
+    // Fade + scale only: positions belong to the layout group (animating them fights the stack and misplaces toasts).
+    IEnumerator ToastLife(GameObject go, RectTransform card, float readTime)
     {
         var cg = go.AddComponent<CanvasGroup>();
         cg.blocksRaycasts = false;
-        yield return null; // let the layout place it
-        if (go == null) yield break;
-        Vector2 basePos = card.anchoredPosition;
-        for (float t = 0; t < 0.28f && go != null; t += Time.unscaledDeltaTime)
+        cg.alpha = 0;
+        card.pivot = new Vector2(1f, 0.5f);
+        for (float t = 0; t < 0.25f && go != null; t += Time.unscaledDeltaTime)
         {
-            float k = 1 - Mathf.Pow(1 - t / 0.28f, 3);
+            float k = 1 - Mathf.Pow(1 - t / 0.25f, 3);
             cg.alpha = k;
-            card.anchoredPosition = basePos + new Vector2(80f * (1 - k), 0);
+            card.localScale = Vector3.one * Mathf.Lerp(0.85f, 1f, k);
             yield return null;
         }
         if (go == null) yield break;
         cg.alpha = 1;
-        card.anchoredPosition = basePos;
-        yield return new WaitForSecondsRealtime(3.6f);
+        card.localScale = Vector3.one;
+        // Hovering pauses the countdown; dragging evidence fades it so drop targets stay visible.
+        for (float t = 0; t < readTime && go != null;)
+        {
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            bool hover = mouse != null && RectTransformUtility.RectangleContainsScreenPoint(card, mouse.position.ReadValue(), null);
+            if (!hover) t += Time.unscaledDeltaTime;
+            cg.alpha = Mathf.MoveTowards(cg.alpha, EvidenceDrag.Dragging ? 0.15f : 1f, Time.unscaledDeltaTime * 6f);
+            yield return null;
+        }
+        if (go == null) yield break;
+        float from = cg.alpha;
         for (float t = 0; t < 0.35f; t += Time.unscaledDeltaTime)
         {
             if (go == null) yield break;
-            cg.alpha = 1 - t / 0.35f;
-            card.anchoredPosition = basePos + new Vector2(60f * t / 0.35f, 0);
+            cg.alpha = from * (1 - t / 0.35f);
+            card.localScale = Vector3.one * Mathf.Lerp(1f, 0.92f, t / 0.35f);
             yield return null;
         }
         if (go != null) Destroy(go);

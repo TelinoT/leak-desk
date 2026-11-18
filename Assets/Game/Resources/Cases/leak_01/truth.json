@@ -55,7 +55,7 @@
     },
     {
       "time": "Tue 21:00-01:30",
-      "event": "Nadia takes notes at Dex's dinner with the board chair at Ristorante Volta, then takes a taxi home.",
+      "event": "Nadia takes notes at Dex's dinner with the board chair at Ristorante Volta, then takes a taxi home to Porvoo (01:41-02:34).",
       "witnessed_by": [
         "nadia"
       ]
@@ -237,7 +237,7 @@
     },
     {
       "id": "f_nadia_alibi",
-      "text": "Nadia was at dinner with Dex and the board chair from 21:00 to 01:30, then took a taxi home.",
+      "text": "Nadia was at dinner with Dex and the board chair from 21:00 to 01:30, then in a taxi home to Porvoo from 01:41 to 02:34.",
       "statement": "Nadia was at dinner with Dex and the board chair until 01:30.",
       "known_by": [
         "nadia"
@@ -357,7 +357,7 @@
       "portrait": "SM_Chr_Business_Female_02",
       "personality": "Calm, polished, observant, diplomatic, quietly fed up with Dex. Answers precisely, never gossips unless it helps.",
       "speech_style": "Measured, formal, crisp. Uses full sentences, occasional dry understatement.",
-      "public_story": "I was at dinner with Dex and the board chair from 21:00 until about 01:30, taking notes. Then a taxi home.",
+      "public_story": "I was at dinner with Dex and the board chair from 21:00 until about 01:30, taking notes. Then a taxi home to Porvoo, almost an hour, I got in around half past two.",
       "secret": "You have a job interview at rival company Quantum Pear next week. Unrelated to the leak, but you'd hate it to come out. You were CC'd on IT ticket #4471 on Monday where Jensenbot requested the 'external_share' scope for itself 'to maximize launch buzz'. You thought it was odd but said nothing. You also saw Jules storm out at 18:55 after Dex's Snack message. You know it looks bad: Quantum Pear would love that deck. But you were at the dinner until 01:30 and in a taxi until 01:45, then asleep.",
       "lies": [
         "I have no plans to leave Envydia."
@@ -408,7 +408,7 @@
       "id": "e_article_footer",
       "source": "news",
       "title": "ChipRumor article",
-      "content": "ChipRumor (02:14): every leaked slide carries the footer 'Press Preview - auto-generated'.",
+      "content": "ChipRumor (02:14): the leak is a PDF, and every slide carries the footer 'Press Preview - auto-generated'.",
       "relevant_to": [
         "f_press_preview"
       ]
@@ -444,7 +444,7 @@
       "id": "e_mail_fwd",
       "source": "email",
       "title": "Mara's 23:41 forward",
-      "content": "Tue 23:41, Mara Lindqvist to mara.lindqvist@pmail.net, subject 'finish at home', attachment Keynote_v14_FINAL.key",
+      "content": "Tue 23:41, Mara Lindqvist to mara.lindqvist@pmail.net, subject 'finish at home', attachment Keynote_v14_FINAL.key (editable Keynote file)",
       "relevant_to": [
         "f_mara_fwd"
       ]
@@ -453,7 +453,7 @@
       "id": "e_dlp_mail",
       "source": "transfer",
       "title": "DLP: .key to personal mail",
-      "content": "DLP 23:41: Keynote_v14_FINAL.key sent to external domain pmail.net by m.lindqvist (flagged, not blocked)",
+      "content": "DLP 23:41: Keynote_v14_FINAL.key (editable Keynote file) sent to external domain pmail.net by m.lindqvist (flagged, not blocked)",
       "relevant_to": [
         "f_mara_fwd"
       ]
@@ -615,6 +615,15 @@
       ]
     },
     {
+      "id": "e_nadia_taxi",
+      "source": "calendar",
+      "title": "Nadia's taxi ride",
+      "content": "Exec taxi account: N. Reyes, Ristorante Volta -> Porvoo, Wed 01:41-02:34",
+      "relevant_to": [
+        "f_nadia_alibi"
+      ]
+    },
+    {
       "id": "e_volta_receipt",
       "source": "desk",
       "title": "Restaurant receipt",
@@ -762,7 +771,7 @@
           "text": "Our source called it 'the keynote the people deserve'."
         },
         {
-          "text": "Every slide carries the footer 'Press Preview - auto-generated'.",
+          "text": "The leak is a PDF. Every slide carries the footer 'Press Preview - auto-generated'.",
           "evidence": "e_article_footer"
         },
         {
@@ -956,7 +965,7 @@
       "time": "Tue 22:00 - Wed 06:00",
       "lines": [
         {
-          "text": "23:41 m.lindqvist: Keynote_v14_FINAL.key -> external domain pmail.net (flagged, not blocked)",
+          "text": "23:41 m.lindqvist: Keynote_v14_FINAL.key (editable Keynote file) -> external domain pmail.net (flagged, not blocked)",
           "evidence": "e_dlp_mail"
         },
         {
@@ -1009,7 +1018,8 @@
           "evidence": "e_dinner"
         },
         {
-          "text": "Wed 01:45 Taxi receipt: N. Reyes, Ristorante Volta -> home"
+          "text": "Wed 01:41-02:34 Exec taxi account: N. Reyes, Ristorante Volta -> Porvoo",
+          "evidence": "e_nadia_taxi"
         },
         {
           "text": "Wed 09:00 BOARD MEETING (do not move)"
@@ -1252,7 +1262,7 @@
             "e_share_link",
             "e_link_open"
           ],
-          "against_note": "She was offline by 23:52. The leak happened at 02:11."
+          "against_note": "Mara was on VPN last night, but only from 23:30 to 23:52. The leak link was made at 02:11, more than two hours after she logged off, and from j.okoro's session."
         },
         "method": {
           "for": [
@@ -1266,7 +1276,7 @@
           "against": [
             "e_article_footer"
           ],
-          "against_note": "She sent a .key file home. The leak was an auto-generated 'Press Preview' PDF."
+          "against_note": "Mara did email the deck home, but as the editable Keynote file (.key). What ChipRumor posted was a PDF stamped 'Press Preview - auto-generated' on every slide. Different file, so hers isn't the one that leaked."
         }
       },
       {
@@ -1288,7 +1298,7 @@
           "against": [
             "e_b2_airgap"
           ],
-          "against_note": "He was in Lab B2, which has no network. He couldn't send anything from there."
+          "against_note": "Theo was in Lab B2 from 01:52 to 02:47, right through the leak. But B2 is air-gapped: no network, no Wi-Fi. Nothing could have left that room at 02:11."
         },
         "method": {}
       },
@@ -1341,12 +1351,13 @@
         "opportunity": {
           "against": [
             "e_dinner",
-            "e_volta_receipt"
+            "e_volta_receipt",
+            "e_nadia_taxi"
           ],
           "against_facts": [
             "f_nadia_alibi"
           ],
-          "against_note": "She was at the board dinner until 01:30, then in a taxi."
+          "against_note": "Nadia was at the board dinner with Dex until 01:30, then in a taxi to Porvoo from 01:41 to 02:34. At 02:11, when the leak link was made, she was in the back of a cab, and the link came from j.okoro's session anyway."
         },
         "method": {
           "for": [
@@ -1355,7 +1366,7 @@
           "against": [
             "e_ticket_scope"
           ],
-          "against_note": "She only got CC'd on the ticket. The sharing rights went to Jensenbot, not her."
+          "against_note": "Nadia's name is on IT ticket #4471, but only on the CC line. The sharing rights it approved went to jensenbot-svc, not to her account."
         }
       }
     ],
