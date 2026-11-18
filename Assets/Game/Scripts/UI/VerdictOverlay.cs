@@ -96,6 +96,8 @@ public class VerdictOverlay
         UiKit.Clear(body);
         var game = ui.Game;
         var c = game.Case;
+        boardClip = null;
+        Voice.Speak(c.BoardVoice, v.BoardComment, clip => boardClip = clip, 1.0f);
 
         Color stampColor = v.Result switch { "convicted" => T.accent, "insufficient" => T.warning, _ => T.danger };
         string stamp = v.Result switch { "convicted" => "CASE CLOSED", "insufficient" => "NOT ENOUGH PROOF", _ => "WRONG PERSON" };
@@ -174,6 +176,7 @@ public class VerdictOverlay
         right.VLayout(16);
         right.Size(flexW: 1);
         var quote = UiKit.Card(right, T.card, 22, 8, "BoardComment");
+        quoteCard = (RectTransform)quote.transform;
         UiKit.Text(quote.transform, "THE BOARD CHAIR", T.smallSize, new Color(T.cardText.r, T.cardText.g, T.cardText.b, 0.6f), style: FontStyles.Bold);
         UiKit.Text(quote.transform, $"\"{v.BoardComment}\"", T.bodySize + 2, T.cardText, style: FontStyles.Italic);
 
@@ -269,7 +272,19 @@ public class VerdictOverlay
         UiFx.Shake((RectTransform)body, 10f, 0.3f);
         Sfx.Play(v.Result == "convicted" ? "win" : "lose");
         if (v.Result == "convicted") ui.StartCoroutine(Confetti());
+
+        // The board chair reads out their verdict once the stamp has landed.
+        for (float t = 0; t < 4f && boardClip == null; t += Time.unscaledDeltaTime) yield return null;
+        yield return new WaitForSecondsRealtime(0.6f);
+        if (boardClip != null && quoteCard != null)
+        {
+            Voice.Play(boardClip);
+            UiFx.Punch(quoteCard, 0.04f, 0.3f);
+        }
     }
+
+    AudioClip boardClip;
+    RectTransform quoteCard;
 
     Color GradeColor(string grade) => grade switch
     {

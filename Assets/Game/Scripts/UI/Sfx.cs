@@ -67,6 +67,18 @@ public class Sfx : MonoBehaviour
 
     // ---------- public API ----------
 
+    float duck = 1f;
+    bool ducked;
+
+    /// <summary>Music bed dips while a voice line plays.</summary>
+    public static void Duck(bool on) { if (instance != null) instance.ducked = on; }
+
+    void Update()
+    {
+        duck = Mathf.MoveTowards(duck, ducked ? 0.35f : 1f, Time.unscaledDeltaTime * (ducked ? 4f : 1.2f));
+        ambience.volume = 0.11f * Volume * duck;
+    }
+
     public static void Play(string name, float pitch = 1f, float volume = 1f)
     {
         var s = Instance;

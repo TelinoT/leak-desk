@@ -115,6 +115,7 @@ public class JensenbotPanel
     {
         root.SetActive(v);
         if (v) chat.ScrollToBottom();
+        else Voice.Stop();
     }
 
     public void RequestSummary(CaseDocument doc)
@@ -152,14 +153,14 @@ public class JensenbotPanel
         askButton.interactable = confrontButton.interactable = false;
         chat.ShowTyping(Bot.Name);
         face.SetMood(JensenbotFace.Mood.Thinking);
-        Bot.Confront(item, (reply, exposed) =>
+        Bot.Confront(item, (reply, exposed) => Voice.Speak(BotVoice, Clean(reply), clip =>
         {
             chat.HideTyping();
             if (exposed) ui.StartCoroutine(Exposed());
             var bubble = chat.AddBubble(Bot.Name, Clean(reply), ChatView.Side.Left,
                 exposed || Bot.Exposed ? new Color(1f, 0.86f, 0.86f) : new Color(0.88f, 1f, 0.82f));
             var texts = bubble.GetComponentsInChildren<TextMeshProUGUI>();
-            UiFx.Typewrite(texts[^1], 70f, exposed ? 1.5f : 1.9f);
+            Voice.TypeAlong(texts[^1], clip, 70f, exposed ? 1.5f : 1.9f);
             askButton.interactable = confrontButton.interactable = true;
             if (!exposed) face.SetMood(JensenbotFace.Mood.Talking);
             if (exposed)
@@ -168,7 +169,7 @@ public class JensenbotPanel
                 var ev = ui.Game.Evidence.AddCaseEvidence(jb.ConfessionEvidence);
                 if (ev != null) ui.Toast($"New evidence: {ev.Title}", T.danger);
             }
-        });
+        }));
     }
 
     System.Collections.IEnumerator Exposed()
@@ -217,17 +218,29 @@ public class JensenbotPanel
         chat.ShowTyping(Bot.Name);
         face.SetMood(JensenbotFace.Mood.Thinking);
         Sfx.Play("click", 1.4f);
-        call(reply =>
+        call(reply => Voice.Speak(BotVoice, SpokenPart(Clean(reply)), clip =>
         {
             chat.HideTyping();
             var bubble = chat.AddBubble(Bot.Name, Clean(reply), ChatView.Side.Left, new Color(0.88f, 1f, 0.82f));
             var texts = bubble.GetComponentsInChildren<TextMeshProUGUI>();
-            UiFx.Typewrite(texts[^1], 90f, 1.9f);
+            if (clip != null) { Voice.Play(clip); UiFx.Typewrite(texts[^1], 90f); }
+            else UiFx.Typewrite(texts[^1], 90f, 1.9f);
             askButton.interactable = true;
             face.SetMood(JensenbotFace.Mood.Talking);
             // A barely-there tell: the face glitches when its feed was doctored.
             if (Bot.LastWasTampered) ui.StartCoroutine(GlitchLater());
-        });
+        }));
+    }
+
+    string BotVoice => ui.Game.Case.Jensenbot?.Voice;
+
+    /// <summary>Summaries are bullet lists; Jensenbot only reads out its own take (the non-bullet lines).</summary>
+    static string SpokenPart(string reply)
+    {
+        var lines = reply.Split('\n');
+        var said = System.Linq.Enumerable.Where(lines, l => l.Trim().Length > 0 && !l.TrimStart().StartsWith("-") && !l.TrimStart().StartsWith("•"));
+        string text = string.Join(" ", said);
+        return text.Length > 0 ? text : reply;
     }
 
     System.Collections.IEnumerator GlitchLater()

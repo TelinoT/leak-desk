@@ -31,6 +31,9 @@ public class CaseFile
     [JsonProperty("waves")] public List<CaseWave> Waves = new();
     [JsonProperty("desks")] public List<CaseDesk> Desks = new();
     [JsonProperty("board")] public CaseBoard Board = new();
+    /// <summary>Fish Audio voice ids for the board chair (verdict) and Rosa (tutorial).</summary>
+    [JsonProperty("board_voice")] public string BoardVoice;
+    [JsonProperty("guide_voice")] public string GuideVoice;
     [JsonProperty("desk_search_seconds")] public float DeskSearchSeconds = 30f;
 
     public SuspectData Suspect(string id) => Suspects.FirstOrDefault(s => s.Id == id);
@@ -147,6 +150,9 @@ public class SuspectData
     [JsonProperty("on_break")] public string OnBreak;
     [JsonProperty("opening_line")] public string OpeningLine;
     [JsonProperty("voice_pitch")] public float VoicePitch = 1f;
+    /// <summary>Fish Audio voice id (spoken replies); empty = babble only.</summary>
+    [JsonProperty("voice")] public string Voice;
+    [JsonProperty("voice_speed")] public float VoiceSpeed = 1.08f;
     [JsonProperty("pronouns")] public string Pronouns = "they/them";
 
     public string FirstName => string.IsNullOrEmpty(Name) ? Id : Name.Split(' ')[0];
@@ -158,6 +164,7 @@ public class JensenbotData
 {
     [JsonProperty("name")] public string Name = "Jensenbot";
     [JsonProperty("is_accomplice")] public bool IsAccomplice;
+    [JsonProperty("voice")] public string Voice;
     [JsonProperty("persona")] public string Persona;
     [JsonProperty("agenda")] public string Agenda;
     [JsonProperty("honest_agenda")] public string HonestAgenda;

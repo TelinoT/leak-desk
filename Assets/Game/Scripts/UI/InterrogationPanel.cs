@@ -222,6 +222,7 @@ public class InterrogationPanel
     public void SetVisible(bool v)
     {
         root.SetActive(v);
+        if (!v && !voicing) Voice.Stop();
         if (v && current != null)
         {
             Rebuild();
@@ -291,6 +292,7 @@ public class InterrogationPanel
             ui.Toast($"{agent.Data.FirstName} isn't in yet.", T.warning);
             return;
         }
+        if (current != agent) Voice.Stop();
         current = agent;
         agent.Meet();
         foreach (var kv in cards)
@@ -320,7 +322,7 @@ public class InterrogationPanel
         UpdateButtons();
     }
 
-    void AddEntry(ChatEntry e, bool animate)
+    void AddEntry(ChatEntry e, bool animate, AudioClip voice = null)
     {
         switch (e.Type)
         {
@@ -334,8 +336,8 @@ public class InterrogationPanel
                 if (animate)
                 {
                     var texts = bubble.GetComponentsInChildren<TextMeshProUGUI>();
-                    UiFx.Typewrite(texts[^1], 60f, current.Data.VoicePitch);
-                    SuspectPortraits.Instance?.Talk(e.Text.Length / 60f);
+                    Voice.TypeAlong(texts[^1], voice, 60f, current.Data.VoicePitch);
+                    SuspectPortraits.Instance?.Talk(voice != null ? voice.length : e.Text.Length / 60f);
                 }
                 break;
             case ChatEntry.Kind.Evidence:
@@ -354,7 +356,7 @@ public class InterrogationPanel
     void Ask()
     {
         string q = input.text.Trim();
-        if (q.Length == 0 || current == null || current.Busy || !CanAct) return;
+        if (q.Length == 0 || current == null || current.Busy || voicing || !CanAct) return;
         input.text = "";
         Sfx.Play("click");
         var agent = current;
@@ -367,7 +369,7 @@ public class InterrogationPanel
 
     void Present(EvidenceItem item, bool slammed)
     {
-        if (current == null || current.Busy || !CanAct) return;
+        if (current == null || current.Busy || voicing || !CanAct) return;
         ui.ShowTab(DeskUI.Tab.Interrogate);
         if (!slammed)
         {
@@ -392,11 +394,28 @@ public class InterrogationPanel
         input.ActivateInputField();
     }
 
+    // True while a reply's voice line is loading (the typing dots stay up: it reads as the suspect thinking).
+    bool voicing;
+
     void OnReply(SuspectAgent agent, bool wasBroken)
     {
         if (agent != current) return; // the reply is in its Log; shown when the player switches back
+        var entry = agent.Log[^1];
+        if (entry.Type != ChatEntry.Kind.Suspect) { ShowReply(agent, wasBroken, null); return; }
+        voicing = true;
+        UpdateButtons();
+        Voice.Speak(agent.Data.Voice, entry.Text, clip =>
+        {
+            voicing = false;
+            if (agent != current) { UpdateButtons(); return; }
+            ShowReply(agent, wasBroken, clip);
+        }, agent.Data.VoiceSpeed);
+    }
+
+    void ShowReply(SuspectAgent agent, bool wasBroken, AudioClip clip)
+    {
         chat.HideTyping();
-        AddEntry(agent.Log[^1], animate: true);
+        AddEntry(agent.Log[^1], animate: true, clip);
         UpdateButtons();
         if (!wasBroken && agent.Broken) ui.StartCoroutine(Cracked());
         if (root.activeInHierarchy) input.ActivateInputField();
@@ -509,7 +528,7 @@ public class InterrogationPanel
 
     void UpdateButtons()
     {
-        bool can = current != null && !current.Busy && CanAct;
+        bool can = current != null && !current.Busy && !voicing && CanAct;
         askButton.interactable = can;
         foreach (var c in quickChips) c.interactable = can;
         presentButton.interactable = can && Game.Evidence.Count > 0;
